@@ -3,489 +3,319 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JeffreyEpsteins.org | Investigative Atlas</title>
+    <title>JeffreyEpsteins.org | Investigative Research OS</title>
     <meta
       name="description"
-      content="JeffreyEpsteins.org is a structured, visual archive of the Epstein case timeline, legal record, and public-interest context."
+      content="An interactive research operating system for navigating the Jeffrey Epstein case timeline, sources, entities, and working notes."
     />
-    <meta property="og:title" content="JeffreyEpsteins.org | Investigative Atlas" />
+    <meta property="og:title" content="JeffreyEpsteins.org | Investigative Research OS" />
     <meta
       property="og:description"
-      content="A design-forward archive focused on chronology, records, and institutional context."
+      content="Filter timeline events, run question queries, inspect source confidence, and generate a structured brief."
     />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <div class="mesh-layer" aria-hidden="true"></div>
-    <div class="noise-layer" aria-hidden="true"></div>
-    <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+  <body data-theme="light">
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-    <div class="progress-track" aria-hidden="true">
-      <div class="progress-bar" id="progress-bar"></div>
+    <div class="progress-shell" aria-hidden="true">
+      <div class="progress-fill" id="scroll-progress"></div>
     </div>
 
     <header class="site-header" id="top">
-      <div class="brand-group">
-        <a class="logo" href="#top">JeffreyEpsteins.org</a>
-        <p class="logo-sub">Investigative Atlas</p>
-      </div>
-
-      <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">Menu</button>
+      <a class="logo" href="#overview">
+        <span class="logo-line">JeffreyEpsteins.org</span>
+        <span class="logo-sub">Investigative Research OS</span>
+      </a>
 
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
-        <a href="#matrix">Case Map</a>
+        <a href="#workbench">Workbench</a>
         <a href="#timeline">Timeline</a>
-        <a href="#workspace">Workspace</a>
+        <a href="#network">Network</a>
         <a href="#sources">Sources</a>
-        <a href="#method">Method</a>
-        <a href="#faq">FAQ</a>
+        <a href="#brief">Brief Builder</a>
       </nav>
 
-      <a class="header-cta" href="#workspace">Open Workspace</a>
+      <div class="header-actions">
+        <button class="header-btn" id="theme-toggle" type="button">Theme</button>
+        <button class="header-btn accent" id="command-open" type="button">Command</button>
+      </div>
     </header>
 
     <main>
-      <section class="hero reveal" id="overview">
+      <section class="panel hero reveal" id="overview">
         <div class="hero-copy">
-          <p class="eyebrow">Public Record Interface</p>
-          <h1>
-            Jeffrey Epstein:
-            <span>a high-clarity archive of timeline, litigation, and institutional response</span>
-          </h1>
+          <p class="eyebrow">Public Record Intelligence Interface</p>
+          <h1>From static reading to active investigation.</h1>
           <p class="lead">
-            This project is designed as an evidence-first reading experience. It focuses on published
-            records, legal milestones, and the long tail of accountability across courts, media, and
-            civil proceedings.
+            This website is built as a practical research surface: query case milestones, filter
+            evidence tracks, inspect source confidence, map entity relationships, and generate a
+            working brief from selected events.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#timeline">Enter Timeline</a>
-            <a class="button ghost" href="#method">Read Methodology</a>
+            <a class="hero-link primary" href="#workbench">Open Workbench</a>
+            <a class="hero-link ghost" href="#timeline">Enter Timeline</a>
           </div>
-          <ul class="hero-notes" aria-label="Editorial notes">
-            <li>Fact-anchored language over speculation.</li>
-            <li>Chronology, then documents, then analysis.</li>
-            <li>Built for continuous updates as new records emerge.</li>
-          </ul>
         </div>
 
-        <aside class="hero-panel">
-          <h2>Editorial Note</h2>
-          <p>
-            The goal is not sensationalism. The goal is structure. This interface helps readers move
-            through a complicated public-interest case in a way that is easy to verify and hard to
-            distort.
-          </p>
+        <div class="hero-metrics" aria-label="Interface metrics">
+          <article class="metric">
+            <p class="metric-value" id="metric-events">0</p>
+            <p class="metric-label">Mapped events</p>
+          </article>
+          <article class="metric">
+            <p class="metric-value" id="metric-sources">0</p>
+            <p class="metric-label">Tracked sources</p>
+          </article>
+          <article class="metric">
+            <p class="metric-value" id="metric-entities">0</p>
+            <p class="metric-label">Linked entities</p>
+          </article>
+        </div>
+      </section>
 
-          <div class="stat-rack" aria-label="Archive statistics">
-            <article class="stat-card">
-              <p class="stat-value" data-count="20">0</p>
-              <p class="stat-label">Years covered</p>
-            </article>
-            <article class="stat-card">
-              <p class="stat-value" data-count="6">0</p>
-              <p class="stat-label">Core case phases</p>
-            </article>
-            <article class="stat-card">
-              <p class="stat-value" data-count="4">0</p>
-              <p class="stat-label">Primary source tracks</p>
-            </article>
+      <section class="panel reveal" id="workbench">
+        <div class="section-head">
+          <p class="eyebrow">Workbench</p>
+          <h2>Ask questions and control your research session</h2>
+        </div>
+
+        <div class="workbench-grid">
+          <article class="tool-card">
+            <h3>Question Engine</h3>
+            <p>
+              Type a specific question. The engine ranks relevant events and sources from this archive.
+            </p>
+
+            <form id="question-form" class="stack" autocomplete="off">
+              <label class="field">
+                <span>Research question</span>
+                <input
+                  id="question-input"
+                  type="text"
+                  placeholder="Example: Which events led to the 2019 federal case?"
+                />
+              </label>
+              <div class="inline-actions">
+                <button class="tool-btn" type="submit">Run query</button>
+                <button class="tool-btn ghost" type="button" id="question-clear">Clear</button>
+              </div>
+            </form>
+
+            <div class="question-results" id="question-results">
+              Run a question to receive ranked matches.
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <h3>Session Controls</h3>
+            <p>Manage pinned data, local notebook state, and offline handoff files.</p>
+            <div class="stack">
+              <button class="tool-btn" id="export-session" type="button">Export session JSON</button>
+              <button class="tool-btn ghost" id="clear-session" type="button">Reset local session</button>
+            </div>
+            <p class="status" id="session-status">Session ready.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal" id="timeline">
+        <div class="section-head">
+          <p class="eyebrow">Timeline Explorer</p>
+          <h2>Filter chronology with analyst controls</h2>
+        </div>
+
+        <div class="timeline-controls">
+          <div class="phase-filters" id="phase-filters" role="tablist" aria-label="Timeline phase filters">
+            <button class="phase-btn active" type="button" data-phase="all">All</button>
+            <button class="phase-btn" type="button" data-phase="investigation">Investigation</button>
+            <button class="phase-btn" type="button" data-phase="legal">Legal</button>
+            <button class="phase-btn" type="button" data-phase="custody">Custody</button>
+            <button class="phase-btn" type="button" data-phase="aftermath">Aftermath</button>
+            <button class="phase-btn" type="button" data-phase="media">Media pressure</button>
           </div>
-        </aside>
-      </section>
 
-      <section class="case-map reveal" id="matrix">
-        <div class="section-head">
-          <p class="eyebrow">Case Map</p>
-          <h2>Four tracks to understand the full picture</h2>
+          <label class="field small">
+            <span>Start year</span>
+            <select id="year-start"></select>
+          </label>
+
+          <label class="field small">
+            <span>End year</span>
+            <select id="year-end"></select>
+          </label>
+
+          <label class="field grow">
+            <span>Keyword</span>
+            <input id="timeline-search" type="search" placeholder="Search events, entities, and notes" />
+          </label>
+
+          <label class="field small">
+            <span>Sort</span>
+            <select id="timeline-sort">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="relevance">Relevance</option>
+            </select>
+          </label>
+
+          <button class="tool-btn ghost" id="timeline-clear" type="button">Reset</button>
         </div>
 
-        <div class="map-grid">
-          <article class="map-card">
-            <p class="chip">Track 01</p>
-            <h3>Investigations</h3>
-            <p>
-              From local law-enforcement inquiries to federal prosecution, this track follows how the
-              case moved through institutions.
-            </p>
-            <a class="map-link" href="#tl-2005">Jump to early investigation</a>
-          </article>
+        <p class="status" id="timeline-status">Showing 0 events.</p>
 
-          <article class="map-card">
-            <p class="chip">Track 02</p>
-            <h3>Legal Pathway</h3>
-            <p>
-              Plea agreements, indictments, courtroom motions, and civil actions are mapped in one
-              sequence for easier comparison.
-            </p>
-            <a class="map-link" href="#tl-2008">Jump to legal milestones</a>
-          </article>
+        <div class="timeline-layout">
+          <div class="timeline-results" id="timeline-results"></div>
 
-          <article class="map-card">
-            <p class="chip">Track 03</p>
-            <h3>Custody and Death</h3>
-            <p>
-              Documents and official findings around detention and death are grouped as a distinct,
-              high-interest evidence layer.
-            </p>
-            <a class="map-link" href="#tl-2019-custody">Jump to custody record</a>
-          </article>
-
-          <article class="map-card">
-            <p class="chip">Track 04</p>
-            <h3>Aftermath</h3>
-            <p>
-              Civil settlements, document unsealing, and related prosecutions shape the ongoing public
-              and legal consequences.
-            </p>
-            <a class="map-link" href="#tl-aftermath">Jump to aftermath</a>
-          </article>
-        </div>
-      </section>
-
-      <section class="timeline reveal" id="timeline">
-        <div class="section-head">
-          <p class="eyebrow">Chronology</p>
-          <h2>Key milestones, arranged for fast reading</h2>
-        </div>
-        <p class="section-sub">Use the workspace tools below to filter, pin, and summarize events.</p>
-
-        <div class="timeline-list" id="timeline-list">
-          <article
-            class="timeline-item"
-            id="tl-2005"
-            data-phase="investigation"
-            data-period="2005-2010"
-            data-keywords="palm beach florida police reports early investigation"
-          >
-            <p class="timeline-date">2005</p>
-            <div class="timeline-content">
-              <h3>Palm Beach investigation begins</h3>
-              <p>
-                Local authorities receive reports involving underage girls, launching the early formal
-                case pathway.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2005">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="timeline-item"
-            id="tl-2008"
-            data-phase="legal"
-            data-period="2005-2010"
-            data-keywords="2008 plea deal florida state charges agreement criticism"
-          >
-            <p class="timeline-date">2008</p>
-            <div class="timeline-content">
-              <h3>Controversial plea deal in Florida</h3>
-              <p>
-                Epstein pleads guilty to state-level charges in an agreement that later faces sustained
-                legal and public criticism.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2008">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="timeline-item"
-            id="tl-2015"
-            data-phase="investigation"
-            data-period="2011-2018"
-            data-keywords="2015 2018 investigative reporting civil litigation scrutiny"
-          >
-            <p class="timeline-date">2015-2018</p>
-            <div class="timeline-content">
-              <h3>New investigative pressure</h3>
-              <p>
-                Continued reporting and civil litigation reframe public understanding of prior handling
-                and institutional decisions.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2015">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="timeline-item"
-            id="tl-2019-federal"
-            data-phase="legal"
-            data-period="2019"
-            data-keywords="july 2019 federal arrest sdny sex trafficking charges"
-          >
-            <p class="timeline-date">July 2019</p>
-            <div class="timeline-content">
-              <h3>Federal arrest in New York</h3>
-              <p>
-                Prosecutors file federal sex trafficking charges connected to conduct involving minors.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2019-federal">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="timeline-item"
-            id="tl-2019-custody"
-            data-phase="custody"
-            data-period="2019"
-            data-keywords="august 2019 custody death medical examiner suicide ruling"
-          >
-            <p class="timeline-date">August 2019</p>
-            <div class="timeline-content">
-              <h3>Death in federal custody</h3>
-              <p>
-                Epstein dies in detention; the New York City medical examiner rules the death a suicide.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2019-custody">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="timeline-item"
-            id="tl-aftermath"
-            data-phase="aftermath"
-            data-period="2020-present"
-            data-keywords="2021 present ghislaine maxwell conviction civil filings unsealed records"
-          >
-            <p class="timeline-date">2021-present</p>
-            <div class="timeline-content">
-              <h3>Related prosecution and document waves</h3>
-              <p>
-                Ghislaine Maxwell is convicted in federal court in 2021, while civil filings and unsealed
-                records continue to shape public accountability.
-              </p>
-              <div class="timeline-actions">
-                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-aftermath">
-                  Pin event
-                </button>
-                <a class="timeline-action link" href="#sources">Related sources</a>
-              </div>
-            </div>
-          </article>
-        </div>
-        <p class="timeline-empty" id="timeline-empty" hidden>No timeline events match your filters.</p>
-      </section>
-
-      <section class="workspace reveal" id="workspace">
-        <div class="section-head">
-          <p class="eyebrow">Research Workspace</p>
-          <h2>Make the archive useful: filter, pin, and export</h2>
-        </div>
-
-        <div class="workspace-grid">
-          <article class="tool-panel">
-            <h3>Filter and search timeline</h3>
-            <p>Narrow events by track, period, and keyword.</p>
-            <div class="tool-fields">
-              <label class="tool-field">
-                <span>Track</span>
-                <select id="filter-track">
-                  <option value="all">All tracks</option>
-                  <option value="investigation">Investigations</option>
-                  <option value="legal">Legal pathway</option>
-                  <option value="custody">Custody and death</option>
-                  <option value="aftermath">Aftermath</option>
-                </select>
-              </label>
-
-              <label class="tool-field">
-                <span>Period</span>
-                <select id="filter-period">
-                  <option value="all">All periods</option>
-                  <option value="2005-2010">2005-2010</option>
-                  <option value="2011-2018">2011-2018</option>
-                  <option value="2019">2019</option>
-                  <option value="2020-present">2020-present</option>
-                </select>
-              </label>
-
-              <label class="tool-field">
-                <span>Keyword</span>
-                <input id="timeline-search" type="search" placeholder="Search timeline text..." />
-              </label>
-            </div>
-            <div class="tool-actions">
-              <button class="tool-btn" id="timeline-reset" type="button">Reset filters</button>
-            </div>
-            <p class="tool-status" id="filter-status">Showing 6 of 6 timeline events.</p>
-          </article>
-
-          <article class="tool-panel">
-            <h3>Pinned events</h3>
-            <p><span id="pinned-count">0</span> events pinned for quick reference.</p>
-            <ul class="pinned-list" id="pinned-list">
+          <aside class="pinned-panel" aria-label="Pinned events">
+            <h3>Pinned Events</h3>
+            <p class="status" id="pin-summary">0 events pinned.</p>
+            <ul class="pinned-list" id="pinned-events">
               <li class="placeholder">No pinned events yet.</li>
             </ul>
-            <div class="tool-actions">
-              <button class="tool-btn" id="export-pins" type="button">Export pinned list</button>
+            <div class="inline-actions">
+              <button class="tool-btn" id="pins-export" type="button">Export pins</button>
+              <button class="tool-btn ghost" id="pins-clear" type="button">Clear pins</button>
             </div>
-            <p class="tool-status" id="pinned-status">Pin timeline events to build a working set.</p>
-          </article>
+          </aside>
+        </div>
+      </section>
 
-          <article class="tool-panel tool-panel-wide">
-            <h3>Research notebook</h3>
-            <p>Write notes here. They save locally in your browser automatically.</p>
-            <textarea
-              id="research-notes"
-              class="notes-area"
-              placeholder="Add findings, open questions, citation reminders, and follow-up tasks..."
-            ></textarea>
-            <div class="tool-actions">
-              <button class="tool-btn" id="copy-notes" type="button">Copy notes</button>
-              <button class="tool-btn" id="download-notes" type="button">Download notes</button>
-              <button class="tool-btn danger" id="clear-notes" type="button">Clear notes</button>
-            </div>
-            <p class="tool-status" id="notes-status">No notes saved yet.</p>
-          </article>
+      <section class="panel reveal" id="network">
+        <div class="section-head">
+          <p class="eyebrow">Entity Network</p>
+          <h2>Visualize relationships and jump back into timeline context</h2>
+        </div>
 
-          <article class="tool-panel tool-panel-wide">
-            <h3>Quick digest</h3>
-            <p>Generate a shareable summary using your current filters and pinned events.</p>
-            <div class="tool-actions">
-              <button class="tool-btn" id="generate-digest" type="button">Generate digest</button>
-              <button class="tool-btn" id="copy-digest" type="button">Copy digest</button>
-            </div>
-            <pre class="digest-output" id="digest-output">Generate a digest to get a shareable summary.</pre>
-            <p class="tool-status" id="digest-status">Digest is generated locally in your browser.</p>
+        <div class="network-layout">
+          <div class="network-canvas-wrap">
+            <canvas id="network-canvas" aria-label="Entity relationship graph"></canvas>
+          </div>
+
+          <article class="entity-panel" id="entity-panel">
+            <h3>Entity Inspector</h3>
+            <p class="status">Select a node in the graph to inspect connections.</p>
+            <button class="tool-btn ghost" id="network-reset" type="button">Reset graph focus</button>
           </article>
         </div>
       </section>
 
-      <section class="sources reveal" id="sources">
+      <section class="panel reveal" id="sources">
         <div class="section-head">
-          <p class="eyebrow">Source Stacks</p>
-          <h2>Start from primary references</h2>
+          <p class="eyebrow">Source Intelligence</p>
+          <h2>Track coverage confidence and reading progress</h2>
         </div>
 
-        <div class="source-grid">
-          <article class="source-card">
-            <h3>Government and court channels</h3>
-            <p>Use official publications for filings, statements, and legal status updates.</p>
-            <ul>
-              <li><a href="https://www.justice.gov/" target="_blank" rel="noreferrer">U.S. Department of Justice</a></li>
-              <li><a href="https://www.justice.gov/usao-sdny" target="_blank" rel="noreferrer">U.S. Attorney's Office SDNY</a></li>
-              <li><a href="https://pacer.uscourts.gov/" target="_blank" rel="noreferrer">PACER</a></li>
-            </ul>
-          </article>
+        <div class="source-controls">
+          <label class="field small">
+            <span>Type</span>
+            <select id="source-type-filter">
+              <option value="all">All types</option>
+              <option value="official">Official</option>
+              <option value="court">Court</option>
+              <option value="media">Media</option>
+              <option value="analysis">Analysis</option>
+            </select>
+          </label>
 
-          <article class="source-card">
-            <h3>Open legal repositories</h3>
-            <p>Track published dockets, orders, and case metadata in searchable interfaces.</p>
-            <ul>
-              <li><a href="https://www.courtlistener.com/" target="_blank" rel="noreferrer">CourtListener</a></li>
-              <li><a href="https://www.justia.com/" target="_blank" rel="noreferrer">Justia</a></li>
-              <li><a href="https://scholar.google.com/" target="_blank" rel="noreferrer">Google Scholar (legal docs)</a></li>
-            </ul>
-          </article>
+          <label class="field grow">
+            <span>Search source</span>
+            <input id="source-search" type="search" placeholder="Search by title or publisher" />
+          </label>
 
-          <article class="source-card">
-            <h3>Investigative reporting archives</h3>
-            <p>Compare long-form reporting across outlets and publication dates.</p>
-            <ul>
-              <li><a href="https://www.nytimes.com/" target="_blank" rel="noreferrer">The New York Times</a></li>
-              <li><a href="https://www.miamiherald.com/" target="_blank" rel="noreferrer">Miami Herald</a></li>
-              <li><a href="https://www.wsj.com/" target="_blank" rel="noreferrer">The Wall Street Journal</a></li>
-            </ul>
-          </article>
+          <button class="tool-btn ghost" id="source-reset" type="button">Reset</button>
+        </div>
 
-          <article class="source-card">
-            <h3>How to use this layer</h3>
-            <p>
-              Prioritize official filings, then verify media reports against document dates and court
-              records before drawing conclusions.
-            </p>
-            <a class="source-cta" href="#method">View methodology</a>
-          </article>
+        <p class="status" id="source-summary">0 sources shown.</p>
+
+        <div class="table-wrap">
+          <table class="source-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Source</th>
+                <th>Type</th>
+                <th>Read</th>
+                <th>Verified</th>
+                <th>Open</th>
+              </tr>
+            </thead>
+            <tbody id="source-table-body"></tbody>
+          </table>
         </div>
       </section>
 
-      <section class="method reveal" id="method">
+      <section class="panel reveal" id="brief">
         <div class="section-head">
-          <p class="eyebrow">Methodology</p>
-          <h2>Design principles behind this archive</h2>
+          <p class="eyebrow">Brief Builder</p>
+          <h2>Generate a structured case memo from your selected events</h2>
         </div>
 
-        <div class="method-layout">
-          <article class="method-card">
-            <h3>Verification first</h3>
-            <ul>
-              <li>Separate confirmed records from unresolved claims.</li>
-              <li>Anchor timeline entries to date-stamped source categories.</li>
-              <li>Update language when court status changes.</li>
+        <div class="brief-layout">
+          <article class="tool-card">
+            <h3>Selected Events</h3>
+            <p class="status" id="brief-count">0 events selected.</p>
+            <ul class="brief-list" id="brief-events">
+              <li class="placeholder">Add events from the timeline or question results.</li>
             </ul>
+            <button class="tool-btn ghost" id="brief-clear" type="button">Clear selection</button>
           </article>
 
-          <article class="method-card">
-            <h3>Information architecture</h3>
-            <ul>
-              <li>Readers should understand the sequence in under five minutes.</li>
-              <li>Every section should lead back to source material.</li>
-              <li>Visual drama should never overpower factual clarity.</li>
-            </ul>
+          <article class="tool-card">
+            <h3>Draft Controls</h3>
+
+            <label class="field small">
+              <span>Tone</span>
+              <select id="brief-tone">
+                <option value="neutral">Neutral summary</option>
+                <option value="chronological">Chronological brief</option>
+                <option value="legal">Legal-focused brief</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Research notes</span>
+              <textarea
+                id="brief-notes"
+                rows="6"
+                placeholder="Write your own observations, open questions, and follow-up tasks..."
+              ></textarea>
+            </label>
+
+            <div class="inline-actions">
+              <button class="tool-btn" id="brief-generate" type="button">Generate brief</button>
+              <button class="tool-btn" id="brief-copy" type="button">Copy</button>
+              <button class="tool-btn ghost" id="brief-download" type="button">Download</button>
+            </div>
+
+            <p class="status" id="brief-status">Brief output ready.</p>
+            <pre class="brief-output" id="brief-output">Generate a brief to start.</pre>
           </article>
-        </div>
-      </section>
-
-      <section class="faq reveal" id="faq">
-        <div class="section-head">
-          <p class="eyebrow">FAQ</p>
-          <h2>Quick answers</h2>
-        </div>
-
-        <div class="faq-list">
-          <details>
-            <summary>Is this site an official court resource?</summary>
-            <p>No. It is an independent information design project based on public records and reporting.</p>
-          </details>
-
-          <details>
-            <summary>Will this archive be updated?</summary>
-            <p>Yes. The structure is made for incremental updates as filings and records evolve.</p>
-          </details>
-
-          <details>
-            <summary>Can this include additional case pages later?</summary>
-            <p>Yes. Add new static pages and connect them through the source and timeline sections.</p>
-          </details>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>JeffreyEpsteins.org - Investigative Atlas</p>
-      <p>Independent public-record interface - <span id="year"></span></p>
+      <p>JeffreyEpsteins.org · Investigative Research OS</p>
+      <p>Independent public-record interface · <span id="year"></span></p>
     </footer>
+
+    <div class="command-shell" id="command-shell" hidden>
+      <button class="command-backdrop" type="button" data-close-command aria-label="Close command palette"></button>
+      <div class="command-dialog" role="dialog" aria-modal="true" aria-label="Command palette">
+        <input id="command-input" type="text" placeholder="Type a command..." />
+        <ul id="command-list" class="command-list"></ul>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>

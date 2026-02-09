@@ -1,45 +1,43 @@
 # JeffreyEpsteins.org
 
-Public-facing investigative website focused on timeline navigation, source discovery, and personal research workflow.
+Interactive public-record research interface focused on timeline analysis, source tracking, entity mapping, and brief generation.
 
 ## Disclaimer
-- This is an independent information-design project.
-- It is not an official court, government, or law-enforcement website.
-- Always verify claims against primary records and reputable reporting.
+- Independent information-design project.
+- Not an official court, government, or law-enforcement website.
+- Use primary records and credible reporting for verification.
 
-## Features
-- Timeline filtering by track, period, and keyword.
-- Event pinning and export (`.txt`) for working sets.
-- Local research notebook with autosave (browser storage).
-- Quick digest generator based on current filters and pinned events.
+## What this site can do
+- Filter and search case timeline events by phase, year range, and keywords.
+- Pin events and export a working set.
+- Run a question engine that ranks matching events and sources.
+- Inspect an interactive entity relationship graph.
+- Track source reading/verification status locally.
+- Generate, copy, and download a structured working brief.
+- Export full local research session state as JSON.
 
 ## Privacy
-- Notes and pinned events are stored in `localStorage` in the visitor's browser.
-- No backend is used for these tools.
+- This project is static and client-side only.
+- Notes, pins, and source flags are saved in browser `localStorage`.
+- No backend persistence is used.
 
-## Tech Stack
-- Static HTML, CSS, and vanilla JavaScript.
-- Custom domain via `CNAME`.
-- Hosted via GitHub Pages.
-
-## Repository Structure
-- `index.html` - page structure and content
-- `styles.css` - visual design and responsive styles
-- `script.js` - interactive tools and UI behavior
+## Stack
+- `index.html` - application structure
+- `styles.css` - visual system and responsive layout
+- `script.js` - timeline engine, query logic, graph, source tracker, brief builder
 - `CNAME` - custom domain configuration
 
-## Local Preview
-Open `index.html` directly in a browser for a quick preview.
+## Local preview
+Open `index.html` directly in your browser.
 
-## Deploy (GitHub Pages)
+## GitHub Pages deployment
 1. Push to `main`.
-2. Go to `Settings -> Pages`.
-3. Select `Deploy from a branch`.
-4. Choose `main` and `/ (root)`.
+2. Open repository `Settings -> Pages`.
+3. Set source to `Deploy from a branch`.
+4. Select branch `main` and folder `/ (root)`.
 5. Save and wait for deployment.
 
-## Contribution Guidelines
-- Keep language factual and source-oriented.
-- Prefer neutral wording over speculation.
-- For timeline edits, include clear dates and verifiable references.
-- Open a PR with a short summary of what changed and why.
+## Contribution guidelines
+- Keep wording factual and source-oriented.
+- Prefer date-specific phrasing over vague relative wording.
+- When editing timeline items, maintain neutral language and verifiable references.
