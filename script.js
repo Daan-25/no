@@ -323,6 +323,112 @@ const PHASE_LABEL = {
   media: 'Media pressure',
 };
 
+const CLUSTER_LABEL = {
+  official: 'Official',
+  court: 'Court',
+  media: 'Media',
+  analysis: 'Analysis',
+};
+
+const FLOW_PHASES = [
+  {
+    id: 'foundation',
+    title: 'Foundation',
+    summary:
+      'Initial investigative and early legal structure (Palm Beach reports through the 2008 plea agreement).',
+    timelinePhase: 'all',
+    yearStart: 2005,
+    yearEnd: 2008,
+    eventIds: ['ev-2005-palm-beach', 'ev-2006-federal-attention', 'ev-2008-plea-deal'],
+    clusters: {
+      official: ['src-fbi', 'src-doj-main'],
+      court: ['src-pacer', 'src-courtlistener'],
+      media: ['src-miami-herald-series'],
+      analysis: ['src-govinfo'],
+    },
+  },
+  {
+    id: 'media-reopening',
+    title: 'Media Reopening',
+    summary:
+      'Civil litigation momentum and long-form reporting apply renewed institutional pressure between 2015 and 2018.',
+    timelinePhase: 'all',
+    yearStart: 2015,
+    yearEnd: 2018,
+    eventIds: ['ev-2015-civil-pressure', 'ev-2018-media-series'],
+    clusters: {
+      official: ['src-doj-main'],
+      court: ['src-courtlistener', 'src-justia'],
+      media: ['src-miami-herald-series', 'src-nyt-archive'],
+      analysis: ['src-wikipedia-overview'],
+    },
+  },
+  {
+    id: 'federal-2019',
+    title: 'Federal 2019 Case',
+    summary:
+      'The new federal prosecution phase centers around SDNY actions, DOJ announcements, and nationwide reporting.',
+    timelinePhase: 'legal',
+    yearStart: 2019,
+    yearEnd: 2019,
+    eventIds: ['ev-2019-arrest'],
+    clusters: {
+      official: ['src-sdny-indictment', 'src-doj-main'],
+      court: ['src-pacer', 'src-courtlistener'],
+      media: ['src-nyt-archive', 'src-wsj-archive'],
+      analysis: ['src-govinfo'],
+    },
+  },
+  {
+    id: 'custody-pivot',
+    title: 'Custody Pivot',
+    summary:
+      'The August 2019 custody event becomes a major interpretive pivot across legal and media narratives.',
+    timelinePhase: 'custody',
+    yearStart: 2019,
+    yearEnd: 2019,
+    eventIds: ['ev-2019-custody-death'],
+    clusters: {
+      official: ['src-doj-main'],
+      court: ['src-courtlistener'],
+      media: ['src-nyt-archive', 'src-wsj-archive'],
+      analysis: ['src-wikipedia-overview'],
+    },
+  },
+  {
+    id: 'related-prosecution',
+    title: 'Related Prosecution',
+    summary:
+      'The Maxwell prosecution phase adds new legal outcomes and procedural endpoints from 2020 through 2022.',
+    timelinePhase: 'legal',
+    yearStart: 2020,
+    yearEnd: 2022,
+    eventIds: ['ev-2020-maxwell-arrest', 'ev-2021-maxwell-conviction', 'ev-2022-maxwell-sentencing'],
+    clusters: {
+      official: ['src-sdny-maxwell-sentencing', 'src-doj-main'],
+      court: ['src-pacer', 'src-courtlistener'],
+      media: ['src-nyt-archive', 'src-wsj-archive'],
+      analysis: ['src-govinfo'],
+    },
+  },
+  {
+    id: 'records-aftershock',
+    title: 'Records Aftershock',
+    summary:
+      'Ongoing visibility of filings and records keeps long-tail accountability active in the post-trial period.',
+    timelinePhase: 'aftermath',
+    yearStart: 2022,
+    yearEnd: 2024,
+    eventIds: ['ev-2022-maxwell-sentencing', 'ev-2024-records-wave'],
+    clusters: {
+      official: ['src-doj-main'],
+      court: ['src-courtlistener', 'src-justia'],
+      media: ['src-nyt-archive', 'src-miami-herald-series'],
+      analysis: ['src-govinfo', 'src-wikipedia-overview'],
+    },
+  },
+];
+
 const STORAGE_KEYS = {
   pins: 'jef_pins_v2',
   brief: 'jef_brief_v2',
@@ -387,6 +493,8 @@ const state = {
   briefNotes: safeStore.get(STORAGE_KEYS.briefNotes, '') || '',
   theme: safeStore.get(STORAGE_KEYS.theme, 'light') || 'light',
   query: '',
+  flowSelectedId: 'foundation',
+  flowCluster: 'official',
 };
 
 const dom = {
@@ -420,6 +528,16 @@ const dom = {
   timelineClear: document.querySelector('#timeline-clear'),
   timelineStatus: document.querySelector('#timeline-status'),
   timelineResults: document.querySelector('#timeline-results'),
+
+  flowTrack: document.querySelector('#flow-track'),
+  flowTitle: document.querySelector('#flow-title'),
+  flowSummary: document.querySelector('#flow-summary'),
+  flowApplyTimeline: document.querySelector('#flow-apply-timeline'),
+  flowFocusSources: document.querySelector('#flow-focus-sources'),
+  flowAddBrief: document.querySelector('#flow-add-brief'),
+  clusterTabs: document.querySelector('#cluster-tabs'),
+  clusterList: document.querySelector('#cluster-list'),
+  clusterStatus: document.querySelector('#cluster-status'),
 
   pinSummary: document.querySelector('#pin-summary'),
   pinnedEvents: document.querySelector('#pinned-events'),
@@ -579,6 +697,105 @@ const getFilteredEvents = () => {
   return rows.map((row) => row.event);
 };
 
+const getFlowPhase = (flowId) => FLOW_PHASES.find((phase) => phase.id === flowId) || FLOW_PHASES[0];
+
+const getCurrentFlowPhase = () => getFlowPhase(state.flowSelectedId);
+
+const getFlowClusterKeys = (phase) =>
+  Object.keys(phase.clusters).filter((key) => Array.isArray(phase.clusters[key]) && phase.clusters[key].length > 0);
+
+const getFlowClusterSourceIds = (phase, cluster) => {
+  if (cluster === 'all') {
+    return [...new Set(getFlowClusterKeys(phase).flatMap((key) => phase.clusters[key]))];
+  }
+  return phase.clusters[cluster] || [];
+};
+
+const renderFlowMap = () => {
+  const phase = getCurrentFlowPhase();
+  const clusterKeys = getFlowClusterKeys(phase);
+
+  if (!clusterKeys.includes(state.flowCluster)) {
+    state.flowCluster = clusterKeys[0] || 'official';
+  }
+
+  if (dom.flowTrack) {
+    dom.flowTrack.querySelectorAll('.flow-node').forEach((button) => {
+      const id = button.getAttribute('data-flow-id');
+      button.classList.toggle('active', id === phase.id);
+    });
+  }
+
+  if (dom.flowTitle) {
+    dom.flowTitle.textContent = phase.title;
+  }
+
+  if (dom.flowSummary) {
+    dom.flowSummary.textContent = `${phase.summary} Timeline window: ${phase.yearStart}-${phase.yearEnd}.`;
+  }
+
+  if (dom.clusterTabs) {
+    dom.clusterTabs.innerHTML = clusterKeys
+      .map((clusterKey) => {
+        const active = clusterKey === state.flowCluster ? 'active' : '';
+        const count = phase.clusters[clusterKey].length;
+        return `<button class=\"cluster-btn ${active}\" type=\"button\" data-cluster=\"${clusterKey}\">${CLUSTER_LABEL[clusterKey] || clusterKey} (${count})</button>`;
+      })
+      .join('');
+  }
+
+  const sourceIds = getFlowClusterSourceIds(phase, state.flowCluster);
+  const sources = sourceIds.map((id) => getSource(id)).filter(Boolean);
+
+  if (dom.clusterList) {
+    if (sources.length === 0) {
+      dom.clusterList.innerHTML = '<li class=\"placeholder\">No sources in this cluster for the selected phase.</li>';
+    } else {
+      dom.clusterList.innerHTML = sources
+        .map(
+          (source) => `
+            <li data-source-id=\"${source.id}\">
+              <div class=\"cluster-source-meta\">
+                <p class=\"cluster-source-title\">${source.title}</p>
+                <p class=\"cluster-source-pub\">${source.publisher}</p>
+              </div>
+              <div class=\"list-actions\">
+                <a class=\"source-open\" href=\"${source.url}\" target=\"_blank\" rel=\"noreferrer\">Open</a>
+                <button class=\"mini-btn\" type=\"button\" data-cluster-action=\"focus-one\">Focus</button>
+              </div>
+            </li>
+          `
+        )
+        .join('');
+    }
+  }
+
+  if (dom.clusterStatus) {
+    const label = CLUSTER_LABEL[state.flowCluster] || state.flowCluster;
+    dom.clusterStatus.textContent = `${label} cluster · ${sources.length} source${sources.length === 1 ? '' : 's'} in this phase.`;
+  }
+};
+
+const applyFlowToTimeline = () => {
+  const phase = getCurrentFlowPhase();
+  state.phase = phase.timelinePhase;
+  state.yearStart = Math.max(minYear, phase.yearStart);
+  state.yearEnd = Math.min(maxYear, phase.yearEnd);
+  state.search = '';
+  state.sort = 'newest';
+  applyTimelineControlState();
+  renderTimeline();
+};
+
+const focusFlowSources = (cluster = 'all') => {
+  const phase = getCurrentFlowPhase();
+  const sourceIds = getFlowClusterSourceIds(phase, cluster);
+  state.sourceType = 'all';
+  state.sourceSearch = '';
+  applySourceControlState();
+  setSourceFocus(sourceIds);
+};
+
 const renderTimeline = () => {
   const events = getFilteredEvents();
 
@@ -682,7 +899,7 @@ const renderBriefSelection = () => {
 };
 
 const setSourceFocus = (sourceIds) => {
-  const clean = sourceIds.filter((id) => validSourceIds.has(id));
+  const clean = (sourceIds || []).filter((id) => validSourceIds.has(id));
   state.sourceFocusIds = clean.length > 0 ? clean : null;
   renderSources();
 };
@@ -1012,6 +1229,8 @@ const resetSession = () => {
   state.sourceState = {};
   state.briefTone = 'neutral';
   state.briefNotes = '';
+  state.flowSelectedId = 'foundation';
+  state.flowCluster = 'official';
 
   safeStore.remove(STORAGE_KEYS.pins);
   safeStore.remove(STORAGE_KEYS.brief);
@@ -1034,6 +1253,7 @@ const resetSession = () => {
 
   renderTimeline();
   renderPinned();
+  renderFlowMap();
   renderSources();
   renderBrief();
   setStatus(dom.sessionStatus, 'Session reset complete.');
@@ -1483,6 +1703,12 @@ const renderCommandPalette = () => {
       run: () => document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth' }),
     },
     {
+      id: 'jump-flow',
+      label: 'Jump to Flow Map',
+      hint: 'Open phase map and source-cluster drilldowns',
+      run: () => document.querySelector('#flow')?.scrollIntoView({ behavior: 'smooth' }),
+    },
+    {
       id: 'jump-sources',
       label: 'Jump to Sources',
       hint: 'Open source intelligence table',
@@ -1507,6 +1733,12 @@ const renderCommandPalette = () => {
         applyTimelineControlState();
         renderTimeline();
       },
+    },
+    {
+      id: 'apply-flow',
+      label: 'Apply selected flow phase to timeline',
+      hint: 'Sync timeline controls with active flow phase',
+      run: () => applyFlowToTimeline(),
     },
     {
       id: 'generate-brief',
@@ -1675,6 +1907,97 @@ const bindEvents = () => {
     state.sort = 'newest';
     applyTimelineControlState();
     renderTimeline();
+  });
+
+  dom.flowTrack.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const button = target.closest('.flow-node[data-flow-id]');
+    if (!button) {
+      return;
+    }
+
+    const flowId = button.getAttribute('data-flow-id');
+    if (!flowId) {
+      return;
+    }
+
+    state.flowSelectedId = flowId;
+    state.flowCluster = 'official';
+    renderFlowMap();
+  });
+
+  dom.clusterTabs.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const button = target.closest('.cluster-btn[data-cluster]');
+    if (!button) {
+      return;
+    }
+
+    const cluster = button.getAttribute('data-cluster');
+    if (!cluster) {
+      return;
+    }
+
+    state.flowCluster = cluster;
+    renderFlowMap();
+  });
+
+  dom.clusterList.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const action = target.getAttribute('data-cluster-action');
+    if (!action) {
+      return;
+    }
+
+    const row = target.closest('[data-source-id]');
+    const sourceId = row?.getAttribute('data-source-id');
+    if (!sourceId) {
+      return;
+    }
+
+    if (action === 'focus-one') {
+      state.sourceType = 'all';
+      state.sourceSearch = '';
+      applySourceControlState();
+      setSourceFocus([sourceId]);
+      document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  dom.flowApplyTimeline.addEventListener('click', () => {
+    applyFlowToTimeline();
+    document.querySelector('#timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  dom.flowFocusSources.addEventListener('click', () => {
+    focusFlowSources('all');
+    document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  dom.flowAddBrief.addEventListener('click', () => {
+    const phase = getCurrentFlowPhase();
+    phase.eventIds.forEach((eventId) => {
+      if (validEventIds.has(eventId)) {
+        state.brief.add(eventId);
+      }
+    });
+    saveBrief();
+    renderTimeline();
+    renderBrief();
+    setStatus(dom.briefStatus, `Added ${phase.eventIds.length} phase event(s) to brief selection.`);
+    document.querySelector('#brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   dom.timelineResults.addEventListener('click', (event) => {
@@ -1934,6 +2257,7 @@ const init = () => {
   bindEvents();
   renderTimeline();
   renderPinned();
+  renderFlowMap();
   renderSources();
   renderBrief();
   setupReveal();

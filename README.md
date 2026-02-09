@@ -9,6 +9,7 @@ Interactive public-record research interface focused on timeline analysis, sourc
 
 ## What this site can do
 - Filter and search case timeline events by phase, year range, and keywords.
+- Explore a phase-based flow map with source-cluster drilldowns.
 - Pin events and export a working set.
 - Run a question engine that ranks matching events and sources.
 - Inspect an interactive entity relationship graph.

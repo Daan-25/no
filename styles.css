@@ -328,13 +328,18 @@ main {
 .workbench-grid,
 .brief-layout,
 .network-layout,
-.timeline-layout {
+.timeline-layout,
+.flow-layout {
   display: grid;
   gap: 0.8rem;
 }
 
 .workbench-grid {
   grid-template-columns: 1.15fr 0.85fr;
+}
+
+.flow-layout {
+  grid-template-columns: 1.05fr 0.95fr;
 }
 
 .tool-card,
@@ -462,6 +467,132 @@ main {
 
 .query-meta {
   font-size: 0.78rem;
+  color: var(--ink-3);
+}
+
+.flow-track {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  padding: 0.68rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.flow-node {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  color: var(--ink-1);
+  text-align: left;
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.18rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+}
+
+.flow-node:hover,
+.flow-node:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(20, 27, 40, 0.14);
+}
+
+.flow-node.active {
+  border-color: color-mix(in srgb, var(--accent-2) 70%, var(--line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 22%, var(--bg-card)), color-mix(in srgb, var(--bg-card) 92%, transparent));
+}
+
+.flow-node.active::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 60%, transparent);
+  pointer-events: none;
+}
+
+.flow-step {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--accent-2);
+  letter-spacing: 0.11em;
+}
+
+.flow-title {
+  font-weight: 700;
+  font-size: 0.94rem;
+}
+
+.flow-meta {
+  color: var(--ink-3);
+  font-size: 0.78rem;
+}
+
+.flow-inspector {
+  align-content: start;
+}
+
+.cluster-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cluster-btn {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  color: var(--ink-2);
+  padding: 0.3rem 0.58rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cluster-btn.active,
+.cluster-btn:hover,
+.cluster-btn:focus-visible {
+  color: #f8fcfe;
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+}
+
+.cluster-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.42rem;
+  max-height: 310px;
+  overflow: auto;
+}
+
+.cluster-list li {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-card) 90%, transparent);
+  padding: 0.44rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cluster-source-meta {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.cluster-source-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--ink-1);
+}
+
+.cluster-source-pub {
+  font-size: 0.72rem;
   color: var(--ink-3);
 }
 
@@ -853,6 +984,7 @@ main {
 
   .hero,
   .timeline-layout,
+  .flow-layout,
   .network-layout,
   .brief-layout,
   .workbench-grid {

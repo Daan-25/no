@@ -40,6 +40,7 @@
         <a href="#overview">Overview</a>
         <a href="#workbench">Workbench</a>
         <a href="#timeline">Timeline</a>
+        <a href="#flow">Flow Map</a>
         <a href="#network">Network</a>
         <a href="#sources">Sources</a>
         <a href="#brief">Brief Builder</a>
@@ -205,6 +206,73 @@
             <h3>Entity Inspector</h3>
             <p class="status">Select a node in the graph to inspect connections.</p>
             <button class="tool-btn ghost" id="network-reset" type="button">Reset graph focus</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal" id="flow">
+        <div class="section-head">
+          <p class="eyebrow">Case Flow Map</p>
+          <h2>Follow the case phases and drill into source clusters</h2>
+        </div>
+
+        <div class="flow-layout">
+          <div class="flow-track" id="flow-track">
+            <button class="flow-node active" type="button" data-flow-id="foundation">
+              <span class="flow-step">01</span>
+              <span class="flow-title">Foundation</span>
+              <span class="flow-meta">2005-2008 · Investigation and first legal outcomes</span>
+            </button>
+
+            <button class="flow-node" type="button" data-flow-id="media-reopening">
+              <span class="flow-step">02</span>
+              <span class="flow-title">Media Reopening</span>
+              <span class="flow-meta">2015-2018 · Reporting pressure and renewed scrutiny</span>
+            </button>
+
+            <button class="flow-node" type="button" data-flow-id="federal-2019">
+              <span class="flow-step">03</span>
+              <span class="flow-title">Federal 2019 Case</span>
+              <span class="flow-meta">2019 · Arrest, indictment, and prosecution track</span>
+            </button>
+
+            <button class="flow-node" type="button" data-flow-id="custody-pivot">
+              <span class="flow-step">04</span>
+              <span class="flow-title">Custody Pivot</span>
+              <span class="flow-meta">2019 · Detention and death in custody</span>
+            </button>
+
+            <button class="flow-node" type="button" data-flow-id="related-prosecution">
+              <span class="flow-step">05</span>
+              <span class="flow-title">Related Prosecution</span>
+              <span class="flow-meta">2020-2022 · Maxwell arrest, conviction, sentencing</span>
+            </button>
+
+            <button class="flow-node" type="button" data-flow-id="records-aftershock">
+              <span class="flow-step">06</span>
+              <span class="flow-title">Records Aftershock</span>
+              <span class="flow-meta">2022-present · Ongoing filings and transparency pressure</span>
+            </button>
+          </div>
+
+          <article class="tool-card flow-inspector">
+            <h3 id="flow-title">Foundation</h3>
+            <p class="status" id="flow-summary">
+              Starting phase selected. Use controls below to drive timeline and sources from this
+              phase definition.
+            </p>
+
+            <div class="inline-actions">
+              <button class="tool-btn" id="flow-apply-timeline" type="button">Apply phase to timeline</button>
+              <button class="tool-btn ghost" id="flow-focus-sources" type="button">Focus phase sources</button>
+              <button class="tool-btn ghost" id="flow-add-brief" type="button">Add phase events to brief</button>
+            </div>
+
+            <div class="cluster-tabs" id="cluster-tabs"></div>
+            <ul class="cluster-list" id="cluster-list">
+              <li class="placeholder">Select a phase cluster to inspect sources.</li>
+            </ul>
+            <p class="status" id="cluster-status">Cluster drilldown ready.</p>
           </article>
         </div>
       </section>
