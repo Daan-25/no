@@ -3,57 +3,148 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JeffreyEpsteins.org | Investigative Archive</title>
+    <title>JeffreyEpsteins.org | Investigative Atlas</title>
     <meta
       name="description"
-      content="JeffreyEpsteins.org provides a clear, accessible overview of the Epstein case with timeline, files, and context."
+      content="JeffreyEpsteins.org is a structured, visual archive of the Epstein case timeline, legal record, and public-interest context."
     />
+    <meta property="og:title" content="JeffreyEpsteins.org | Investigative Atlas" />
+    <meta
+      property="og:description"
+      content="A design-forward archive focused on chronology, records, and institutional context."
+    />
+    <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="ambient"></div>
+    <div class="mesh-layer" aria-hidden="true"></div>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
+    <div class="progress-track" aria-hidden="true">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
 
     <header class="site-header" id="top">
-      <a class="logo" href="#top">JeffreyEpsteins.org</a>
+      <div class="brand-group">
+        <a class="logo" href="#top">JeffreyEpsteins.org</a>
+        <p class="logo-sub">Investigative Atlas</p>
+      </div>
+
       <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">Menu</button>
-      <nav class="site-nav" aria-label="Main navigation">
+
+      <nav class="site-nav" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
+        <a href="#matrix">Case Map</a>
         <a href="#timeline">Timeline</a>
-        <a href="#dossiers">Files</a>
+        <a href="#sources">Sources</a>
+        <a href="#method">Method</a>
         <a href="#faq">FAQ</a>
       </nav>
+
+      <a class="header-cta" href="#sources">Browse Sources</a>
     </header>
 
     <main>
       <section class="hero reveal" id="overview">
-        <p class="eyebrow">Case File</p>
-        <h1>A visual, factual overview of the Epstein case</h1>
-        <p class="lead">
-          This site compiles key moments, legal context, and references to publicly known
-          information. The goal is documentation and context, not sensationalism.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="#timeline">View timeline</a>
-          <a class="button ghost" href="#dossiers">Open files</a>
+        <div class="hero-copy">
+          <p class="eyebrow">Public Record Interface</p>
+          <h1>
+            Jeffrey Epstein:
+            <span>a high-clarity archive of timeline, litigation, and institutional response</span>
+          </h1>
+          <p class="lead">
+            This project is designed as an evidence-first reading experience. It focuses on published
+            records, legal milestones, and the long tail of accountability across courts, media, and
+            civil proceedings.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#timeline">Enter Timeline</a>
+            <a class="button ghost" href="#method">Read Methodology</a>
+          </div>
+          <ul class="hero-notes" aria-label="Editorial notes">
+            <li>Fact-anchored language over speculation.</li>
+            <li>Chronology, then documents, then analysis.</li>
+            <li>Built for continuous updates as new records emerge.</li>
+          </ul>
         </div>
-        <div class="hero-cards" aria-label="Key points">
-          <article>
-            <h2>2005</h2>
-            <p>Police investigation begins in Palm Beach.</p>
+
+        <aside class="hero-panel">
+          <h2>Editorial Note</h2>
+          <p>
+            The goal is not sensationalism. The goal is structure. This interface helps readers move
+            through a complicated public-interest case in a way that is easy to verify and hard to
+            distort.
+          </p>
+
+          <div class="stat-rack" aria-label="Archive statistics">
+            <article class="stat-card">
+              <p class="stat-value" data-count="20">0</p>
+              <p class="stat-label">Years covered</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-value" data-count="6">0</p>
+              <p class="stat-label">Core case phases</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-value" data-count="4">0</p>
+              <p class="stat-label">Primary source tracks</p>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section class="case-map reveal" id="matrix">
+        <div class="section-head">
+          <p class="eyebrow">Case Map</p>
+          <h2>Four tracks to understand the full picture</h2>
+        </div>
+
+        <div class="map-grid">
+          <article class="map-card">
+            <p class="chip">Track 01</p>
+            <h3>Investigations</h3>
+            <p>
+              From local law-enforcement inquiries to federal prosecution, this track follows how the
+              case moved through institutions.
+            </p>
+            <a class="map-link" href="#tl-2005">Jump to early investigation</a>
           </article>
-          <article>
-            <h2>2019</h2>
-            <p>Federal indictment and arrest in New York.</p>
+
+          <article class="map-card">
+            <p class="chip">Track 02</p>
+            <h3>Legal Pathway</h3>
+            <p>
+              Plea agreements, indictments, courtroom motions, and civil actions are mapped in one
+              sequence for easier comparison.
+            </p>
+            <a class="map-link" href="#tl-2008">Jump to legal milestones</a>
           </article>
-          <article>
-            <h2>Ongoing</h2>
-            <p>Civil litigation, document releases, and broader public impact.</p>
+
+          <article class="map-card">
+            <p class="chip">Track 03</p>
+            <h3>Custody and Death</h3>
+            <p>
+              Documents and official findings around detention and death are grouped as a distinct,
+              high-interest evidence layer.
+            </p>
+            <a class="map-link" href="#tl-2019-custody">Jump to custody record</a>
+          </article>
+
+          <article class="map-card">
+            <p class="chip">Track 04</p>
+            <h3>Aftermath</h3>
+            <p>
+              Civil settlements, document unsealing, and related prosecutions shape the ongoing public
+              and legal consequences.
+            </p>
+            <a class="map-link" href="#tl-aftermath">Jump to aftermath</a>
           </article>
         </div>
       </section>
@@ -61,103 +152,179 @@
       <section class="timeline reveal" id="timeline">
         <div class="section-head">
           <p class="eyebrow">Chronology</p>
-          <h2>Key events in order</h2>
+          <h2>Key milestones, arranged for fast reading</h2>
         </div>
-        <ol>
-          <li>
-            <span class="year">2005</span>
+
+        <div class="timeline-list">
+          <article class="timeline-item" id="tl-2005">
+            <p class="timeline-date">2005</p>
             <div>
-              <h3>Start of local investigation</h3>
-              <p>Authorities in Florida receive reports and open a formal investigation.</p>
+              <h3>Palm Beach investigation begins</h3>
+              <p>
+                Local authorities receive reports involving underage girls, launching the early formal
+                case pathway.
+              </p>
             </div>
-          </li>
-          <li>
-            <span class="year">2008</span>
+          </article>
+
+          <article class="timeline-item" id="tl-2008">
+            <p class="timeline-date">2008</p>
             <div>
-              <h3>Plea deal in Florida</h3>
-              <p>Epstein pleads guilty to state-level charges under a controversial arrangement.</p>
+              <h3>Controversial plea deal in Florida</h3>
+              <p>
+                Epstein pleads guilty to state-level charges in an agreement that later faces sustained
+                legal and public criticism.
+              </p>
             </div>
-          </li>
-          <li>
-            <span class="year">2015-2018</span>
+          </article>
+
+          <article class="timeline-item">
+            <p class="timeline-date">2015-2018</p>
             <div>
-              <h3>Growing journalistic pressure</h3>
-              <p>Investigative reporting and civil claims bring renewed scrutiny to earlier handling.</p>
+              <h3>New investigative pressure</h3>
+              <p>
+                Continued reporting and civil litigation reframe public understanding of prior handling
+                and institutional decisions.
+              </p>
             </div>
-          </li>
-          <li>
-            <span class="year">July 2019</span>
+          </article>
+
+          <article class="timeline-item">
+            <p class="timeline-date">July 2019</p>
             <div>
-              <h3>New federal case</h3>
-              <p>Epstein is arrested on federal allegations of sex trafficking of minors.</p>
+              <h3>Federal arrest in New York</h3>
+              <p>
+                Prosecutors file federal sex trafficking charges connected to conduct involving minors.
+              </p>
             </div>
-          </li>
-          <li>
-            <span class="year">August 2019</span>
+          </article>
+
+          <article class="timeline-item" id="tl-2019-custody">
+            <p class="timeline-date">August 2019</p>
             <div>
-              <h3>Death in custody</h3>
-              <p>Epstein dies in detention; official ruling: suicide.</p>
+              <h3>Death in federal custody</h3>
+              <p>
+                Epstein dies in detention; the New York City medical examiner rules the death a suicide.
+              </p>
             </div>
-          </li>
-          <li>
-            <span class="year">2020-present</span>
+          </article>
+
+          <article class="timeline-item" id="tl-aftermath">
+            <p class="timeline-date">2021-present</p>
             <div>
-              <h3>Aftermath and ongoing proceedings</h3>
-              <p>Court filings, civil cases, and public debate continue.</p>
+              <h3>Related prosecution and document waves</h3>
+              <p>
+                Ghislaine Maxwell is convicted in federal court in 2021, while civil filings and unsealed
+                records continue to shape public accountability.
+              </p>
             </div>
-          </li>
-        </ol>
+          </article>
+        </div>
       </section>
 
-      <section class="dossiers reveal" id="dossiers">
+      <section class="sources reveal" id="sources">
         <div class="section-head">
-          <p class="eyebrow">Files</p>
-          <h2>Topics you can expand further</h2>
+          <p class="eyebrow">Source Stacks</p>
+          <h2>Start from primary references</h2>
         </div>
-        <div class="grid">
-          <article>
-            <h3>Legal track</h3>
-            <p>Court cases, indictments, plea agreements, and relevant legal documents.</p>
-            <a href="#" aria-label="Read more about legal track">Read file</a>
+
+        <div class="source-grid">
+          <article class="source-card">
+            <h3>Government and court channels</h3>
+            <p>Use official publications for filings, statements, and legal status updates.</p>
+            <ul>
+              <li><a href="https://www.justice.gov/" target="_blank" rel="noreferrer">U.S. Department of Justice</a></li>
+              <li><a href="https://www.justice.gov/usao-sdny" target="_blank" rel="noreferrer">U.S. Attorney's Office SDNY</a></li>
+              <li><a href="https://pacer.uscourts.gov/" target="_blank" rel="noreferrer">PACER</a></li>
+            </ul>
           </article>
-          <article>
-            <h3>Media investigations</h3>
-            <p>Major publications, investigative reporting, and timeline-based data points.</p>
-            <a href="#" aria-label="Read more about media investigations">Read file</a>
+
+          <article class="source-card">
+            <h3>Open legal repositories</h3>
+            <p>Track published dockets, orders, and case metadata in searchable interfaces.</p>
+            <ul>
+              <li><a href="https://www.courtlistener.com/" target="_blank" rel="noreferrer">CourtListener</a></li>
+              <li><a href="https://www.justia.com/" target="_blank" rel="noreferrer">Justia</a></li>
+              <li><a href="https://scholar.google.com/" target="_blank" rel="noreferrer">Google Scholar (legal docs)</a></li>
+            </ul>
           </article>
-          <article>
-            <h3>Network and impact</h3>
-            <p>Public questions about power, influence, and institutional response.</p>
-            <a href="#" aria-label="Read more about network and impact">Read file</a>
+
+          <article class="source-card">
+            <h3>Investigative reporting archives</h3>
+            <p>Compare long-form reporting across outlets and publication dates.</p>
+            <ul>
+              <li><a href="https://www.nytimes.com/" target="_blank" rel="noreferrer">The New York Times</a></li>
+              <li><a href="https://www.miamiherald.com/" target="_blank" rel="noreferrer">Miami Herald</a></li>
+              <li><a href="https://www.wsj.com/" target="_blank" rel="noreferrer">The Wall Street Journal</a></li>
+            </ul>
+          </article>
+
+          <article class="source-card">
+            <h3>How to use this layer</h3>
+            <p>
+              Prioritize official filings, then verify media reports against document dates and court
+              records before drawing conclusions.
+            </p>
+            <a class="source-cta" href="#method">View methodology</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="method reveal" id="method">
+        <div class="section-head">
+          <p class="eyebrow">Methodology</p>
+          <h2>Design principles behind this archive</h2>
+        </div>
+
+        <div class="method-layout">
+          <article class="method-card">
+            <h3>Verification first</h3>
+            <ul>
+              <li>Separate confirmed records from unresolved claims.</li>
+              <li>Anchor timeline entries to date-stamped source categories.</li>
+              <li>Update language when court status changes.</li>
+            </ul>
+          </article>
+
+          <article class="method-card">
+            <h3>Information architecture</h3>
+            <ul>
+              <li>Readers should understand the sequence in under five minutes.</li>
+              <li>Every section should lead back to source material.</li>
+              <li>Visual drama should never overpower factual clarity.</li>
+            </ul>
           </article>
         </div>
       </section>
 
       <section class="faq reveal" id="faq">
         <div class="section-head">
-          <p class="eyebrow">Frequently Asked Questions</p>
-          <h2>Quick context</h2>
+          <p class="eyebrow">FAQ</p>
+          <h2>Quick answers</h2>
         </div>
+
         <div class="faq-list">
           <details>
-            <summary>What is this website for?</summary>
-            <p>To provide an informative, structured overview of publicly known facts and context.</p>
+            <summary>Is this site an official court resource?</summary>
+            <p>No. It is an independent information design project based on public records and reporting.</p>
           </details>
+
           <details>
-            <summary>Is the content updated regularly?</summary>
-            <p>Yes. You can manage new articles, legal documents, and updates directly in GitHub.</p>
+            <summary>Will this archive be updated?</summary>
+            <p>Yes. The structure is made for incremental updates as filings and records evolve.</p>
           </details>
+
           <details>
-            <summary>Can I add sources?</summary>
-            <p>Yes, through additional pages or markdown files that you publish in the repository.</p>
+            <summary>Can this include additional case pages later?</summary>
+            <p>Yes. Add new static pages and connect them through the source and timeline sections.</p>
           </details>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>JeffreyEpsteins.org · Investigative Archive</p>
-      <p>© <span id="year"></span> · Built for GitHub Pages</p>
+      <p>JeffreyEpsteins.org - Investigative Atlas</p>
+      <p>Independent public-record interface - <span id="year"></span></p>
     </footer>
 
     <script src="script.js"></script>
