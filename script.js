@@ -1263,6 +1263,7 @@ const setTheme = (theme) => {
   state.theme = theme;
   dom.body.dataset.theme = theme;
   saveTheme();
+  graphState.redraw();
 };
 
 const toggleTheme = () => {
@@ -1393,8 +1394,7 @@ const renderEntityPanel = (entityId) => {
     `;
     dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
       graphState.selectedNodeId = null;
-      graphState.simulationActive = true;
-      graphState.settleFrames = 0;
+      graphState.redraw();
       renderEntityPanel(null);
     });
     return;
@@ -1429,8 +1429,7 @@ const renderEntityPanel = (entityId) => {
 
   dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
     graphState.selectedNodeId = null;
-    graphState.simulationActive = true;
-    graphState.settleFrames = 0;
+    graphState.redraw();
     renderEntityPanel(null);
   });
 
@@ -1459,12 +1458,10 @@ const graphState = {
   edges: [],
   selectedNodeId: null,
   hoverNodeId: null,
-  raf: 0,
   width: 0,
   height: 0,
   ctx: null,
-  simulationActive: true,
-  settleFrames: 0,
+  redraw: () => {},
 };
 
 const entityColor = (type) => {
@@ -1480,6 +1477,17 @@ const entityColor = (type) => {
   return '#58a37d';
 };
 
+const getGraphDegreeMap = () => {
+  const degree = new Map(ENTITIES.map((entity) => [entity.id, 0]));
+  EDGES.forEach(([a, b]) => {
+    degree.set(a, (degree.get(a) || 0) + 1);
+    degree.set(b, (degree.get(b) || 0) + 1);
+  });
+  return degree;
+};
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
 const initGraph = () => {
   const canvas = dom.networkCanvas;
   if (!canvas) {
@@ -1491,26 +1499,267 @@ const initGraph = () => {
   }
   graphState.ctx = ctx;
 
-  const buildNodes = () => {
-    graphState.nodes = ENTITIES.map((entity, index) => {
-      const angle = (index / ENTITIES.length) * Math.PI * 2;
-      const radius = Math.min(graphState.width, graphState.height) * 0.33;
-      const jitter = 8;
+  const degree = getGraphDegreeMap();
+  const adjacency = new Map(ENTITIES.map((entity) => [entity.id, new Set()]));
+  EDGES.forEach(([a, b]) => {
+    adjacency.get(a)?.add(b);
+    adjacency.get(b)?.add(a);
+  });
+
+  const typeOrder = {
+    person: 0,
+    institution: 1,
+    group: 2,
+    media: 3,
+  };
+
+  const sortEntityIds = (ids) =>
+    [...ids].sort((a, b) => {
+      const entityA = getEntity(a);
+      const entityB = getEntity(b);
+      if (!entityA || !entityB) {
+        return a.localeCompare(b);
+      }
+      if ((degree.get(b) || 0) !== (degree.get(a) || 0)) {
+        return (degree.get(b) || 0) - (degree.get(a) || 0);
+      }
+      if ((typeOrder[entityA.type] || 99) !== (typeOrder[entityB.type] || 99)) {
+        return (typeOrder[entityA.type] || 99) - (typeOrder[entityB.type] || 99);
+      }
+      return entityA.label.localeCompare(entityB.label);
+    });
+
+  const buildLayout = () => {
+    const centerX = graphState.width / 2;
+    const centerY = graphState.height / 2;
+    const safeWidth = Math.max(graphState.width, 240);
+    const safeHeight = Math.max(graphState.height, 240);
+
+    let centerId = ENTITIES[0]?.id || null;
+    ENTITIES.forEach((entity) => {
+      if (!centerId || (degree.get(entity.id) || 0) > (degree.get(centerId) || 0)) {
+        centerId = entity.id;
+      }
+    });
+
+    const basePosition = new Map();
+    if (centerId) {
+      basePosition.set(centerId, {
+        x: centerX,
+        y: centerY,
+      });
+    }
+
+    const firstRing = centerId ? sortEntityIds([...adjacency.get(centerId)]) : [];
+    const ringRadiusX = clamp(safeWidth * 0.28, 130, 290);
+    const ringRadiusY = clamp(safeHeight * 0.25, 95, 220);
+    firstRing.forEach((id, index) => {
+      const angle = -Math.PI / 2 + (index / Math.max(firstRing.length, 1)) * Math.PI * 2;
+      basePosition.set(id, {
+        x: centerX + Math.cos(angle) * ringRadiusX,
+        y: centerY + Math.sin(angle) * ringRadiusY,
+      });
+    });
+
+    const remaining = sortEntityIds(
+      ENTITIES.map((entity) => entity.id).filter((id) => !basePosition.has(id))
+    );
+    const satellitesByAnchor = new Map();
+
+    remaining.forEach((id) => {
+      const neighbors = [...(adjacency.get(id) || [])];
+      const anchorId =
+        neighbors
+          .filter((neighborId) => basePosition.has(neighborId))
+          .sort((a, b) => (degree.get(b) || 0) - (degree.get(a) || 0))[0] || centerId;
+
+      const key = anchorId || 'orphan';
+      if (!satellitesByAnchor.has(key)) {
+        satellitesByAnchor.set(key, []);
+      }
+      satellitesByAnchor.get(key).push(id);
+    });
+
+    satellitesByAnchor.forEach((ids, anchorId) => {
+      const anchor = basePosition.get(anchorId) || { x: centerX, y: centerY };
+      const anchorAngle = Math.atan2(anchor.y - centerY, anchor.x - centerX);
+      const spread = Math.PI * 0.78;
+      const orbitX = clamp(safeWidth * 0.12, 72, 125);
+      const orbitY = clamp(safeHeight * 0.1, 56, 98);
+
+      sortEntityIds(ids).forEach((id, index) => {
+        const ratio = ids.length <= 1 ? 0 : index / (ids.length - 1);
+        const angle = anchorAngle - spread / 2 + ratio * spread;
+        const depth = 1 + Math.floor(index / 2) * 0.14;
+        basePosition.set(id, {
+          x: anchor.x + Math.cos(angle) * orbitX * depth,
+          y: anchor.y + Math.sin(angle) * orbitY * depth,
+        });
+      });
+    });
+
+    const nodes = ENTITIES.map((entity) => {
+      const base = basePosition.get(entity.id) || { x: centerX, y: centerY };
       return {
         ...entity,
-        x: graphState.width / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * jitter,
-        y: graphState.height / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * jitter,
-        baseX: graphState.width / 2 + Math.cos(angle) * radius,
-        baseY: graphState.height / 2 + Math.sin(angle) * radius,
-        vx: 0,
-        vy: 0,
-        r: 11,
+        x: base.x,
+        y: base.y,
+        baseX: base.x,
+        baseY: base.y,
+        degree: degree.get(entity.id) || 0,
+        r: entity.id === centerId ? 13 : 11,
+        labelX: base.x,
+        labelY: base.y,
+        labelAlign: 'center',
       };
     });
 
-    graphState.edges = EDGES.map(([a, b]) => ({ a, b }));
-    graphState.simulationActive = true;
-    graphState.settleFrames = 0;
+    // Light deterministic relaxation so node circles never overlap.
+    const margin = 26;
+    for (let iteration = 0; iteration < 90; iteration += 1) {
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+          const minDistance = a.r + b.r + 18;
+
+          if (dist < minDistance) {
+            const push = ((minDistance - dist) / dist) * 0.34;
+            const fx = dx * push;
+            const fy = dy * push;
+            if (a.id !== centerId) {
+              a.x -= fx * 0.5;
+              a.y -= fy * 0.5;
+            }
+            if (b.id !== centerId) {
+              b.x += fx * 0.5;
+              b.y += fy * 0.5;
+            }
+          }
+        }
+      }
+
+      nodes.forEach((node) => {
+        if (node.id !== centerId) {
+          node.x += (node.baseX - node.x) * 0.1;
+          node.y += (node.baseY - node.y) * 0.1;
+        }
+        node.x = clamp(node.x, margin, graphState.width - margin);
+        node.y = clamp(node.y, margin, graphState.height - margin);
+      });
+    }
+
+    const labelGap = 16;
+    const top = 16;
+    const bottom = graphState.height - 12;
+    const left = nodes.filter((node) => node.x < centerX).sort((a, b) => a.y - b.y);
+    const right = nodes.filter((node) => node.x >= centerX).sort((a, b) => a.y - b.y);
+
+    const placeLabelColumn = (list, side) => {
+      let cursor = top;
+      list.forEach((node, index) => {
+        const remainingCount = list.length - index - 1;
+        const maxY = bottom - remainingCount * labelGap;
+        const target = clamp(node.y, top, bottom);
+        const y = clamp(Math.max(target, cursor), top, maxY);
+        cursor = y + labelGap;
+        node.labelY = y;
+        if (side === 'left') {
+          node.labelAlign = 'right';
+          node.labelX = node.x - (node.r + 10);
+        } else {
+          node.labelAlign = 'left';
+          node.labelX = node.x + (node.r + 10);
+        }
+      });
+    };
+
+    placeLabelColumn(left, 'left');
+    placeLabelColumn(right, 'right');
+
+    return nodes;
+  };
+
+  const draw = () => {
+    const context = graphState.ctx;
+    if (!context) {
+      return;
+    }
+
+    context.clearRect(0, 0, graphState.width, graphState.height);
+    const map = new Map(graphState.nodes.map((node) => [node.id, node]));
+    const selectedAdjacency = graphState.selectedNodeId ? adjacency.get(graphState.selectedNodeId) || new Set() : null;
+    const labelColor = dom.body.dataset.theme === 'dark' ? 'rgba(233, 241, 255, 0.88)' : 'rgba(20, 26, 37, 0.88)';
+    const wireColor = dom.body.dataset.theme === 'dark' ? 'rgba(201, 219, 241, 0.22)' : 'rgba(61, 78, 107, 0.26)';
+
+    graphState.edges.forEach((edge) => {
+      const a = map.get(edge.a);
+      const b = map.get(edge.b);
+      if (!a || !b) {
+        return;
+      }
+
+      const selectedEdge =
+        graphState.selectedNodeId && (edge.a === graphState.selectedNodeId || edge.b === graphState.selectedNodeId);
+      const hoveredEdge = graphState.hoverNodeId && (edge.a === graphState.hoverNodeId || edge.b === graphState.hoverNodeId);
+
+      context.beginPath();
+      context.strokeStyle = selectedEdge
+        ? 'rgba(18, 102, 125, 0.7)'
+        : hoveredEdge
+          ? 'rgba(151, 63, 39, 0.56)'
+          : wireColor;
+      context.lineWidth = selectedEdge ? 2.2 : hoveredEdge ? 1.6 : 1;
+      context.moveTo(a.x, a.y);
+      context.lineTo(b.x, b.y);
+      context.stroke();
+    });
+
+    graphState.nodes.forEach((node) => {
+      const hovered = graphState.hoverNodeId === node.id;
+      const selected = graphState.selectedNodeId === node.id;
+      const connectedToSelection = selectedAdjacency?.has(node.id);
+      const faded = graphState.selectedNodeId && !selected && !connectedToSelection;
+
+      context.beginPath();
+      context.fillStyle = entityColor(node.type);
+      context.globalAlpha = faded ? 0.45 : selected ? 1 : hovered ? 0.95 : 0.85;
+      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
+      context.fill();
+      context.globalAlpha = 1;
+
+      context.beginPath();
+      context.strokeStyle = selected ? '#ffffff' : 'rgba(255, 255, 255, 0.5)';
+      context.lineWidth = selected ? 2.4 : 1.2;
+      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
+      context.stroke();
+    });
+
+    context.font = "11px 'Space Mono', monospace";
+    context.fillStyle = labelColor;
+    graphState.nodes.forEach((node) => {
+      const hovered = graphState.hoverNodeId === node.id;
+      const selected = graphState.selectedNodeId === node.id;
+      const connected = graphState.selectedNodeId ? adjacency.get(graphState.selectedNodeId)?.has(node.id) : false;
+      const faded = graphState.selectedNodeId && !selected && !connected;
+
+      context.beginPath();
+      context.strokeStyle = faded ? 'rgba(123, 138, 162, 0.2)' : 'rgba(114, 132, 158, 0.42)';
+      context.lineWidth = 1;
+      context.moveTo(node.x, node.y);
+      const connectorX = node.labelAlign === 'right' ? node.labelX - 4 : node.labelX + 4;
+      context.lineTo(connectorX, node.labelY - 3);
+      context.stroke();
+
+      context.textAlign = node.labelAlign;
+      context.textBaseline = 'middle';
+      context.globalAlpha = faded ? 0.4 : selected || hovered ? 1 : 0.82;
+      context.fillText(node.label, node.labelX, node.labelY);
+      context.globalAlpha = 1;
+    });
   };
 
   const setCanvasSize = (rebuild = true) => {
@@ -1525,149 +1774,15 @@ const initGraph = () => {
     graphState.width = rect.width;
     graphState.height = rect.height;
     if (rebuild) {
-      buildNodes();
-    }
-  };
-
-  setCanvasSize(true);
-  window.addEventListener('resize', () => setCanvasSize(true));
-
-  const nodeById = () => new Map(graphState.nodes.map((node) => [node.id, node]));
-
-  const step = () => {
-    const nodes = graphState.nodes;
-    const map = nodeById();
-
-    for (let i = 0; i < nodes.length; i += 1) {
-      for (let j = i + 1; j < nodes.length; j += 1) {
-        const na = nodes[i];
-        const nb = nodes[j];
-        const dx = nb.x - na.x;
-        const dy = nb.y - na.y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-        const minDistance = 92;
-        if (dist < minDistance) {
-          const push = Math.min((minDistance - dist) * 0.016, 1.0);
-          const fx = (dx / dist) * push;
-          const fy = (dy / dist) * push;
-          na.vx -= fx;
-          na.vy -= fy;
-          nb.vx += fx;
-          nb.vy += fy;
-        }
-      }
-    }
-
-    graphState.edges.forEach((edge) => {
-      const a = map.get(edge.a);
-      const b = map.get(edge.b);
-      if (!a || !b) {
-        return;
-      }
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const target = 126;
-      const stretch = dist - target;
-      const spring = Math.max(Math.min(stretch * 0.006, 1.25), -1.25);
-      const fx = (dx / dist) * spring;
-      const fy = (dy / dist) * spring;
-      a.vx += fx;
-      a.vy += fy;
-      b.vx -= fx;
-      b.vy -= fy;
-    });
-
-    let totalSpeed = 0;
-    nodes.forEach((node) => {
-      node.vx += (node.baseX - node.x) * 0.02;
-      node.vy += (node.baseY - node.y) * 0.02;
-
-      node.vx *= 0.8;
-      node.vy *= 0.8;
-
-      const speed = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
-      const maxSpeed = 2.6;
-      if (speed > maxSpeed) {
-        const ratio = maxSpeed / speed;
-        node.vx *= ratio;
-        node.vy *= ratio;
-      }
-
-      node.x += node.vx;
-      node.y += node.vy;
-
-      node.x = Math.max(22, Math.min(graphState.width - 22, node.x));
-      node.y = Math.max(22, Math.min(graphState.height - 22, node.y));
-
-      totalSpeed += Math.abs(node.vx) + Math.abs(node.vy);
-    });
-
-    if (totalSpeed < 0.18) {
-      graphState.settleFrames += 1;
-      if (graphState.settleFrames > 20) {
-        graphState.simulationActive = false;
-      }
-    } else {
-      graphState.settleFrames = 0;
-    }
-  };
-
-  const draw = () => {
-    const context = graphState.ctx;
-    context.clearRect(0, 0, graphState.width, graphState.height);
-
-    const map = new Map(graphState.nodes.map((node) => [node.id, node]));
-
-    graphState.edges.forEach((edge) => {
-      const a = map.get(edge.a);
-      const b = map.get(edge.b);
-      if (!a || !b) {
-        return;
-      }
-
-      const highlighted =
-        graphState.selectedNodeId && (edge.a === graphState.selectedNodeId || edge.b === graphState.selectedNodeId);
-
-      context.beginPath();
-      context.strokeStyle = highlighted ? 'rgba(18, 102, 125, 0.65)' : 'rgba(80, 95, 120, 0.25)';
-      context.lineWidth = highlighted ? 2 : 1;
-      context.moveTo(a.x, a.y);
-      context.lineTo(b.x, b.y);
-      context.stroke();
-    });
-
-    graphState.nodes.forEach((node) => {
-      const hovered = graphState.hoverNodeId === node.id;
-      const selected = graphState.selectedNodeId === node.id;
-      context.beginPath();
-      context.fillStyle = entityColor(node.type);
-      context.globalAlpha = selected ? 1 : hovered ? 0.95 : 0.82;
-      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
-      context.fill();
-      context.globalAlpha = 1;
-
-      context.beginPath();
-      context.strokeStyle = selected ? '#ffffff' : 'rgba(255,255,255,0.45)';
-      context.lineWidth = selected ? 2.2 : 1.2;
-      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
-      context.stroke();
-
-      context.fillStyle =
-        dom.body.dataset.theme === 'dark' ? 'rgba(233, 241, 255, 0.82)' : 'rgba(20, 26, 37, 0.85)';
-      context.font = "11px 'Space Mono', monospace";
-      context.textAlign = 'center';
-      context.fillText(node.label, node.x, node.y - 16);
-    });
-  };
-
-  const animate = () => {
-    if (graphState.simulationActive) {
-      step();
+      graphState.nodes = buildLayout();
+      graphState.edges = EDGES.map(([a, b]) => ({ a, b }));
     }
     draw();
-    graphState.raf = requestAnimationFrame(animate);
   };
+
+  graphState.redraw = draw;
+  setCanvasSize(true);
+  window.addEventListener('resize', () => setCanvasSize(true));
 
   const getPointerNode = (event) => {
     const rect = canvas.getBoundingClientRect();
@@ -1676,40 +1791,42 @@ const initGraph = () => {
 
     let hit = null;
     let hitDist = Infinity;
-
     graphState.nodes.forEach((node) => {
       const dx = x - node.x;
       const dy = y - node.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < node.r + 8 && dist < hitDist) {
-        hitDist = dist;
         hit = node;
+        hitDist = dist;
       }
     });
-
     return hit;
   };
 
   canvas.addEventListener('mousemove', (event) => {
     const node = getPointerNode(event);
-    graphState.hoverNodeId = node ? node.id : null;
+    const nextId = node ? node.id : null;
+    if (nextId !== graphState.hoverNodeId) {
+      graphState.hoverNodeId = nextId;
+      draw();
+    }
     canvas.style.cursor = node ? 'pointer' : 'default';
   });
 
   canvas.addEventListener('mouseleave', () => {
-    graphState.hoverNodeId = null;
+    if (graphState.hoverNodeId !== null) {
+      graphState.hoverNodeId = null;
+      draw();
+    }
     canvas.style.cursor = 'default';
   });
 
   canvas.addEventListener('click', (event) => {
     const node = getPointerNode(event);
     graphState.selectedNodeId = node ? node.id : null;
-    graphState.simulationActive = true;
-    graphState.settleFrames = 0;
+    draw();
     renderEntityPanel(graphState.selectedNodeId);
   });
-
-  animate();
 };
 
 const focusEntity = (entityId) => {
@@ -1717,8 +1834,7 @@ const focusEntity = (entityId) => {
     return;
   }
   graphState.selectedNodeId = entityId;
-  graphState.simulationActive = true;
-  graphState.settleFrames = 0;
+  graphState.redraw();
   renderEntityPanel(entityId);
   document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
