@@ -43,12 +43,13 @@
         <a href="#overview">Overview</a>
         <a href="#matrix">Case Map</a>
         <a href="#timeline">Timeline</a>
+        <a href="#workspace">Workspace</a>
         <a href="#sources">Sources</a>
         <a href="#method">Method</a>
         <a href="#faq">FAQ</a>
       </nav>
 
-      <a class="header-cta" href="#sources">Browse Sources</a>
+      <a class="header-cta" href="#workspace">Open Workspace</a>
     </header>
 
     <main>
@@ -154,70 +155,229 @@
           <p class="eyebrow">Chronology</p>
           <h2>Key milestones, arranged for fast reading</h2>
         </div>
+        <p class="section-sub">Use the workspace tools below to filter, pin, and summarize events.</p>
 
-        <div class="timeline-list">
-          <article class="timeline-item" id="tl-2005">
+        <div class="timeline-list" id="timeline-list">
+          <article
+            class="timeline-item"
+            id="tl-2005"
+            data-phase="investigation"
+            data-period="2005-2010"
+            data-keywords="palm beach florida police reports early investigation"
+          >
             <p class="timeline-date">2005</p>
-            <div>
+            <div class="timeline-content">
               <h3>Palm Beach investigation begins</h3>
               <p>
                 Local authorities receive reports involving underage girls, launching the early formal
                 case pathway.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2005">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
           </article>
 
-          <article class="timeline-item" id="tl-2008">
+          <article
+            class="timeline-item"
+            id="tl-2008"
+            data-phase="legal"
+            data-period="2005-2010"
+            data-keywords="2008 plea deal florida state charges agreement criticism"
+          >
             <p class="timeline-date">2008</p>
-            <div>
+            <div class="timeline-content">
               <h3>Controversial plea deal in Florida</h3>
               <p>
                 Epstein pleads guilty to state-level charges in an agreement that later faces sustained
                 legal and public criticism.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2008">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
           </article>
 
-          <article class="timeline-item">
+          <article
+            class="timeline-item"
+            id="tl-2015"
+            data-phase="investigation"
+            data-period="2011-2018"
+            data-keywords="2015 2018 investigative reporting civil litigation scrutiny"
+          >
             <p class="timeline-date">2015-2018</p>
-            <div>
+            <div class="timeline-content">
               <h3>New investigative pressure</h3>
               <p>
                 Continued reporting and civil litigation reframe public understanding of prior handling
                 and institutional decisions.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2015">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
           </article>
 
-          <article class="timeline-item">
+          <article
+            class="timeline-item"
+            id="tl-2019-federal"
+            data-phase="legal"
+            data-period="2019"
+            data-keywords="july 2019 federal arrest sdny sex trafficking charges"
+          >
             <p class="timeline-date">July 2019</p>
-            <div>
+            <div class="timeline-content">
               <h3>Federal arrest in New York</h3>
               <p>
                 Prosecutors file federal sex trafficking charges connected to conduct involving minors.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2019-federal">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
           </article>
 
-          <article class="timeline-item" id="tl-2019-custody">
+          <article
+            class="timeline-item"
+            id="tl-2019-custody"
+            data-phase="custody"
+            data-period="2019"
+            data-keywords="august 2019 custody death medical examiner suicide ruling"
+          >
             <p class="timeline-date">August 2019</p>
-            <div>
+            <div class="timeline-content">
               <h3>Death in federal custody</h3>
               <p>
                 Epstein dies in detention; the New York City medical examiner rules the death a suicide.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-2019-custody">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
           </article>
 
-          <article class="timeline-item" id="tl-aftermath">
+          <article
+            class="timeline-item"
+            id="tl-aftermath"
+            data-phase="aftermath"
+            data-period="2020-present"
+            data-keywords="2021 present ghislaine maxwell conviction civil filings unsealed records"
+          >
             <p class="timeline-date">2021-present</p>
-            <div>
+            <div class="timeline-content">
               <h3>Related prosecution and document waves</h3>
               <p>
                 Ghislaine Maxwell is convicted in federal court in 2021, while civil filings and unsealed
                 records continue to shape public accountability.
               </p>
+              <div class="timeline-actions">
+                <button class="timeline-action bookmark-btn" type="button" data-bookmark-id="tl-aftermath">
+                  Pin event
+                </button>
+                <a class="timeline-action link" href="#sources">Related sources</a>
+              </div>
             </div>
+          </article>
+        </div>
+        <p class="timeline-empty" id="timeline-empty" hidden>No timeline events match your filters.</p>
+      </section>
+
+      <section class="workspace reveal" id="workspace">
+        <div class="section-head">
+          <p class="eyebrow">Research Workspace</p>
+          <h2>Make the archive useful: filter, pin, and export</h2>
+        </div>
+
+        <div class="workspace-grid">
+          <article class="tool-panel">
+            <h3>Filter and search timeline</h3>
+            <p>Narrow events by track, period, and keyword.</p>
+            <div class="tool-fields">
+              <label class="tool-field">
+                <span>Track</span>
+                <select id="filter-track">
+                  <option value="all">All tracks</option>
+                  <option value="investigation">Investigations</option>
+                  <option value="legal">Legal pathway</option>
+                  <option value="custody">Custody and death</option>
+                  <option value="aftermath">Aftermath</option>
+                </select>
+              </label>
+
+              <label class="tool-field">
+                <span>Period</span>
+                <select id="filter-period">
+                  <option value="all">All periods</option>
+                  <option value="2005-2010">2005-2010</option>
+                  <option value="2011-2018">2011-2018</option>
+                  <option value="2019">2019</option>
+                  <option value="2020-present">2020-present</option>
+                </select>
+              </label>
+
+              <label class="tool-field">
+                <span>Keyword</span>
+                <input id="timeline-search" type="search" placeholder="Search timeline text..." />
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn" id="timeline-reset" type="button">Reset filters</button>
+            </div>
+            <p class="tool-status" id="filter-status">Showing 6 of 6 timeline events.</p>
+          </article>
+
+          <article class="tool-panel">
+            <h3>Pinned events</h3>
+            <p><span id="pinned-count">0</span> events pinned for quick reference.</p>
+            <ul class="pinned-list" id="pinned-list">
+              <li class="placeholder">No pinned events yet.</li>
+            </ul>
+            <div class="tool-actions">
+              <button class="tool-btn" id="export-pins" type="button">Export pinned list</button>
+            </div>
+            <p class="tool-status" id="pinned-status">Pin timeline events to build a working set.</p>
+          </article>
+
+          <article class="tool-panel tool-panel-wide">
+            <h3>Research notebook</h3>
+            <p>Write notes here. They save locally in your browser automatically.</p>
+            <textarea
+              id="research-notes"
+              class="notes-area"
+              placeholder="Add findings, open questions, citation reminders, and follow-up tasks..."
+            ></textarea>
+            <div class="tool-actions">
+              <button class="tool-btn" id="copy-notes" type="button">Copy notes</button>
+              <button class="tool-btn" id="download-notes" type="button">Download notes</button>
+              <button class="tool-btn danger" id="clear-notes" type="button">Clear notes</button>
+            </div>
+            <p class="tool-status" id="notes-status">No notes saved yet.</p>
+          </article>
+
+          <article class="tool-panel tool-panel-wide">
+            <h3>Quick digest</h3>
+            <p>Generate a shareable summary using your current filters and pinned events.</p>
+            <div class="tool-actions">
+              <button class="tool-btn" id="generate-digest" type="button">Generate digest</button>
+              <button class="tool-btn" id="copy-digest" type="button">Copy digest</button>
+            </div>
+            <pre class="digest-output" id="digest-output">Generate a digest to get a shareable summary.</pre>
+            <p class="tool-status" id="digest-status">Digest is generated locally in your browser.</p>
           </article>
         </div>
       </section>

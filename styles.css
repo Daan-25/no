@@ -212,6 +212,7 @@ main {
 .hero,
 .case-map,
 .timeline,
+.workspace,
 .sources,
 .method,
 .faq {
@@ -376,8 +377,14 @@ main {
   font-size: clamp(1.65rem, 3.7vw, 3rem);
 }
 
+.section-sub {
+  margin: -0.5rem 0 1rem;
+  color: var(--ink-2);
+}
+
 .case-map,
 .timeline,
+.workspace,
 .sources,
 .method,
 .faq {
@@ -512,6 +519,217 @@ main {
 
 .timeline-item p {
   color: var(--ink-2);
+}
+
+.timeline-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.timeline-item.hidden {
+  display: none;
+}
+
+.timeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.timeline-action {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0.35rem 0.68rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.timeline-action.link {
+  color: var(--teal);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.bookmark-btn {
+  font: inherit;
+  cursor: pointer;
+  color: var(--ink-1);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.bookmark-btn.pinned {
+  color: #f6fafc;
+  background: linear-gradient(120deg, var(--teal), #2c6b81);
+  border-color: transparent;
+}
+
+.timeline-empty {
+  margin-top: 1rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 0.8rem;
+  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.tool-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.84);
+  padding: 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.tool-panel h3 {
+  margin: 0;
+  font-size: 1.28rem;
+}
+
+.tool-panel p {
+  color: var(--ink-2);
+}
+
+.tool-panel-wide {
+  grid-column: span 2;
+}
+
+.tool-fields {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tool-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.tool-field span {
+  font-family: "Space Mono", monospace;
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tool-field select,
+.tool-field input,
+.notes-area {
+  font: inherit;
+  color: var(--ink-1);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.55rem 0.65rem;
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tool-btn {
+  font: inherit;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.93);
+  color: var(--ink-1);
+  font-weight: 700;
+  padding: 0.42rem 0.78rem;
+  cursor: pointer;
+  transition: transform 170ms ease, box-shadow 170ms ease;
+}
+
+.tool-btn:hover,
+.tool-btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(24, 30, 41, 0.12);
+}
+
+.tool-btn.danger {
+  color: #6d1f1f;
+  border-color: rgba(109, 31, 31, 0.35);
+}
+
+.tool-status {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+}
+
+.pinned-list {
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.pinned-list li {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(246, 250, 252, 0.9);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--ink-2);
+}
+
+.pinned-list li.placeholder {
+  justify-content: flex-start;
+}
+
+.pin-meta {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.pin-title {
+  color: var(--ink-1);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.pin-date {
+  font-size: 0.8rem;
+  color: var(--ink-3);
+}
+
+.remove-pin {
+  font: inherit;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink-1);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.notes-area {
+  min-height: 170px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.digest-output {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(247, 250, 252, 0.95);
+  padding: 0.8rem;
+  color: var(--ink-1);
+  font-family: "Space Mono", monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  min-height: 170px;
 }
 
 .source-grid {
@@ -732,9 +950,14 @@ details p {
   }
 
   .source-grid,
+  .workspace-grid,
   .method-layout,
   .map-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tool-panel-wide {
+    grid-column: span 1;
   }
 }
 
