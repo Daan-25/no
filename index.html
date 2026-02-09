@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JeffreyEpsteins.org | Investigative Archive</title>
+    <meta
+      name="description"
+      content="JeffreyEpsteins.org provides a clear, accessible overview of the Epstein case with timeline, files, and context."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient"></div>
+
+    <header class="site-header" id="top">
+      <a class="logo" href="#top">JeffreyEpsteins.org</a>
+      <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">Menu</button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#overview">Overview</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#dossiers">Files</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero reveal" id="overview">
+        <p class="eyebrow">Case File</p>
+        <h1>A visual, factual overview of the Epstein case</h1>
+        <p class="lead">
+          This site compiles key moments, legal context, and references to publicly known
+          information. The goal is documentation and context, not sensationalism.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#timeline">View timeline</a>
+          <a class="button ghost" href="#dossiers">Open files</a>
+        </div>
+        <div class="hero-cards" aria-label="Key points">
+          <article>
+            <h2>2005</h2>
+            <p>Police investigation begins in Palm Beach.</p>
+          </article>
+          <article>
+            <h2>2019</h2>
+            <p>Federal indictment and arrest in New York.</p>
+          </article>
+          <article>
+            <h2>Ongoing</h2>
+            <p>Civil litigation, document releases, and broader public impact.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="timeline reveal" id="timeline">
+        <div class="section-head">
+          <p class="eyebrow">Chronology</p>
+          <h2>Key events in order</h2>
+        </div>
+        <ol>
+          <li>
+            <span class="year">2005</span>
+            <div>
+              <h3>Start of local investigation</h3>
+              <p>Authorities in Florida receive reports and open a formal investigation.</p>
+            </div>
+          </li>
+          <li>
+            <span class="year">2008</span>
+            <div>
+              <h3>Plea deal in Florida</h3>
+              <p>Epstein pleads guilty to state-level charges under a controversial arrangement.</p>
+            </div>
+          </li>
+          <li>
+            <span class="year">2015-2018</span>
+            <div>
+              <h3>Growing journalistic pressure</h3>
+              <p>Investigative reporting and civil claims bring renewed scrutiny to earlier handling.</p>
+            </div>
+          </li>
+          <li>
+            <span class="year">July 2019</span>
+            <div>
+              <h3>New federal case</h3>
+              <p>Epstein is arrested on federal allegations of sex trafficking of minors.</p>
+            </div>
+          </li>
+          <li>
+            <span class="year">August 2019</span>
+            <div>
+              <h3>Death in custody</h3>
+              <p>Epstein dies in detention; official ruling: suicide.</p>
+            </div>
+          </li>
+          <li>
+            <span class="year">2020-present</span>
+            <div>
+              <h3>Aftermath and ongoing proceedings</h3>
+              <p>Court filings, civil cases, and public debate continue.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="dossiers reveal" id="dossiers">
+        <div class="section-head">
+          <p class="eyebrow">Files</p>
+          <h2>Topics you can expand further</h2>
+        </div>
+        <div class="grid">
+          <article>
+            <h3>Legal track</h3>
+            <p>Court cases, indictments, plea agreements, and relevant legal documents.</p>
+            <a href="#" aria-label="Read more about legal track">Read file</a>
+          </article>
+          <article>
+            <h3>Media investigations</h3>
+            <p>Major publications, investigative reporting, and timeline-based data points.</p>
+            <a href="#" aria-label="Read more about media investigations">Read file</a>
+          </article>
+          <article>
+            <h3>Network and impact</h3>
+            <p>Public questions about power, influence, and institutional response.</p>
+            <a href="#" aria-label="Read more about network and impact">Read file</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="faq reveal" id="faq">
+        <div class="section-head">
+          <p class="eyebrow">Frequently Asked Questions</p>
+          <h2>Quick context</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>What is this website for?</summary>
+            <p>To provide an informative, structured overview of publicly known facts and context.</p>
+          </details>
+          <details>
+            <summary>Is the content updated regularly?</summary>
+            <p>Yes. You can manage new articles, legal documents, and updates directly in GitHub.</p>
+          </details>
+          <details>
+            <summary>Can I add sources?</summary>
+            <p>Yes, through additional pages or markdown files that you publish in the repository.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>JeffreyEpsteins.org · Investigative Archive</p>
+      <p>© <span id="year"></span> · Built for GitHub Pages</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
