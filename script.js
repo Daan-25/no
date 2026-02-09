@@ -1393,6 +1393,8 @@ const renderEntityPanel = (entityId) => {
     `;
     dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
       graphState.selectedNodeId = null;
+      graphState.simulationActive = true;
+      graphState.settleFrames = 0;
       renderEntityPanel(null);
     });
     return;
@@ -1427,6 +1429,8 @@ const renderEntityPanel = (entityId) => {
 
   dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
     graphState.selectedNodeId = null;
+    graphState.simulationActive = true;
+    graphState.settleFrames = 0;
     renderEntityPanel(null);
   });
 
@@ -1459,6 +1463,8 @@ const graphState = {
   width: 0,
   height: 0,
   ctx: null,
+  simulationActive: true,
+  settleFrames: 0,
 };
 
 const entityColor = (type) => {
@@ -1476,36 +1482,55 @@ const entityColor = (type) => {
 
 const initGraph = () => {
   const canvas = dom.networkCanvas;
+  if (!canvas) {
+    return;
+  }
   const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
   graphState.ctx = ctx;
 
-  const setCanvasSize = () => {
+  const buildNodes = () => {
+    graphState.nodes = ENTITIES.map((entity, index) => {
+      const angle = (index / ENTITIES.length) * Math.PI * 2;
+      const radius = Math.min(graphState.width, graphState.height) * 0.33;
+      const jitter = 8;
+      return {
+        ...entity,
+        x: graphState.width / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * jitter,
+        y: graphState.height / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * jitter,
+        baseX: graphState.width / 2 + Math.cos(angle) * radius,
+        baseY: graphState.height / 2 + Math.sin(angle) * radius,
+        vx: 0,
+        vy: 0,
+        r: 11,
+      };
+    });
+
+    graphState.edges = EDGES.map(([a, b]) => ({ a, b }));
+    graphState.simulationActive = true;
+    graphState.settleFrames = 0;
+  };
+
+  const setCanvasSize = (rebuild = true) => {
     const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      return;
+    }
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.floor(rect.width * dpr);
     canvas.height = Math.floor(rect.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     graphState.width = rect.width;
     graphState.height = rect.height;
+    if (rebuild) {
+      buildNodes();
+    }
   };
 
-  setCanvasSize();
-  window.addEventListener('resize', setCanvasSize);
-
-  graphState.nodes = ENTITIES.map((entity, index) => {
-    const angle = (index / ENTITIES.length) * Math.PI * 2;
-    const radius = Math.min(graphState.width, graphState.height) * 0.32;
-    return {
-      ...entity,
-      x: graphState.width / 2 + Math.cos(angle) * radius,
-      y: graphState.height / 2 + Math.sin(angle) * radius,
-      vx: 0,
-      vy: 0,
-      r: 11,
-    };
-  });
-
-  graphState.edges = EDGES.map(([a, b]) => ({ a, b }));
+  setCanvasSize(true);
+  window.addEventListener('resize', () => setCanvasSize(true));
 
   const nodeById = () => new Map(graphState.nodes.map((node) => [node.id, node]));
 
@@ -1519,14 +1544,17 @@ const initGraph = () => {
         const nb = nodes[j];
         const dx = nb.x - na.x;
         const dy = nb.y - na.y;
-        const distSq = dx * dx + dy * dy + 0.01;
-        const force = 1200 / distSq;
-        const fx = force * dx;
-        const fy = force * dy;
-        na.vx -= fx;
-        na.vy -= fy;
-        nb.vx += fx;
-        nb.vy += fy;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        const minDistance = 92;
+        if (dist < minDistance) {
+          const push = Math.min((minDistance - dist) * 0.016, 1.0);
+          const fx = (dx / dist) * push;
+          const fy = (dy / dist) * push;
+          na.vx -= fx;
+          na.vy -= fy;
+          nb.vx += fx;
+          nb.vy += fy;
+        }
       }
     }
 
@@ -1539,31 +1567,50 @@ const initGraph = () => {
       const dx = b.x - a.x;
       const dy = b.y - a.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const target = 130;
+      const target = 126;
       const stretch = dist - target;
-      const spring = 0.0035 * stretch;
-      const fx = spring * dx;
-      const fy = spring * dy;
+      const spring = Math.max(Math.min(stretch * 0.006, 1.25), -1.25);
+      const fx = (dx / dist) * spring;
+      const fy = (dy / dist) * spring;
       a.vx += fx;
       a.vy += fy;
       b.vx -= fx;
       b.vy -= fy;
     });
 
+    let totalSpeed = 0;
     nodes.forEach((node) => {
-      const centerX = graphState.width / 2;
-      const centerY = graphState.height / 2;
-      node.vx += (centerX - node.x) * 0.00065;
-      node.vy += (centerY - node.y) * 0.00065;
+      node.vx += (node.baseX - node.x) * 0.02;
+      node.vy += (node.baseY - node.y) * 0.02;
 
-      node.vx *= 0.88;
-      node.vy *= 0.88;
+      node.vx *= 0.8;
+      node.vy *= 0.8;
+
+      const speed = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
+      const maxSpeed = 2.6;
+      if (speed > maxSpeed) {
+        const ratio = maxSpeed / speed;
+        node.vx *= ratio;
+        node.vy *= ratio;
+      }
+
       node.x += node.vx;
       node.y += node.vy;
 
       node.x = Math.max(22, Math.min(graphState.width - 22, node.x));
       node.y = Math.max(22, Math.min(graphState.height - 22, node.y));
+
+      totalSpeed += Math.abs(node.vx) + Math.abs(node.vy);
     });
+
+    if (totalSpeed < 0.18) {
+      graphState.settleFrames += 1;
+      if (graphState.settleFrames > 20) {
+        graphState.simulationActive = false;
+      }
+    } else {
+      graphState.settleFrames = 0;
+    }
   };
 
   const draw = () => {
@@ -1606,7 +1653,8 @@ const initGraph = () => {
       context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
       context.stroke();
 
-      context.fillStyle = 'rgba(20, 26, 37, 0.85)';
+      context.fillStyle =
+        dom.body.dataset.theme === 'dark' ? 'rgba(233, 241, 255, 0.82)' : 'rgba(20, 26, 37, 0.85)';
       context.font = "11px 'Space Mono', monospace";
       context.textAlign = 'center';
       context.fillText(node.label, node.x, node.y - 16);
@@ -1614,7 +1662,9 @@ const initGraph = () => {
   };
 
   const animate = () => {
-    step();
+    if (graphState.simulationActive) {
+      step();
+    }
     draw();
     graphState.raf = requestAnimationFrame(animate);
   };
@@ -1654,12 +1704,9 @@ const initGraph = () => {
   canvas.addEventListener('click', (event) => {
     const node = getPointerNode(event);
     graphState.selectedNodeId = node ? node.id : null;
+    graphState.simulationActive = true;
+    graphState.settleFrames = 0;
     renderEntityPanel(graphState.selectedNodeId);
-  });
-
-  dom.networkReset.addEventListener('click', () => {
-    graphState.selectedNodeId = null;
-    renderEntityPanel(null);
   });
 
   animate();
@@ -1670,6 +1717,8 @@ const focusEntity = (entityId) => {
     return;
   }
   graphState.selectedNodeId = entityId;
+  graphState.simulationActive = true;
+  graphState.settleFrames = 0;
   renderEntityPanel(entityId);
   document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
