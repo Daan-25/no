@@ -437,6 +437,7 @@ const STORAGE_KEYS = {
   briefTone: 'jef_brief_tone_v2',
   theme: 'jef_theme_v2',
   notebook: 'jef_notebook_v1',
+  gameBest: 'jef_game_best_v1',
 };
 
 const safeStore = {
@@ -514,6 +515,7 @@ const state = {
   evidenceScope: 'filtered',
   notebook: initialNotebook,
   notebookFilter: 'all',
+  gameBest: Number(safeStore.get(STORAGE_KEYS.gameBest, 0)) || 0,
 };
 
 const dom = {
@@ -547,6 +549,19 @@ const dom = {
   timelineClear: document.querySelector('#timeline-clear'),
   timelineStatus: document.querySelector('#timeline-status'),
   timelineResults: document.querySelector('#timeline-results'),
+
+  gameCanvas: document.querySelector('#case-game-canvas'),
+  gameStart: document.querySelector('#game-start'),
+  gamePause: document.querySelector('#game-pause'),
+  gameReset: document.querySelector('#game-reset'),
+  gameDifficulty: document.querySelector('#game-difficulty'),
+  gameStatus: document.querySelector('#game-status'),
+  gameScore: document.querySelector('#game-score'),
+  gameLives: document.querySelector('#game-lives'),
+  gameTime: document.querySelector('#game-time'),
+  gameBest: document.querySelector('#game-best'),
+  gameLeft: document.querySelector('#game-left'),
+  gameRight: document.querySelector('#game-right'),
 
   evidenceScope: document.querySelector('#evidence-scope'),
   evidenceRefresh: document.querySelector('#evidence-refresh'),
@@ -666,6 +681,7 @@ const saveBriefNotes = () => safeStore.set(STORAGE_KEYS.briefNotes, state.briefN
 const saveBriefTone = () => safeStore.set(STORAGE_KEYS.briefTone, state.briefTone);
 const saveTheme = () => safeStore.set(STORAGE_KEYS.theme, state.theme);
 const saveNotebook = () => safeStore.set(STORAGE_KEYS.notebook, state.notebook);
+const saveGameBest = () => safeStore.set(STORAGE_KEYS.gameBest, state.gameBest);
 
 const setStatus = (node, text) => {
   if (node) {
@@ -1601,6 +1617,7 @@ const exportSession = () => {
     briefNotes: state.briefNotes,
     evidenceScope: state.evidenceScope,
     notebook: state.notebook,
+    gameBest: state.gameBest,
   };
 
   downloadText('research-session.json', JSON.stringify(payload, null, 2));
@@ -1626,6 +1643,7 @@ const resetSession = () => {
   state.evidenceScope = 'filtered';
   state.notebook = [];
   state.notebookFilter = 'all';
+  state.gameBest = 0;
 
   safeStore.remove(STORAGE_KEYS.pins);
   safeStore.remove(STORAGE_KEYS.brief);
@@ -1633,6 +1651,7 @@ const resetSession = () => {
   safeStore.remove(STORAGE_KEYS.briefNotes);
   safeStore.remove(STORAGE_KEYS.briefTone);
   safeStore.remove(STORAGE_KEYS.notebook);
+  safeStore.remove(STORAGE_KEYS.gameBest);
 
   dom.timelineSearch.value = '';
   dom.timelineSort.value = 'newest';
@@ -1668,6 +1687,7 @@ const resetSession = () => {
   renderSources();
   renderBrief();
   renderNotebook();
+  resetGame();
   setStatus(dom.sessionStatus, 'Session reset complete.');
 };
 
@@ -1676,6 +1696,7 @@ const setTheme = (theme) => {
   dom.body.dataset.theme = theme;
   saveTheme();
   graphState.redraw();
+  renderGameFrame();
 };
 
 const toggleTheme = () => {
@@ -2251,6 +2272,525 @@ const focusEntity = (entityId) => {
   document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+const GAME_LEAD_TYPES = {
+  official: { label: 'Official', color: '#58a37d', points: 5, bad: false },
+  court: { label: 'Court', color: '#3da0bd', points: 4, bad: false },
+  media: { label: 'Media', color: '#9b7bd9', points: 2, bad: false },
+  analysis: { label: 'Analysis', color: '#de7f4d', points: 1, bad: false },
+  decoy: { label: 'Decoy', color: '#973f27', points: -4, bad: true },
+};
+
+const getGameDifficultyConfig = (difficulty) => {
+  if (difficulty === 'casual') {
+    return {
+      duration: 65,
+      lives: 4,
+      spawnMs: 760,
+      minSpeed: 94,
+      maxSpeed: 138,
+      weights: ['official', 'official', 'court', 'court', 'media', 'analysis', 'analysis', 'decoy'],
+    };
+  }
+  if (difficulty === 'intense') {
+    return {
+      duration: 55,
+      lives: 3,
+      spawnMs: 520,
+      minSpeed: 128,
+      maxSpeed: 196,
+      weights: ['official', 'court', 'media', 'analysis', 'decoy', 'decoy', 'decoy'],
+    };
+  }
+  return {
+    duration: 60,
+    lives: 3,
+    spawnMs: 640,
+    minSpeed: 108,
+    maxSpeed: 166,
+    weights: ['official', 'official', 'court', 'court', 'media', 'analysis', 'decoy', 'decoy'],
+  };
+};
+
+const gameState = {
+  ctx: null,
+  width: 0,
+  height: 0,
+  running: false,
+  paused: false,
+  difficulty: 'standard',
+  score: 0,
+  lives: 3,
+  timeLeft: 60,
+  tokens: [],
+  spawnClock: 0,
+  playerX: 0,
+  playerY: 0,
+  playerWidth: 78,
+  playerHeight: 16,
+  moveLeft: false,
+  moveRight: false,
+  playerSpeed: 330,
+  lastFrame: 0,
+  raf: 0,
+};
+
+const setGameStatus = (text) => {
+  setStatus(dom.gameStatus, text);
+};
+
+const syncGameHud = () => {
+  if (dom.gameScore) {
+    dom.gameScore.textContent = String(Math.max(0, Math.round(gameState.score)));
+  }
+  if (dom.gameLives) {
+    dom.gameLives.textContent = String(Math.max(0, Math.round(gameState.lives)));
+  }
+  if (dom.gameTime) {
+    dom.gameTime.textContent = String(Math.max(0, Math.ceil(gameState.timeLeft)));
+  }
+  if (dom.gameBest) {
+    dom.gameBest.textContent = String(Math.max(0, Math.round(state.gameBest)));
+  }
+};
+
+const drawRoundedRect = (context, x, y, width, height, radius) => {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+};
+
+const getGameTheme = () =>
+  dom.body.dataset.theme === 'dark'
+    ? {
+        bgTop: 'rgba(18, 33, 53, 0.96)',
+        bgBottom: 'rgba(8, 16, 27, 0.98)',
+        grid: 'rgba(191, 211, 236, 0.14)',
+        text: 'rgba(236, 245, 255, 0.86)',
+        player: '#4eb9d7',
+      }
+    : {
+        bgTop: 'rgba(231, 240, 252, 0.95)',
+        bgBottom: 'rgba(212, 224, 240, 0.96)',
+        grid: 'rgba(38, 62, 93, 0.13)',
+        text: 'rgba(23, 31, 45, 0.85)',
+        player: '#12667d',
+      };
+
+const renderGameFrame = () => {
+  const context = gameState.ctx;
+  if (!context || gameState.width <= 0 || gameState.height <= 0) {
+    return;
+  }
+
+  const theme = getGameTheme();
+  const gradient = context.createLinearGradient(0, 0, 0, gameState.height);
+  gradient.addColorStop(0, theme.bgTop);
+  gradient.addColorStop(1, theme.bgBottom);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, gameState.width, gameState.height);
+
+  context.strokeStyle = theme.grid;
+  context.lineWidth = 1;
+  for (let x = 20; x < gameState.width; x += 26) {
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, gameState.height);
+    context.stroke();
+  }
+  for (let y = 20; y < gameState.height; y += 24) {
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(gameState.width, y);
+    context.stroke();
+  }
+
+  gameState.tokens.forEach((token) => {
+    context.beginPath();
+    context.fillStyle = token.color;
+    context.globalAlpha = token.bad ? 0.95 : 0.88;
+    context.arc(token.x, token.y, token.r, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 1;
+
+    context.fillStyle = '#ffffff';
+    context.font = "10px 'Space Mono', monospace";
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(token.label.charAt(0), token.x, token.y + 0.3);
+  });
+
+  context.fillStyle = theme.player;
+  drawRoundedRect(
+    context,
+    gameState.playerX,
+    gameState.playerY,
+    gameState.playerWidth,
+    gameState.playerHeight,
+    9
+  );
+  context.fill();
+
+  context.fillStyle = theme.text;
+  context.font = "12px 'Space Mono', monospace";
+  context.textAlign = 'left';
+  context.fillText('Signal vs Noise', 14, 18);
+
+  if (!gameState.running || gameState.paused) {
+    context.fillStyle = 'rgba(7, 10, 16, 0.46)';
+    drawRoundedRect(context, gameState.width * 0.19, gameState.height * 0.34, gameState.width * 0.62, 74, 16);
+    context.fill();
+    context.fillStyle = '#f8fbff';
+    context.textAlign = 'center';
+    context.font = "14px 'Space Mono', monospace";
+    context.fillText(
+      gameState.paused ? 'Paused - press Pause to resume' : 'Press Start to launch the mission',
+      gameState.width / 2,
+      gameState.height * 0.34 + 40
+    );
+  }
+};
+
+const pickGameTokenKind = () => {
+  const config = getGameDifficultyConfig(gameState.difficulty);
+  const pool = config.weights;
+  return pool[Math.floor(Math.random() * pool.length)] || 'analysis';
+};
+
+const spawnGameToken = () => {
+  const kind = pickGameTokenKind();
+  const data = GAME_LEAD_TYPES[kind] || GAME_LEAD_TYPES.analysis;
+  const config = getGameDifficultyConfig(gameState.difficulty);
+  const radius = 12;
+  const token = {
+    id: `tok-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    kind,
+    label: data.label,
+    color: data.color,
+    bad: data.bad,
+    points: data.points,
+    r: radius,
+    x: radius + Math.random() * Math.max(1, gameState.width - radius * 2),
+    y: -radius,
+    speed: config.minSpeed + Math.random() * (config.maxSpeed - config.minSpeed),
+  };
+  gameState.tokens.push(token);
+};
+
+const tokenHitsPlayer = (token) => {
+  const closestX = clamp(token.x, gameState.playerX, gameState.playerX + gameState.playerWidth);
+  const closestY = clamp(token.y, gameState.playerY, gameState.playerY + gameState.playerHeight);
+  const dx = token.x - closestX;
+  const dy = token.y - closestY;
+  return dx * dx + dy * dy <= token.r * token.r;
+};
+
+const finalizeGameRound = (reason) => {
+  gameState.running = false;
+  gameState.paused = false;
+  gameState.moveLeft = false;
+  gameState.moveRight = false;
+  if (gameState.raf) {
+    cancelAnimationFrame(gameState.raf);
+    gameState.raf = 0;
+  }
+  if (gameState.score > state.gameBest) {
+    state.gameBest = Math.max(0, Math.round(gameState.score));
+    saveGameBest();
+    setGameStatus(`${reason} New high score: ${state.gameBest}.`);
+  } else {
+    setGameStatus(reason);
+  }
+  if (dom.gamePause) {
+    dom.gamePause.textContent = 'Pause';
+  }
+  syncGameHud();
+  renderGameFrame();
+};
+
+const updateGameStep = (deltaSeconds) => {
+  if (!gameState.running || gameState.paused) {
+    return;
+  }
+
+  if (gameState.moveLeft) {
+    gameState.playerX -= gameState.playerSpeed * deltaSeconds;
+  }
+  if (gameState.moveRight) {
+    gameState.playerX += gameState.playerSpeed * deltaSeconds;
+  }
+  gameState.playerX = clamp(gameState.playerX, 10, gameState.width - gameState.playerWidth - 10);
+
+  const config = getGameDifficultyConfig(gameState.difficulty);
+  gameState.spawnClock += deltaSeconds * 1000;
+  while (gameState.spawnClock >= config.spawnMs) {
+    spawnGameToken();
+    gameState.spawnClock -= config.spawnMs;
+  }
+
+  for (let i = gameState.tokens.length - 1; i >= 0; i -= 1) {
+    const token = gameState.tokens[i];
+    token.y += token.speed * deltaSeconds;
+
+    if (tokenHitsPlayer(token)) {
+      if (token.bad) {
+        gameState.lives -= 1;
+        gameState.score = Math.max(0, gameState.score - 4);
+        setGameStatus('Bad intel intercepted your channel. Lose 1 life.');
+      } else {
+        gameState.score += token.points;
+      }
+      gameState.tokens.splice(i, 1);
+      continue;
+    }
+
+    if (token.y - token.r > gameState.height) {
+      if (!token.bad) {
+        gameState.score = Math.max(0, gameState.score - 1);
+      }
+      gameState.tokens.splice(i, 1);
+    }
+  }
+
+  gameState.timeLeft -= deltaSeconds;
+  if (gameState.lives <= 0) {
+    finalizeGameRound('Mission failed. You ran out of lives.');
+    return;
+  }
+  if (gameState.timeLeft <= 0) {
+    gameState.timeLeft = 0;
+    finalizeGameRound('Time is up. Round complete.');
+    return;
+  }
+
+  syncGameHud();
+};
+
+const gameLoop = (timestamp) => {
+  if (!gameState.running || gameState.paused) {
+    return;
+  }
+
+  const deltaSeconds = Math.min((timestamp - gameState.lastFrame) / 1000, 0.06);
+  gameState.lastFrame = timestamp;
+
+  updateGameStep(deltaSeconds);
+  renderGameFrame();
+
+  if (gameState.running && !gameState.paused) {
+    gameState.raf = requestAnimationFrame(gameLoop);
+  }
+};
+
+const startGameRound = () => {
+  if (!dom.gameCanvas || !gameState.ctx) {
+    return;
+  }
+  gameState.difficulty = dom.gameDifficulty?.value || 'standard';
+  const config = getGameDifficultyConfig(gameState.difficulty);
+  gameState.running = true;
+  gameState.paused = false;
+  gameState.score = 0;
+  gameState.lives = config.lives;
+  gameState.timeLeft = config.duration;
+  gameState.tokens = [];
+  gameState.spawnClock = 0;
+  gameState.moveLeft = false;
+  gameState.moveRight = false;
+  gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
+  gameState.playerY = gameState.height - 30;
+  gameState.lastFrame = performance.now();
+  if (gameState.raf) {
+    cancelAnimationFrame(gameState.raf);
+  }
+  gameState.raf = requestAnimationFrame(gameLoop);
+  if (dom.gamePause) {
+    dom.gamePause.textContent = 'Pause';
+  }
+  setGameStatus('Mission running. Collect reliable leads and dodge red decoys.');
+  syncGameHud();
+  renderGameFrame();
+};
+
+const toggleGamePause = () => {
+  if (!gameState.running) {
+    return;
+  }
+  gameState.paused = !gameState.paused;
+  if (gameState.paused) {
+    if (gameState.raf) {
+      cancelAnimationFrame(gameState.raf);
+      gameState.raf = 0;
+    }
+    if (dom.gamePause) {
+      dom.gamePause.textContent = 'Resume';
+    }
+    setGameStatus('Game paused.');
+    renderGameFrame();
+    return;
+  }
+
+  gameState.lastFrame = performance.now();
+  gameState.raf = requestAnimationFrame(gameLoop);
+  if (dom.gamePause) {
+    dom.gamePause.textContent = 'Pause';
+  }
+  setGameStatus('Game resumed.');
+  renderGameFrame();
+};
+
+const resetGame = () => {
+  if (gameState.raf) {
+    cancelAnimationFrame(gameState.raf);
+    gameState.raf = 0;
+  }
+  gameState.running = false;
+  gameState.paused = false;
+  gameState.moveLeft = false;
+  gameState.moveRight = false;
+  gameState.tokens = [];
+  gameState.score = 0;
+  gameState.lives = getGameDifficultyConfig(dom.gameDifficulty?.value || gameState.difficulty).lives;
+  gameState.timeLeft = getGameDifficultyConfig(dom.gameDifficulty?.value || gameState.difficulty).duration;
+  gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
+  gameState.playerY = gameState.height - 30;
+  if (dom.gamePause) {
+    dom.gamePause.textContent = 'Pause';
+  }
+  setGameStatus('Game reset. Press Start when ready.');
+  syncGameHud();
+  renderGameFrame();
+};
+
+const initGame = () => {
+  const canvas = dom.gameCanvas;
+  if (!canvas) {
+    return;
+  }
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return;
+  }
+
+  gameState.ctx = context;
+  gameState.difficulty = dom.gameDifficulty?.value || 'standard';
+  const config = getGameDifficultyConfig(gameState.difficulty);
+  gameState.lives = config.lives;
+  gameState.timeLeft = config.duration;
+
+  const setGameCanvasSize = () => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      return;
+    }
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gameState.width = rect.width;
+    gameState.height = rect.height;
+    if (gameState.playerX === 0) {
+      gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
+    }
+    gameState.playerY = gameState.height - 30;
+    renderGameFrame();
+  };
+
+  setGameCanvasSize();
+  window.addEventListener('resize', setGameCanvasSize);
+
+  canvas.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    gameState.playerX = clamp(x - gameState.playerWidth / 2, 10, gameState.width - gameState.playerWidth - 10);
+    if (!gameState.running || gameState.paused) {
+      renderGameFrame();
+    }
+  });
+
+  canvas.addEventListener(
+    'touchmove',
+    (event) => {
+      const touch = event.touches[0];
+      if (!touch) {
+        return;
+      }
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      gameState.playerX = clamp(x - gameState.playerWidth / 2, 10, gameState.width - gameState.playerWidth - 10);
+      if (!gameState.running || gameState.paused) {
+        renderGameFrame();
+      }
+      event.preventDefault();
+    },
+    { passive: false }
+  );
+
+  const setMove = (direction, value) => {
+    if (direction === 'left') {
+      gameState.moveLeft = value;
+    } else {
+      gameState.moveRight = value;
+    }
+  };
+
+  const bindTouchMoveButton = (button, direction) => {
+    if (!button) {
+      return;
+    }
+    button.addEventListener('mousedown', () => setMove(direction, true));
+    button.addEventListener('mouseup', () => setMove(direction, false));
+    button.addEventListener('mouseleave', () => setMove(direction, false));
+    button.addEventListener('touchstart', () => setMove(direction, true), { passive: true });
+    button.addEventListener('touchend', () => setMove(direction, false), { passive: true });
+    button.addEventListener('touchcancel', () => setMove(direction, false), { passive: true });
+  };
+
+  bindTouchMoveButton(dom.gameLeft, 'left');
+  bindTouchMoveButton(dom.gameRight, 'right');
+
+  window.addEventListener('keydown', (event) => {
+    const target = event.target;
+    if (target instanceof HTMLElement) {
+      const tag = target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        return;
+      }
+    }
+
+    if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      gameState.moveLeft = true;
+      event.preventDefault();
+    } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      gameState.moveRight = true;
+      event.preventDefault();
+    } else if (event.key === ' ' && gameState.running) {
+      toggleGamePause();
+      event.preventDefault();
+    }
+  });
+
+  window.addEventListener('keyup', (event) => {
+    if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      gameState.moveLeft = false;
+    } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      gameState.moveRight = false;
+    }
+  });
+
+  syncGameHud();
+  setGameStatus('Press Start to begin. Arrow keys or A/D to move.');
+  renderGameFrame();
+};
+
 const renderCommandPalette = () => {
   const commandInput = dom.commandInput.value.trim().toLowerCase();
 
@@ -2266,6 +2806,12 @@ const renderCommandPalette = () => {
       label: 'Jump to Workbench',
       hint: 'Open query and session controls',
       run: () => document.querySelector('#workbench')?.scrollIntoView({ behavior: 'smooth' }),
+    },
+    {
+      id: 'jump-game',
+      label: 'Jump to Game',
+      hint: 'Open Signal vs Noise mini-game',
+      run: () => document.querySelector('#game')?.scrollIntoView({ behavior: 'smooth' }),
     },
     {
       id: 'jump-timeline',
@@ -2349,6 +2895,12 @@ const renderCommandPalette = () => {
       label: 'Export full report',
       hint: 'Download Markdown report from current research state',
       run: () => exportReportMarkdown(),
+    },
+    {
+      id: 'start-game',
+      label: 'Start game round',
+      hint: 'Launch a fresh Signal vs Noise mission',
+      run: () => startGameRound(),
     },
     {
       id: 'toggle-theme',
@@ -2502,6 +3054,27 @@ const bindEvents = () => {
     state.sort = 'newest';
     applyTimelineControlState();
     renderTimeline();
+  });
+
+  dom.gameStart?.addEventListener('click', () => {
+    startGameRound();
+  });
+
+  dom.gamePause?.addEventListener('click', () => {
+    toggleGamePause();
+  });
+
+  dom.gameReset?.addEventListener('click', () => {
+    resetGame();
+  });
+
+  dom.gameDifficulty?.addEventListener('change', () => {
+    gameState.difficulty = dom.gameDifficulty?.value || 'standard';
+    if (!gameState.running) {
+      resetGame();
+    } else {
+      setGameStatus(`Difficulty switched to ${gameState.difficulty}. It applies next round.`);
+    }
   });
 
   dom.evidenceScope?.addEventListener('change', () => {
@@ -2994,6 +3567,9 @@ const init = () => {
   if (dom.notebookFilter) {
     dom.notebookFilter.value = state.notebookFilter;
   }
+  if (dom.gameDifficulty) {
+    dom.gameDifficulty.value = gameState.difficulty;
+  }
   renderNotebookEventOptions();
 
   if (dom.briefTone) {
@@ -3003,6 +3579,7 @@ const init = () => {
     dom.briefNotes.value = state.briefNotes;
   }
 
+  initGame();
   bindEvents();
   renderTimeline();
   renderPinned();

@@ -20,7 +20,7 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260210-2" />
+    <link rel="stylesheet" href="styles.css?v=20260210-4" />
   </head>
   <body data-theme="light">
     <div class="aurora" aria-hidden="true"></div>
@@ -39,6 +39,7 @@
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
         <a href="#workbench">Workbench</a>
+        <a href="#game">Game</a>
         <a href="#timeline">Timeline</a>
         <a href="#evidence">Evidence</a>
         <a href="#flow">Flow Map</a>
@@ -127,6 +128,55 @@
               <button class="tool-btn ghost" id="clear-session" type="button">Reset local session</button>
             </div>
             <p class="status" id="session-status">Session ready.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal" id="game">
+        <div class="section-head">
+          <p class="eyebrow">Mini Game</p>
+          <h2>Signal vs Noise: catch credible leads, avoid bad intel</h2>
+        </div>
+
+        <div class="game-layout">
+          <div class="game-canvas-wrap">
+            <canvas id="case-game-canvas" aria-label="Signal vs Noise game canvas"></canvas>
+          </div>
+
+          <article class="tool-card game-panel">
+            <h3>Mission Console</h3>
+            <p class="status" id="game-status">Press Start to begin. Arrow keys or A/D to move.</p>
+
+            <div class="game-stats">
+              <p><strong>Score:</strong> <span id="game-score">0</span></p>
+              <p><strong>Lives:</strong> <span id="game-lives">3</span></p>
+              <p><strong>Time:</strong> <span id="game-time">60</span>s</p>
+              <p><strong>Best:</strong> <span id="game-best">0</span></p>
+            </div>
+
+            <label class="field small">
+              <span>Difficulty</span>
+              <select id="game-difficulty">
+                <option value="casual">Casual</option>
+                <option value="standard" selected>Standard</option>
+                <option value="intense">Intense</option>
+              </select>
+            </label>
+
+            <div class="inline-actions">
+              <button class="tool-btn" id="game-start" type="button">Start</button>
+              <button class="tool-btn ghost" id="game-pause" type="button">Pause</button>
+              <button class="tool-btn ghost" id="game-reset" type="button">Reset</button>
+            </div>
+
+            <div class="inline-actions game-touch-controls" aria-label="Touch controls">
+              <button class="tool-btn ghost" id="game-left" type="button">Move Left</button>
+              <button class="tool-btn ghost" id="game-right" type="button">Move Right</button>
+            </div>
+
+            <p class="status">
+              Good leads: Official, Court, Media, Analysis. Red decoys cost lives. Survive until the timer ends.
+            </p>
           </article>
         </div>
       </section>
@@ -490,6 +540,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260210-3"></script>
+    <script src="script.js?v=20260210-4"></script>
   </body>
 </html>

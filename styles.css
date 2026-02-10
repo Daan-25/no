@@ -329,7 +329,8 @@ main {
 .brief-layout,
 .network-layout,
 .timeline-layout,
-.flow-layout {
+.flow-layout,
+.game-layout {
   display: grid;
   gap: 0.8rem;
 }
@@ -783,6 +784,47 @@ main {
   grid-template-columns: minmax(0, 1fr) 340px;
 }
 
+.game-layout {
+  grid-template-columns: minmax(0, 1fr) 340px;
+}
+
+.game-canvas-wrap {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 18%, var(--bg-card)), color-mix(in srgb, var(--bg-card) 92%, transparent)),
+    color-mix(in srgb, var(--bg-card) 86%, transparent);
+  overflow: hidden;
+  min-height: 430px;
+}
+
+#case-game-canvas {
+  display: block;
+  width: 100%;
+  height: 430px;
+}
+
+.game-panel {
+  align-content: start;
+}
+
+.game-stats {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  padding: 0.56rem 0.62rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.32rem 0.62rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+}
+
+.game-touch-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .network-canvas-wrap {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -1076,12 +1118,17 @@ main {
   .timeline-layout,
   .flow-layout,
   .network-layout,
+  .game-layout,
   .brief-layout,
   .workbench-grid {
     grid-template-columns: 1fr;
   }
 
   #network-canvas {
+    height: 380px;
+  }
+
+  #case-game-canvas {
     height: 380px;
   }
 }
@@ -1120,6 +1167,10 @@ main {
 
   #network-canvas {
     height: 320px;
+  }
+
+  #case-game-canvas {
+    height: 300px;
   }
 }
 
