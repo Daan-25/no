@@ -1642,11 +1642,21 @@ const resetSession = () => {
   dom.sourceSearch.value = '';
   dom.briefTone.value = 'neutral';
   dom.briefNotes.value = '';
-  dom.evidenceScope.value = 'filtered';
-  dom.notebookFilter.value = 'all';
-  dom.notebookEvent.value = '';
-  dom.notebookTag.value = '';
-  dom.notebookText.value = '';
+  if (dom.evidenceScope) {
+    dom.evidenceScope.value = 'filtered';
+  }
+  if (dom.notebookFilter) {
+    dom.notebookFilter.value = 'all';
+  }
+  if (dom.notebookEvent) {
+    dom.notebookEvent.value = '';
+  }
+  if (dom.notebookTag) {
+    dom.notebookTag.value = '';
+  }
+  if (dom.notebookText) {
+    dom.notebookText.value = '';
+  }
 
   dom.phaseFilters.querySelectorAll('.phase-btn').forEach((button) => {
     button.classList.toggle('active', button.dataset.phase === 'all');
@@ -2494,16 +2504,18 @@ const bindEvents = () => {
     renderTimeline();
   });
 
-  dom.evidenceScope.addEventListener('change', () => {
-    state.evidenceScope = dom.evidenceScope.value;
+  dom.evidenceScope?.addEventListener('change', () => {
+    if (dom.evidenceScope) {
+      state.evidenceScope = dom.evidenceScope.value;
+    }
     renderEvidenceMatrix();
   });
 
-  dom.evidenceRefresh.addEventListener('click', () => {
+  dom.evidenceRefresh?.addEventListener('click', () => {
     renderEvidenceMatrix();
   });
 
-  dom.evidenceBody.addEventListener('click', (event) => {
+  dom.evidenceBody?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
       return;
@@ -2772,11 +2784,11 @@ const bindEvents = () => {
     setStatus(dom.briefStatus, 'Brief downloaded as case-brief.txt.');
   });
 
-  dom.reportExportMd.addEventListener('click', () => {
+  dom.reportExportMd?.addEventListener('click', () => {
     exportReportMarkdown();
   });
 
-  dom.reportExportPdf.addEventListener('click', () => {
+  dom.reportExportPdf?.addEventListener('click', () => {
     exportReportPdf();
   });
 
@@ -2813,7 +2825,10 @@ const bindEvents = () => {
     }
   });
 
-  dom.notebookSave.addEventListener('click', () => {
+  dom.notebookSave?.addEventListener('click', () => {
+    if (!dom.notebookText || !dom.notebookEvent || !dom.notebookTag) {
+      return;
+    }
     const text = dom.notebookText.value.trim();
     const eventId = dom.notebookEvent.value.trim();
     const tag = dom.notebookTag.value.trim().slice(0, 40);
@@ -2841,24 +2856,29 @@ const bindEvents = () => {
     setStatus(dom.notebookEditorStatus, `Notebook entry saved at ${new Date().toLocaleTimeString()}.`);
   });
 
-  dom.notebookClearInput.addEventListener('click', () => {
+  dom.notebookClearInput?.addEventListener('click', () => {
+    if (!dom.notebookEvent || !dom.notebookTag || !dom.notebookText) {
+      return;
+    }
     dom.notebookEvent.value = '';
     dom.notebookTag.value = '';
     dom.notebookText.value = '';
     setStatus(dom.notebookEditorStatus, 'Notebook editor cleared.');
   });
 
-  dom.notebookExport.addEventListener('click', () => {
+  dom.notebookExport?.addEventListener('click', () => {
     downloadText('investigation-notebook.md', composeNotebookMarkdown());
     setStatus(dom.notebookEditorStatus, 'Notebook exported as investigation-notebook.md.');
   });
 
-  dom.notebookFilter.addEventListener('change', () => {
-    state.notebookFilter = dom.notebookFilter.value;
+  dom.notebookFilter?.addEventListener('change', () => {
+    if (dom.notebookFilter) {
+      state.notebookFilter = dom.notebookFilter.value;
+    }
     renderNotebook();
   });
 
-  dom.notebookList.addEventListener('click', (event) => {
+  dom.notebookList?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
       return;
@@ -2968,12 +2988,20 @@ const init = () => {
   updateMetrics();
   initYearSelects();
   applySourceControlState();
-  dom.evidenceScope.value = state.evidenceScope;
-  dom.notebookFilter.value = state.notebookFilter;
+  if (dom.evidenceScope) {
+    dom.evidenceScope.value = state.evidenceScope;
+  }
+  if (dom.notebookFilter) {
+    dom.notebookFilter.value = state.notebookFilter;
+  }
   renderNotebookEventOptions();
 
-  dom.briefTone.value = state.briefTone;
-  dom.briefNotes.value = state.briefNotes;
+  if (dom.briefTone) {
+    dom.briefTone.value = state.briefTone;
+  }
+  if (dom.briefNotes) {
+    dom.briefNotes.value = state.briefNotes;
+  }
 
   bindEvents();
   renderTimeline();
