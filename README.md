@@ -1,35 +1,30 @@
 # JeffreyEpsteins.org
 
-Interactive public-record research interface focused on timeline analysis, source tracking, entity mapping, and brief generation.
+Public dossier website for navigating the Jeffrey Epstein case through structured chronology, legal context, institutional response, and source trails.
 
 ## Disclaimer
 - Independent information-design project.
 - Not an official court, government, or law-enforcement website.
-- Use primary records and credible reporting for verification.
+- This site organizes public references and does not replace primary legal records.
 
-## What this site can do
-- Filter and search case timeline events by phase, year range, and keywords.
-- Explore a phase-based flow map with source-cluster drilldowns.
-- Pin events and export a working set.
-- Run a question engine that ranks matching events and sources.
-- Inspect an interactive entity relationship graph.
-- Track source reading/verification status locally.
-- Generate, copy, and download a structured working brief.
-- Export full local research session state as JSON.
+## What this site does
+- Presents curated dossier lenses (chronology, legal process, institutional response, media/records, open issues).
+- Shows filterable timeline milestones per dossier.
+- Provides a source index linked to dossier events.
+- Supports event-level source focus and dossier Markdown export.
 
 ## Privacy
-- This project is static and client-side only.
-- Notes, pins, and source flags are saved in browser `localStorage`.
-- No backend persistence is used.
+- Static client-side website.
+- No backend storage or user accounts.
 
 ## Stack
-- `index.html` - application structure
-- `styles.css` - visual system and responsive layout
-- `script.js` - timeline engine, query logic, graph, source tracker, brief builder
-- `CNAME` - custom domain configuration
+- `/Users/daanros/Documents/jef/index.html` - page structure
+- `/Users/daanros/Documents/jef/styles.css` - editorial UI styling
+- `/Users/daanros/Documents/jef/script.js` - dossier/timeline/source logic
+- `/Users/daanros/Documents/jef/CNAME` - custom domain configuration
 
 ## Local preview
-Open `index.html` directly in your browser.
+Open `/Users/daanros/Documents/jef/index.html` in your browser.
 
 ## GitHub Pages deployment
 1. Push to `main`.
@@ -38,7 +33,7 @@ Open `index.html` directly in your browser.
 4. Select branch `main` and folder `/ (root)`.
 5. Save and wait for deployment.
 
-## Contribution guidelines
+## Contribution notes
 - Keep wording factual and source-oriented.
-- Prefer date-specific phrasing over vague relative wording.
-- When editing timeline items, maintain neutral language and verifiable references.
+- Prefer date-specific phrasing.
+- Update timeline entries together with source links.

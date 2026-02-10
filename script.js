@@ -5,9 +5,8 @@ const EVENTS = [
     date: '2005-03-01',
     phase: 'investigation',
     summary:
-      'Local authorities in Palm Beach receive reports involving underage girls, opening the first formal investigative pathway.',
-    keywords: 'palm beach police florida early investigation reports',
-    entities: ['ent-palm-beach-police', 'ent-victims', 'ent-epstein'],
+      'Local authorities in Palm Beach receive reports involving underage girls, opening the first formal investigative track.',
+    keywords: 'palm beach police florida investigation reports',
     sources: ['src-miami-herald-series', 'src-courtlistener'],
   },
   {
@@ -18,7 +17,6 @@ const EVENTS = [
     summary:
       'Federal investigators begin deeper review as scrutiny expands beyond local proceedings.',
     keywords: 'federal investigators fbi review escalation',
-    entities: ['ent-fbi', 'ent-epstein', 'ent-victims'],
     sources: ['src-fbi', 'src-doj-main'],
   },
   {
@@ -27,20 +25,18 @@ const EVENTS = [
     date: '2008-06-30',
     phase: 'legal',
     summary:
-      'Epstein pleads guilty to state-level charges in a deal that later becomes central to public and legal criticism.',
-    keywords: '2008 plea deal state charges controversy prosecution',
-    entities: ['ent-epstein', 'ent-courts', 'ent-public-interest'],
+      'Epstein pleads guilty to state-level charges in a deal later criticized in legal and public reporting.',
+    keywords: '2008 plea deal legal controversy prosecution',
     sources: ['src-courtlistener', 'src-miami-herald-series'],
   },
   {
     id: 'ev-2015-civil-pressure',
-    title: 'Civil litigation and survivor claims intensify',
+    title: 'Civil litigation pressure increases',
     date: '2015-08-01',
     phase: 'aftermath',
     summary:
-      'Civil claims and survivor-led legal actions push renewed attention to earlier institutional decisions.',
+      'Civil claims and survivor-led legal actions intensify focus on prior institutional decisions.',
     keywords: 'civil litigation survivors claims institutional response',
-    entities: ['ent-victims', 'ent-public-interest', 'ent-courts'],
     sources: ['src-courtlistener', 'src-justia'],
   },
   {
@@ -49,9 +45,8 @@ const EVENTS = [
     date: '2018-11-01',
     phase: 'media',
     summary:
-      'Long-form investigative reporting reframes how the earlier case handling is understood by the public.',
+      'Long-form investigative reporting reframes public understanding of earlier case handling.',
     keywords: 'investigative reporting media pressure 2018 journalism',
-    entities: ['ent-miami-herald', 'ent-media', 'ent-public-interest'],
     sources: ['src-miami-herald-series', 'src-nyt-archive'],
   },
   {
@@ -60,9 +55,8 @@ const EVENTS = [
     date: '2019-07-06',
     phase: 'legal',
     summary:
-      'The U.S. Attorney\'s Office for the Southern District of New York announces federal charges in a new case.',
-    keywords: '2019 arrest sdny federal indictment trafficking',
-    entities: ['ent-sdny', 'ent-doj', 'ent-epstein'],
+      'The U.S. Attorney\'s Office for the Southern District of New York announces federal charges.',
+    keywords: '2019 arrest federal indictment trafficking',
     sources: ['src-sdny-indictment', 'src-doj-main'],
   },
   {
@@ -72,19 +66,17 @@ const EVENTS = [
     phase: 'custody',
     summary:
       'Epstein dies while in detention. Official findings classify the death as suicide.',
-    keywords: 'custody death detention official findings suicide ruling',
-    entities: ['ent-mcc', 'ent-courts', 'ent-epstein'],
+    keywords: 'custody death detention official findings',
     sources: ['src-nyt-archive', 'src-wsj-archive'],
   },
   {
     id: 'ev-2020-maxwell-arrest',
     title: 'Ghislaine Maxwell arrested',
     date: '2020-07-02',
-    phase: 'aftermath',
+    phase: 'legal',
     summary:
-      'A key related defendant is arrested, opening a new major prosecution track.',
+      'A key related defendant is arrested, opening a separate major prosecution track.',
     keywords: 'maxwell arrest related prosecution federal case',
-    entities: ['ent-maxwell', 'ent-fbi', 'ent-sdny'],
     sources: ['src-doj-main', 'src-sdny-maxwell-sentencing'],
   },
   {
@@ -93,9 +85,8 @@ const EVENTS = [
     date: '2021-12-29',
     phase: 'legal',
     summary:
-      'The trial concludes with convictions, influencing subsequent legal and public accountability narratives.',
+      'The trial concludes with convictions, shaping later legal and accountability discussions.',
     keywords: 'maxwell conviction federal trial verdict accountability',
-    entities: ['ent-maxwell', 'ent-courts', 'ent-sdny'],
     sources: ['src-sdny-maxwell-sentencing', 'src-courtlistener'],
   },
   {
@@ -104,9 +95,8 @@ const EVENTS = [
     date: '2022-06-28',
     phase: 'legal',
     summary:
-      'Federal sentencing marks a major procedural endpoint in the related prosecution.',
-    keywords: 'sentencing 2022 federal prison term',
-    entities: ['ent-maxwell', 'ent-sdny', 'ent-courts'],
+      'Federal sentencing marks a major procedural endpoint in related prosecution proceedings.',
+    keywords: 'sentencing federal prison term 2022',
     sources: ['src-sdny-maxwell-sentencing', 'src-doj-main'],
   },
   {
@@ -115,9 +105,8 @@ const EVENTS = [
     date: '2024-01-01',
     phase: 'aftermath',
     summary:
-      'Continuing records activity keeps public attention on civil filings, legal context, and institutional process.',
+      'Continuing records activity keeps attention on filings, legal context, and institutional process.',
     keywords: 'records filings unsealed documents transparency',
-    entities: ['ent-courts', 'ent-public-interest', 'ent-media'],
     sources: ['src-courtlistener', 'src-justia'],
   },
 ];
@@ -141,7 +130,7 @@ const SOURCES = [
   },
   {
     id: 'src-doj-main',
-    title: 'Department of Justice main portal',
+    title: 'Department of Justice portal',
     publisher: 'U.S. Department of Justice',
     type: 'official',
     date: '2024-01-01',
@@ -154,14 +143,6 @@ const SOURCES = [
     type: 'official',
     date: '2024-01-01',
     url: 'https://www.fbi.gov/',
-  },
-  {
-    id: 'src-pacer',
-    title: 'PACER case record system',
-    publisher: 'U.S. Courts',
-    type: 'court',
-    date: '2024-01-01',
-    url: 'https://pacer.uscourts.gov/',
   },
   {
     id: 'src-courtlistener',
@@ -204,14 +185,6 @@ const SOURCES = [
     url: 'https://www.wsj.com/',
   },
   {
-    id: 'src-wikipedia-overview',
-    title: 'Wikipedia overview entry',
-    publisher: 'Wikipedia',
-    type: 'analysis',
-    date: '2024-01-01',
-    url: 'https://en.wikipedia.org/wiki/Jeffrey_Epstein',
-  },
-  {
     id: 'src-govinfo',
     title: 'GovInfo document access portal',
     publisher: 'U.S. Government Publishing Office',
@@ -221,98 +194,141 @@ const SOURCES = [
   },
 ];
 
-const ENTITIES = [
+const DOSSIERS = [
   {
-    id: 'ent-epstein',
-    label: 'Jeffrey Epstein',
-    type: 'person',
-    blurb: 'Central figure across criminal investigations, plea history, and later federal prosecution.',
+    id: 'chronology',
+    title: 'Chronology Dossier',
+    period: '2005-2024',
+    yearStart: 2005,
+    yearEnd: 2024,
+    summary:
+      'Linear overview of key milestones from early investigation through post-trial records activity.',
+    points: [
+      'Tracks major procedural changes over time.',
+      'Useful as baseline before deeper legal analysis.',
+      'Connects each milestone to public source references.',
+    ],
+    questions: [
+      'Which transitions changed institutional behavior most visibly?',
+      'What remained unresolved after each legal milestone?',
+      'Where did media pressure correlate with procedural movement?',
+    ],
+    eventIds: [
+      'ev-2005-palm-beach',
+      'ev-2006-federal-attention',
+      'ev-2008-plea-deal',
+      'ev-2015-civil-pressure',
+      'ev-2018-media-series',
+      'ev-2019-arrest',
+      'ev-2019-custody-death',
+      'ev-2020-maxwell-arrest',
+      'ev-2021-maxwell-conviction',
+      'ev-2022-maxwell-sentencing',
+      'ev-2024-records-wave',
+    ],
   },
   {
-    id: 'ent-maxwell',
-    label: 'Ghislaine Maxwell',
-    type: 'person',
-    blurb: 'Related defendant convicted in federal court in 2021 and sentenced in 2022.',
+    id: 'legal',
+    title: 'Legal Process Dossier',
+    period: '2008-2022',
+    yearStart: 2008,
+    yearEnd: 2022,
+    summary:
+      'Focus on plea agreements, federal charging decisions, trial outcomes, and sentencing endpoints.',
+    points: [
+      'Separates procedural facts from commentary.',
+      'Highlights where federal and state pathways diverged.',
+      'Surfaces official releases and docket-oriented references.',
+    ],
+    questions: [
+      'How did the 2008 plea structure influence later federal steps?',
+      'Which filings best document procedural decision points?',
+      'What accountability mechanisms emerged after sentencing?',
+    ],
+    eventIds: [
+      'ev-2008-plea-deal',
+      'ev-2019-arrest',
+      'ev-2020-maxwell-arrest',
+      'ev-2021-maxwell-conviction',
+      'ev-2022-maxwell-sentencing',
+    ],
   },
   {
-    id: 'ent-victims',
-    label: 'Survivors / complainants',
-    type: 'group',
-    blurb: 'Civil claims and testimonies have been central to accountability pathways.',
+    id: 'institutions',
+    title: 'Institutional Response Dossier',
+    period: '2005-2024',
+    yearStart: 2005,
+    yearEnd: 2024,
+    summary:
+      'Institution-level lens across local police, federal agencies, prosecutors, courts, and detention context.',
+    points: [
+      'Compares local and federal timelines.',
+      'Maps events to institutional actors rather than personalities.',
+      'Useful for governance and process analysis.',
+    ],
+    questions: [
+      'Where did institutional coordination appear strongest or weakest?',
+      'Which procedural events indicate policy or oversight shifts?',
+      'What records remain essential for institutional accountability review?',
+    ],
+    eventIds: [
+      'ev-2005-palm-beach',
+      'ev-2006-federal-attention',
+      'ev-2019-arrest',
+      'ev-2019-custody-death',
+      'ev-2024-records-wave',
+    ],
   },
   {
-    id: 'ent-palm-beach-police',
-    label: 'Palm Beach Police',
-    type: 'institution',
-    blurb: 'Initial local investigative track in Florida.',
+    id: 'media-records',
+    title: 'Media and Records Dossier',
+    period: '2015-2024',
+    yearStart: 2015,
+    yearEnd: 2024,
+    summary:
+      'Coverage-focused dossier tracking reporting waves, civil filing visibility, and records transparency pressure.',
+    points: [
+      'Centers on publication and records visibility effects.',
+      'Connects source types to shifts in public attention.',
+      'Useful for research planning and source triage.',
+    ],
+    questions: [
+      'Which reports drove renewed legal or public scrutiny?',
+      'How did records visibility change over time?',
+      'What source gaps remain for independent verification?',
+    ],
+    eventIds: [
+      'ev-2015-civil-pressure',
+      'ev-2018-media-series',
+      'ev-2019-arrest',
+      'ev-2024-records-wave',
+    ],
   },
   {
-    id: 'ent-fbi',
-    label: 'FBI',
-    type: 'institution',
-    blurb: 'Federal investigative agency connected to later case development.',
+    id: 'open-issues',
+    title: 'Open Issues Dossier',
+    period: '2005-2024',
+    yearStart: 2005,
+    yearEnd: 2024,
+    summary:
+      'Unresolved or contested areas where public documents and reporting still leave analytical gaps.',
+    points: [
+      'Designed for follow-up research planning.',
+      'Flags uncertainty rather than asserting conclusions.',
+      'Encourages source verification before interpretation.',
+    ],
+    questions: [
+      'Which record sets remain unavailable or incomplete?',
+      'What contradictions in public narratives need primary-document checking?',
+      'Which institutions still require clearer public accounting?',
+    ],
+    eventIds: [
+      'ev-2008-plea-deal',
+      'ev-2019-custody-death',
+      'ev-2021-maxwell-conviction',
+      'ev-2024-records-wave',
+    ],
   },
-  {
-    id: 'ent-doj',
-    label: 'U.S. Department of Justice',
-    type: 'institution',
-    blurb: 'Federal justice framework and public announcements hub.',
-  },
-  {
-    id: 'ent-sdny',
-    label: 'U.S. Attorney\'s Office (SDNY)',
-    type: 'institution',
-    blurb: 'Lead office for key federal prosecution announcements in New York.',
-  },
-  {
-    id: 'ent-courts',
-    label: 'Federal / state courts',
-    type: 'institution',
-    blurb: 'Core venue for prosecution, sentencing, civil filings, and records.',
-  },
-  {
-    id: 'ent-mcc',
-    label: 'Federal detention context',
-    type: 'institution',
-    blurb: 'Custody setting tied to events in August 2019.',
-  },
-  {
-    id: 'ent-miami-herald',
-    label: 'Miami Herald',
-    type: 'media',
-    blurb: 'Investigative reporting outlet with major influence on public attention.',
-  },
-  {
-    id: 'ent-media',
-    label: 'National media ecosystem',
-    type: 'media',
-    blurb: 'Broader reporting environment shaping public interpretation of events.',
-  },
-  {
-    id: 'ent-public-interest',
-    label: 'Public-interest litigation',
-    type: 'group',
-    blurb: 'Civil legal activity and transparency pressure linked to long-tail accountability.',
-  },
-];
-
-const EDGES = [
-  ['ent-epstein', 'ent-palm-beach-police'],
-  ['ent-epstein', 'ent-fbi'],
-  ['ent-epstein', 'ent-sdny'],
-  ['ent-epstein', 'ent-courts'],
-  ['ent-epstein', 'ent-mcc'],
-  ['ent-epstein', 'ent-victims'],
-  ['ent-maxwell', 'ent-sdny'],
-  ['ent-maxwell', 'ent-courts'],
-  ['ent-maxwell', 'ent-victims'],
-  ['ent-sdny', 'ent-doj'],
-  ['ent-fbi', 'ent-doj'],
-  ['ent-miami-herald', 'ent-media'],
-  ['ent-media', 'ent-public-interest'],
-  ['ent-public-interest', 'ent-courts'],
-  ['ent-victims', 'ent-public-interest'],
-  ['ent-palm-beach-police', 'ent-fbi'],
 ];
 
 const PHASE_LABEL = {
@@ -320,312 +336,41 @@ const PHASE_LABEL = {
   legal: 'Legal',
   custody: 'Custody',
   aftermath: 'Aftermath',
-  media: 'Media pressure',
-};
-
-const CLUSTER_LABEL = {
-  official: 'Official',
-  court: 'Court',
   media: 'Media',
-  analysis: 'Analysis',
-};
-
-const FLOW_PHASES = [
-  {
-    id: 'foundation',
-    title: 'Foundation',
-    summary:
-      'Initial investigative and early legal structure (Palm Beach reports through the 2008 plea agreement).',
-    timelinePhase: 'all',
-    yearStart: 2005,
-    yearEnd: 2008,
-    eventIds: ['ev-2005-palm-beach', 'ev-2006-federal-attention', 'ev-2008-plea-deal'],
-    clusters: {
-      official: ['src-fbi', 'src-doj-main'],
-      court: ['src-pacer', 'src-courtlistener'],
-      media: ['src-miami-herald-series'],
-      analysis: ['src-govinfo'],
-    },
-  },
-  {
-    id: 'media-reopening',
-    title: 'Media Reopening',
-    summary:
-      'Civil litigation momentum and long-form reporting apply renewed institutional pressure between 2015 and 2018.',
-    timelinePhase: 'all',
-    yearStart: 2015,
-    yearEnd: 2018,
-    eventIds: ['ev-2015-civil-pressure', 'ev-2018-media-series'],
-    clusters: {
-      official: ['src-doj-main'],
-      court: ['src-courtlistener', 'src-justia'],
-      media: ['src-miami-herald-series', 'src-nyt-archive'],
-      analysis: ['src-wikipedia-overview'],
-    },
-  },
-  {
-    id: 'federal-2019',
-    title: 'Federal 2019 Case',
-    summary:
-      'The new federal prosecution phase centers around SDNY actions, DOJ announcements, and nationwide reporting.',
-    timelinePhase: 'legal',
-    yearStart: 2019,
-    yearEnd: 2019,
-    eventIds: ['ev-2019-arrest'],
-    clusters: {
-      official: ['src-sdny-indictment', 'src-doj-main'],
-      court: ['src-pacer', 'src-courtlistener'],
-      media: ['src-nyt-archive', 'src-wsj-archive'],
-      analysis: ['src-govinfo'],
-    },
-  },
-  {
-    id: 'custody-pivot',
-    title: 'Custody Pivot',
-    summary:
-      'The August 2019 custody event becomes a major interpretive pivot across legal and media narratives.',
-    timelinePhase: 'custody',
-    yearStart: 2019,
-    yearEnd: 2019,
-    eventIds: ['ev-2019-custody-death'],
-    clusters: {
-      official: ['src-doj-main'],
-      court: ['src-courtlistener'],
-      media: ['src-nyt-archive', 'src-wsj-archive'],
-      analysis: ['src-wikipedia-overview'],
-    },
-  },
-  {
-    id: 'related-prosecution',
-    title: 'Related Prosecution',
-    summary:
-      'The Maxwell prosecution phase adds new legal outcomes and procedural endpoints from 2020 through 2022.',
-    timelinePhase: 'legal',
-    yearStart: 2020,
-    yearEnd: 2022,
-    eventIds: ['ev-2020-maxwell-arrest', 'ev-2021-maxwell-conviction', 'ev-2022-maxwell-sentencing'],
-    clusters: {
-      official: ['src-sdny-maxwell-sentencing', 'src-doj-main'],
-      court: ['src-pacer', 'src-courtlistener'],
-      media: ['src-nyt-archive', 'src-wsj-archive'],
-      analysis: ['src-govinfo'],
-    },
-  },
-  {
-    id: 'records-aftershock',
-    title: 'Records Aftershock',
-    summary:
-      'Ongoing visibility of filings and records keeps long-tail accountability active in the post-trial period.',
-    timelinePhase: 'aftermath',
-    yearStart: 2022,
-    yearEnd: 2024,
-    eventIds: ['ev-2022-maxwell-sentencing', 'ev-2024-records-wave'],
-    clusters: {
-      official: ['src-doj-main'],
-      court: ['src-courtlistener', 'src-justia'],
-      media: ['src-nyt-archive', 'src-miami-herald-series'],
-      analysis: ['src-govinfo', 'src-wikipedia-overview'],
-    },
-  },
-];
-
-const STORAGE_KEYS = {
-  pins: 'jef_pins_v2',
-  brief: 'jef_brief_v2',
-  sourceState: 'jef_source_state_v2',
-  briefNotes: 'jef_brief_notes_v2',
-  briefTone: 'jef_brief_tone_v2',
-  theme: 'jef_theme_v2',
-  notebook: 'jef_notebook_v1',
-  gameBest: 'jef_game_best_v1',
-};
-
-const safeStore = {
-  get(key, fallback) {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) {
-        return fallback;
-      }
-      return JSON.parse(raw);
-    } catch {
-      return fallback;
-    }
-  },
-  set(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch {
-      // ignore storage errors
-    }
-  },
-  remove(key) {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      // ignore storage errors
-    }
-  },
 };
 
 const years = EVENTS.map((event) => new Date(event.date).getFullYear());
 const minYear = Math.min(...years);
 const maxYear = Math.max(...years);
 
-const validEventIds = new Set(EVENTS.map((event) => event.id));
-const validSourceIds = new Set(SOURCES.map((source) => source.id));
-const validEntityIds = new Set(ENTITIES.map((entity) => entity.id));
-
-const initialPins = (safeStore.get(STORAGE_KEYS.pins, []) || []).filter((id) => validEventIds.has(id));
-const initialBrief = (safeStore.get(STORAGE_KEYS.brief, []) || []).filter((id) => validEventIds.has(id));
-const sanitizeNotebookEntries = (rows) => {
-  if (!Array.isArray(rows)) {
-    return [];
-  }
-  return rows
-    .map((row) => ({
-      id: typeof row?.id === 'string' && row.id.trim() ? row.id : `note-${Math.random().toString(36).slice(2, 9)}`,
-      createdAt: typeof row?.createdAt === 'string' ? row.createdAt : new Date().toISOString(),
-      eventId: typeof row?.eventId === 'string' && validEventIds.has(row.eventId) ? row.eventId : '',
-      tag: typeof row?.tag === 'string' ? row.tag.trim().slice(0, 40) : '',
-      text: typeof row?.text === 'string' ? row.text.trim().slice(0, 8000) : '',
-    }))
-    .filter((row) => row.text.length > 0);
-};
-const initialNotebook = sanitizeNotebookEntries(safeStore.get(STORAGE_KEYS.notebook, []));
-
-const state = {
-  phase: 'all',
-  yearStart: minYear,
-  yearEnd: maxYear,
-  search: '',
-  sort: 'newest',
-  sourceType: 'all',
-  sourceSearch: '',
-  sourceFocusIds: null,
-  pins: new Set(initialPins),
-  brief: new Set(initialBrief),
-  sourceState: safeStore.get(STORAGE_KEYS.sourceState, {}) || {},
-  briefTone: safeStore.get(STORAGE_KEYS.briefTone, 'neutral') || 'neutral',
-  briefNotes: safeStore.get(STORAGE_KEYS.briefNotes, '') || '',
-  theme: safeStore.get(STORAGE_KEYS.theme, 'light') || 'light',
-  query: '',
-  flowSelectedId: 'foundation',
-  flowCluster: 'official',
-  evidenceScope: 'filtered',
-  notebook: initialNotebook,
-  notebookFilter: 'all',
-  gameBest: Number(safeStore.get(STORAGE_KEYS.gameBest, 0)) || 0,
-};
-
 const dom = {
-  body: document.body,
-  header: document.querySelector('.site-header'),
-  navLinks: Array.from(document.querySelectorAll('.site-nav a')),
-  scrollProgress: document.querySelector('#scroll-progress'),
   yearNode: document.querySelector('#year'),
+  dossierMenu: document.querySelector('#dossier-menu'),
+  dossierTitle: document.querySelector('#dossier-title'),
+  dossierSummary: document.querySelector('#dossier-summary'),
+  dossierPoints: document.querySelector('#dossier-points'),
+  dossierPeriod: document.querySelector('#dossier-period'),
+  dossierCounts: document.querySelector('#dossier-counts'),
+  dossierExport: document.querySelector('#dossier-export'),
+  questionList: document.querySelector('#question-list'),
 
-  metricEvents: document.querySelector('#metric-events'),
-  metricSources: document.querySelector('#metric-sources'),
-  metricEntities: document.querySelector('#metric-entities'),
-
-  themeToggle: document.querySelector('#theme-toggle'),
-  commandOpen: document.querySelector('#command-open'),
-
-  questionForm: document.querySelector('#question-form'),
-  questionInput: document.querySelector('#question-input'),
-  questionClear: document.querySelector('#question-clear'),
-  questionResults: document.querySelector('#question-results'),
-
-  sessionStatus: document.querySelector('#session-status'),
-  exportSession: document.querySelector('#export-session'),
-  clearSession: document.querySelector('#clear-session'),
-
-  phaseFilters: document.querySelector('#phase-filters'),
+  timelineSearch: document.querySelector('#timeline-search'),
   yearStart: document.querySelector('#year-start'),
   yearEnd: document.querySelector('#year-end'),
-  timelineSearch: document.querySelector('#timeline-search'),
-  timelineSort: document.querySelector('#timeline-sort'),
-  timelineClear: document.querySelector('#timeline-clear'),
+  timelineReset: document.querySelector('#timeline-reset'),
   timelineStatus: document.querySelector('#timeline-status'),
-  timelineResults: document.querySelector('#timeline-results'),
+  timelineList: document.querySelector('#timeline-list'),
 
-  gameCanvas: document.querySelector('#case-game-canvas'),
-  gameStart: document.querySelector('#game-start'),
-  gamePause: document.querySelector('#game-pause'),
-  gameReset: document.querySelector('#game-reset'),
-  gameDifficulty: document.querySelector('#game-difficulty'),
-  gameStatus: document.querySelector('#game-status'),
-  gameScore: document.querySelector('#game-score'),
-  gameLives: document.querySelector('#game-lives'),
-  gameTime: document.querySelector('#game-time'),
-  gameBest: document.querySelector('#game-best'),
-  gameLeft: document.querySelector('#game-left'),
-  gameRight: document.querySelector('#game-right'),
-
-  evidenceScope: document.querySelector('#evidence-scope'),
-  evidenceRefresh: document.querySelector('#evidence-refresh'),
-  evidenceStatus: document.querySelector('#evidence-status'),
-  evidenceBody: document.querySelector('#evidence-body'),
-
-  flowTrack: document.querySelector('#flow-track'),
-  flowTitle: document.querySelector('#flow-title'),
-  flowSummary: document.querySelector('#flow-summary'),
-  flowApplyTimeline: document.querySelector('#flow-apply-timeline'),
-  flowFocusSources: document.querySelector('#flow-focus-sources'),
-  flowAddBrief: document.querySelector('#flow-add-brief'),
-  clusterTabs: document.querySelector('#cluster-tabs'),
-  clusterList: document.querySelector('#cluster-list'),
-  clusterStatus: document.querySelector('#cluster-status'),
-
-  pinSummary: document.querySelector('#pin-summary'),
-  pinnedEvents: document.querySelector('#pinned-events'),
-  pinsExport: document.querySelector('#pins-export'),
-  pinsClear: document.querySelector('#pins-clear'),
-
-  networkCanvas: document.querySelector('#network-canvas'),
-  networkReset: document.querySelector('#network-reset'),
-  entityPanel: document.querySelector('#entity-panel'),
-
-  sourceTypeFilter: document.querySelector('#source-type-filter'),
-  sourceSearch: document.querySelector('#source-search'),
-  sourceReset: document.querySelector('#source-reset'),
-  sourceSummary: document.querySelector('#source-summary'),
-  sourceTableBody: document.querySelector('#source-table-body'),
-
-  briefCount: document.querySelector('#brief-count'),
-  briefEvents: document.querySelector('#brief-events'),
-  briefTone: document.querySelector('#brief-tone'),
-  briefNotes: document.querySelector('#brief-notes'),
-  briefGenerate: document.querySelector('#brief-generate'),
-  briefCopy: document.querySelector('#brief-copy'),
-  briefDownload: document.querySelector('#brief-download'),
-  reportExportMd: document.querySelector('#report-export-md'),
-  reportExportPdf: document.querySelector('#report-export-pdf'),
-  briefClear: document.querySelector('#brief-clear'),
-  briefStatus: document.querySelector('#brief-status'),
-  briefOutput: document.querySelector('#brief-output'),
-
-  notebookEvent: document.querySelector('#notebook-event'),
-  notebookTag: document.querySelector('#notebook-tag'),
-  notebookText: document.querySelector('#notebook-text'),
-  notebookSave: document.querySelector('#notebook-save'),
-  notebookClearInput: document.querySelector('#notebook-clear-input'),
-  notebookExport: document.querySelector('#notebook-export'),
-  notebookFilter: document.querySelector('#notebook-filter'),
-  notebookSummary: document.querySelector('#notebook-summary'),
-  notebookList: document.querySelector('#notebook-list'),
-  notebookEditorStatus: document.querySelector('#notebook-editor-status'),
-
-  commandShell: document.querySelector('#command-shell'),
-  commandInput: document.querySelector('#command-input'),
-  commandList: document.querySelector('#command-list'),
+  sourceStatus: document.querySelector('#source-status'),
+  sourceBody: document.querySelector('#source-body'),
 };
 
-let commandState = {
-  open: false,
-  filtered: [],
-  activeIndex: 0,
+const state = {
+  dossierId: DOSSIERS[0].id,
+  search: '',
+  yearStart: DOSSIERS[0].yearStart,
+  yearEnd: DOSSIERS[0].yearEnd,
+  sourceFocusIds: null,
 };
 
 const tokenize = (value) =>
@@ -652,2904 +397,316 @@ const downloadText = (filename, text) => {
   URL.revokeObjectURL(url);
 };
 
-const copyText = async (text) => {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(text);
-    return true;
-  }
-
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'absolute';
-  area.style.left = '-9999px';
-  document.body.appendChild(area);
-  area.select();
-  const copied = document.execCommand('copy');
-  document.body.removeChild(area);
-  return copied;
-};
-
-const getEvent = (id) => EVENTS.find((event) => event.id === id) || null;
-const getEntity = (id) => ENTITIES.find((entity) => entity.id === id) || null;
-const getSource = (id) => SOURCES.find((source) => source.id === id) || null;
-
-const savePins = () => safeStore.set(STORAGE_KEYS.pins, [...state.pins]);
-const saveBrief = () => safeStore.set(STORAGE_KEYS.brief, [...state.brief]);
-const saveSourceState = () => safeStore.set(STORAGE_KEYS.sourceState, state.sourceState);
-const saveBriefNotes = () => safeStore.set(STORAGE_KEYS.briefNotes, state.briefNotes);
-const saveBriefTone = () => safeStore.set(STORAGE_KEYS.briefTone, state.briefTone);
-const saveTheme = () => safeStore.set(STORAGE_KEYS.theme, state.theme);
-const saveNotebook = () => safeStore.set(STORAGE_KEYS.notebook, state.notebook);
-const saveGameBest = () => safeStore.set(STORAGE_KEYS.gameBest, state.gameBest);
-
 const setStatus = (node, text) => {
   if (node) {
     node.textContent = text;
   }
 };
 
-const getPhaseText = (phase) => PHASE_LABEL[phase] || phase;
+const getEvent = (id) => EVENTS.find((event) => event.id === id) || null;
+const getSource = (id) => SOURCES.find((source) => source.id === id) || null;
+const getActiveDossier = () => DOSSIERS.find((dossier) => dossier.id === state.dossierId) || DOSSIERS[0];
 
-const escapeHtml = (value) =>
-  String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const getEventCollectionByIds = (ids, ascending = true) =>
-  [...ids]
+const getDossierEvents = (dossierId = state.dossierId) => {
+  const dossier = DOSSIERS.find((row) => row.id === dossierId);
+  if (!dossier) {
+    return [];
+  }
+  return dossier.eventIds
     .map((id) => getEvent(id))
     .filter(Boolean)
-    .sort((a, b) => (ascending ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)));
-
-const getEvidenceSourceWeight = (sourceType) => {
-  if (sourceType === 'official') {
-    return 1;
-  }
-  if (sourceType === 'court') {
-    return 0.95;
-  }
-  if (sourceType === 'media') {
-    return 0.7;
-  }
-  return 0.58;
+    .sort((a, b) => a.date.localeCompare(b.date));
 };
 
-const eventSearchHaystack = (event) => {
-  const entityNames = event.entities.map((id) => getEntity(id)?.label || '').join(' ');
-  return `${event.title} ${event.summary} ${event.keywords} ${entityNames}`.toLowerCase();
+const getDossierSourceIds = (dossierId = state.dossierId) => {
+  const ids = new Set();
+  getDossierEvents(dossierId).forEach((event) => {
+    event.sources.forEach((sourceId) => ids.add(sourceId));
+  });
+  return [...ids];
 };
 
-const scoreByTokens = (text, tokens) => {
-  if (tokens.length === 0) {
-    return 0;
-  }
+const getVisibleEvents = () => {
+  const tokens = tokenize(state.search);
 
-  let score = 0;
-  for (const token of tokens) {
-    if (text.includes(token)) {
-      score += token.length > 4 ? 2 : 1;
-    }
-  }
-  return score;
-};
-
-const getFilteredEvents = () => {
-  const queryTokens = tokenize(state.search);
-
-  const rows = EVENTS.filter((event) => {
+  return getDossierEvents().filter((event) => {
     const year = new Date(event.date).getFullYear();
-
-    if (state.phase !== 'all' && event.phase !== state.phase) {
-      return false;
-    }
     if (year < state.yearStart || year > state.yearEnd) {
       return false;
     }
 
-    if (queryTokens.length > 0) {
-      const haystack = eventSearchHaystack(event);
-      const matches = queryTokens.every((token) => haystack.includes(token));
-      return matches;
+    if (tokens.length > 0) {
+      const haystack = `${event.title} ${event.summary} ${event.keywords} ${event.phase}`.toLowerCase();
+      return tokens.every((token) => haystack.includes(token));
     }
 
     return true;
-  }).map((event) => {
-    const relevance = scoreByTokens(eventSearchHaystack(event), queryTokens);
-    return { event, relevance };
   });
-
-  if (state.sort === 'oldest') {
-    rows.sort((a, b) => a.event.date.localeCompare(b.event.date));
-  } else if (state.sort === 'relevance') {
-    rows.sort((a, b) => {
-      if (b.relevance !== a.relevance) {
-        return b.relevance - a.relevance;
-      }
-      return b.event.date.localeCompare(a.event.date);
-    });
-  } else {
-    rows.sort((a, b) => b.event.date.localeCompare(a.event.date));
-  }
-
-  return rows.map((row) => row.event);
 };
 
-const getFlowPhase = (flowId) => FLOW_PHASES.find((phase) => phase.id === flowId) || FLOW_PHASES[0];
+const getLinkedEventTitlesForSource = (sourceId) =>
+  getDossierEvents()
+    .filter((event) => event.sources.includes(sourceId))
+    .map((event) => event.title);
 
-const getCurrentFlowPhase = () => getFlowPhase(state.flowSelectedId);
-
-const getFlowClusterKeys = (phase) =>
-  Object.keys(phase.clusters).filter((key) => Array.isArray(phase.clusters[key]) && phase.clusters[key].length > 0);
-
-const getFlowClusterSourceIds = (phase, cluster) => {
-  if (cluster === 'all') {
-    return [...new Set(getFlowClusterKeys(phase).flatMap((key) => phase.clusters[key]))];
-  }
-  return phase.clusters[cluster] || [];
+const renderDossierMenu = () => {
+  dom.dossierMenu.innerHTML = DOSSIERS.map((dossier) => {
+    const active = dossier.id === state.dossierId ? 'active' : '';
+    return `
+      <button class="dossier-btn ${active}" type="button" data-dossier-id="${dossier.id}">
+        <span class="dossier-btn-title">${dossier.title}</span>
+        <span class="dossier-btn-meta">${dossier.period} · ${dossier.eventIds.length} events</span>
+      </button>
+    `;
+  }).join('');
 };
 
-const renderFlowMap = () => {
-  const phase = getCurrentFlowPhase();
-  const clusterKeys = getFlowClusterKeys(phase);
+const renderDossierDetail = () => {
+  const dossier = getActiveDossier();
+  const sources = getDossierSourceIds(dossier.id);
 
-  if (!clusterKeys.includes(state.flowCluster)) {
-    state.flowCluster = clusterKeys[0] || 'official';
-  }
-
-  if (dom.flowTrack) {
-    dom.flowTrack.querySelectorAll('.flow-node').forEach((button) => {
-      const id = button.getAttribute('data-flow-id');
-      button.classList.toggle('active', id === phase.id);
-    });
-  }
-
-  if (dom.flowTitle) {
-    dom.flowTitle.textContent = phase.title;
-  }
-
-  if (dom.flowSummary) {
-    dom.flowSummary.textContent = `${phase.summary} Timeline window: ${phase.yearStart}-${phase.yearEnd}.`;
-  }
-
-  if (dom.clusterTabs) {
-    dom.clusterTabs.innerHTML = clusterKeys
-      .map((clusterKey) => {
-        const active = clusterKey === state.flowCluster ? 'active' : '';
-        const count = phase.clusters[clusterKey].length;
-        return `<button class=\"cluster-btn ${active}\" type=\"button\" data-cluster=\"${clusterKey}\">${CLUSTER_LABEL[clusterKey] || clusterKey} (${count})</button>`;
-      })
-      .join('');
-  }
-
-  const sourceIds = getFlowClusterSourceIds(phase, state.flowCluster);
-  const sources = sourceIds.map((id) => getSource(id)).filter(Boolean);
-
-  if (dom.clusterList) {
-    if (sources.length === 0) {
-      dom.clusterList.innerHTML = '<li class=\"placeholder\">No sources in this cluster for the selected phase.</li>';
-    } else {
-      dom.clusterList.innerHTML = sources
-        .map(
-          (source) => `
-            <li data-source-id=\"${source.id}\">
-              <div class=\"cluster-source-meta\">
-                <p class=\"cluster-source-title\">${source.title}</p>
-                <p class=\"cluster-source-pub\">${source.publisher}</p>
-              </div>
-              <div class=\"list-actions\">
-                <a class=\"source-open\" href=\"${source.url}\" target=\"_blank\" rel=\"noreferrer\">Open</a>
-                <button class=\"mini-btn\" type=\"button\" data-cluster-action=\"focus-one\">Focus</button>
-              </div>
-            </li>
-          `
-        )
-        .join('');
-    }
-  }
-
-  if (dom.clusterStatus) {
-    const label = CLUSTER_LABEL[state.flowCluster] || state.flowCluster;
-    dom.clusterStatus.textContent = `${label} cluster · ${sources.length} source${sources.length === 1 ? '' : 's'} in this phase.`;
-  }
-};
-
-const applyFlowToTimeline = () => {
-  const phase = getCurrentFlowPhase();
-  state.phase = phase.timelinePhase;
-  state.yearStart = Math.max(minYear, phase.yearStart);
-  state.yearEnd = Math.min(maxYear, phase.yearEnd);
-  state.search = '';
-  state.sort = 'newest';
-  applyTimelineControlState();
-  renderTimeline();
-};
-
-const focusFlowSources = (cluster = 'all') => {
-  const phase = getCurrentFlowPhase();
-  const sourceIds = getFlowClusterSourceIds(phase, cluster);
-  state.sourceType = 'all';
-  state.sourceSearch = '';
-  applySourceControlState();
-  setSourceFocus(sourceIds);
+  dom.dossierTitle.textContent = dossier.title;
+  dom.dossierSummary.textContent = dossier.summary;
+  dom.dossierPoints.innerHTML = dossier.points.map((point) => `<li>${point}</li>`).join('');
+  dom.dossierPeriod.textContent = `Coverage period: ${dossier.period}`;
+  dom.dossierCounts.textContent = `Events: ${dossier.eventIds.length} · Sources: ${sources.length}`;
+  dom.questionList.innerHTML = dossier.questions.map((question) => `<li>${question}</li>`).join('');
 };
 
 const renderTimeline = () => {
-  const events = getFilteredEvents();
+  const events = getVisibleEvents();
 
-  setStatus(dom.timelineStatus, `Showing ${events.length} events (${state.phase === 'all' ? 'all phases' : getPhaseText(state.phase)}).`);
+  setStatus(dom.timelineStatus, `Showing ${events.length} event${events.length === 1 ? '' : 's'} in active dossier.`);
 
   if (events.length === 0) {
-    dom.timelineResults.innerHTML = `<article class="event-card"><p class="status">No events match your filters. Try a wider year range or fewer keywords.</p></article>`;
-    renderEvidenceMatrix();
+    dom.timelineList.innerHTML = `
+      <article class="event-card">
+        <p class="status">No events match current filters. Try wider years or fewer keywords.</p>
+      </article>
+    `;
     return;
   }
 
-  dom.timelineResults.innerHTML = events
+  dom.timelineList.innerHTML = events
     .map((event) => {
-      const entities = event.entities
-        .map((entityId) => {
-          const entity = getEntity(entityId);
-          if (!entity) {
-            return '';
-          }
-          return `<li>${entity.label}</li>`;
-        })
-        .join('');
-
-      const pinActive = state.pins.has(event.id) ? 'active' : '';
-      const briefActive = state.brief.has(event.id) ? 'active' : '';
-      const primaryEntity = event.entities[0] || '';
-
+      const phaseLabel = PHASE_LABEL[event.phase] || event.phase;
       return `
         <article class="event-card" data-event-id="${event.id}">
           <div class="event-head">
             <p class="event-date">${formatDate(event.date)}</p>
-            <span class="phase-tag">${getPhaseText(event.phase)}</span>
+            <span class="phase-tag">${phaseLabel}</span>
           </div>
           <h3 class="event-title">${event.title}</h3>
           <p class="event-summary">${event.summary}</p>
-          <ul class="entity-chips">${entities}</ul>
-          <div class="event-actions">
-            <button class="event-btn pin ${pinActive}" type="button" data-action="pin">Pin</button>
-            <button class="event-btn brief ${briefActive}" type="button" data-action="brief">Add to brief</button>
-            <button class="event-btn" type="button" data-action="focus" data-entity="${primaryEntity}">Focus network</button>
-            <button class="event-btn" type="button" data-action="sources">Open sources</button>
+          <div class="inline-actions">
+            <button class="mini-btn" type="button" data-event-action="sources" data-event-id="${event.id}">
+              Focus ${event.sources.length} source${event.sources.length === 1 ? '' : 's'}
+            </button>
           </div>
         </article>
-      `;
-    })
-    .join('');
-  renderEvidenceMatrix();
-};
-
-const renderPinned = () => {
-  const pinEvents = [...state.pins].map((id) => getEvent(id)).filter(Boolean);
-
-  setStatus(dom.pinSummary, `${pinEvents.length} events pinned.`);
-
-  if (pinEvents.length === 0) {
-    dom.pinnedEvents.innerHTML = '<li class="placeholder">No pinned events yet.</li>';
-    return;
-  }
-
-  dom.pinnedEvents.innerHTML = pinEvents
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .map(
-      (event) => `
-        <li data-event-id="${event.id}">
-          <div>
-            <p class="list-title">${event.title}</p>
-            <p class="list-meta">${formatDate(event.date)}</p>
-          </div>
-          <div class="list-actions">
-            <button class="mini-btn" type="button" data-pin-action="jump">Jump</button>
-            <button class="mini-btn" type="button" data-pin-action="remove">Remove</button>
-          </div>
-        </li>
-      `
-    )
-    .join('');
-};
-
-const renderBriefSelection = () => {
-  const briefEvents = [...state.brief].map((id) => getEvent(id)).filter(Boolean);
-
-  setStatus(dom.briefCount, `${briefEvents.length} events selected.`);
-
-  if (briefEvents.length === 0) {
-    dom.briefEvents.innerHTML = '<li class="placeholder">Add events from the timeline or question results.</li>';
-    return;
-  }
-
-  dom.briefEvents.innerHTML = briefEvents
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map(
-      (event) => `
-        <li data-event-id="${event.id}">
-          <div>
-            <p class="list-title">${event.title}</p>
-            <p class="list-meta">${formatDate(event.date)}</p>
-          </div>
-          <button class="mini-btn" type="button" data-brief-action="remove">Remove</button>
-        </li>
-      `
-    )
-    .join('');
-};
-
-const setSourceFocus = (sourceIds) => {
-  const clean = (sourceIds || []).filter((id) => validSourceIds.has(id));
-  state.sourceFocusIds = clean.length > 0 ? clean : null;
-  renderSources();
-};
-
-const getFilteredSources = () => {
-  const searchTokens = tokenize(state.sourceSearch);
-
-  return SOURCES.filter((source) => {
-    if (state.sourceType !== 'all' && source.type !== state.sourceType) {
-      return false;
-    }
-
-    if (state.sourceFocusIds && !state.sourceFocusIds.includes(source.id)) {
-      return false;
-    }
-
-    if (searchTokens.length > 0) {
-      const haystack = `${source.title} ${source.publisher} ${source.type}`.toLowerCase();
-      if (!searchTokens.every((token) => haystack.includes(token))) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-};
-
-const getEvidenceScopeEvents = () => {
-  if (state.evidenceScope === 'all') {
-    return [...EVENTS].sort((a, b) => b.date.localeCompare(a.date));
-  }
-  if (state.evidenceScope === 'pinned') {
-    return getEventCollectionByIds(state.pins, false);
-  }
-  if (state.evidenceScope === 'brief') {
-    return getEventCollectionByIds(state.brief, false);
-  }
-  return getFilteredEvents();
-};
-
-const getEvidenceStatsForEvent = (event) => {
-  const sources = event.sources.map((sourceId) => getSource(sourceId)).filter(Boolean);
-  const typeCounts = {
-    official: 0,
-    court: 0,
-    media: 0,
-    analysis: 0,
-  };
-
-  let scoreAccumulator = 0;
-  let readCount = 0;
-  let verifiedCount = 0;
-
-  sources.forEach((source) => {
-    typeCounts[source.type] += 1;
-    const sourceState = state.sourceState[source.id] || { read: false, verified: false };
-    if (sourceState.read) {
-      readCount += 1;
-    }
-    if (sourceState.verified) {
-      verifiedCount += 1;
-    }
-
-    let weightedScore = getEvidenceSourceWeight(source.type);
-    if (sourceState.read) {
-      weightedScore += 0.08;
-    }
-    if (sourceState.verified) {
-      weightedScore += 0.19;
-    }
-    scoreAccumulator += weightedScore;
-  });
-
-  const averageScore = sources.length > 0 ? scoreAccumulator / sources.length : 0;
-  const normalizedScore = Math.round((Math.min(averageScore, 1.27) / 1.27) * 100);
-
-  return {
-    sourceCount: sources.length,
-    readCount,
-    verifiedCount,
-    typeCounts,
-    score: normalizedScore,
-  };
-};
-
-const renderEvidenceMatrix = () => {
-  if (!dom.evidenceBody) {
-    return;
-  }
-
-  const events = getEvidenceScopeEvents();
-  if (events.length === 0) {
-    dom.evidenceBody.innerHTML = `
-      <tr>
-        <td colspan="5"><p class="status">No events available for this matrix scope.</p></td>
-      </tr>
-    `;
-    setStatus(dom.evidenceStatus, '0 events in matrix scope.');
-    return;
-  }
-
-  dom.evidenceBody.innerHTML = events
-    .map((event) => {
-      const stats = getEvidenceStatsForEvent(event);
-      const spread = [
-        `Official ${stats.typeCounts.official}`,
-        `Court ${stats.typeCounts.court}`,
-        `Media ${stats.typeCounts.media}`,
-        `Analysis ${stats.typeCounts.analysis}`,
-      ].join(' · ');
-
-      return `
-        <tr data-evidence-event-id="${event.id}">
-          <td>
-            <p class="evidence-event-title">${event.title}</p>
-            <p class="evidence-event-meta">${formatDate(event.date)} · ${getPhaseText(event.phase)}</p>
-          </td>
-          <td>
-            <p class="evidence-types">${stats.sourceCount} total · ${stats.readCount} read · ${stats.verifiedCount} verified</p>
-          </td>
-          <td><p class="evidence-types">${spread}</p></td>
-          <td>
-            <div class="evidence-score">
-              <div class="evidence-meter"><div class="evidence-fill" style="width:${stats.score}%"></div></div>
-              <p class="evidence-score-label">${stats.score}/100 confidence</p>
-            </div>
-          </td>
-          <td>
-            <div class="list-actions">
-              <button class="mini-btn" type="button" data-evidence-action="sources">Sources</button>
-              <button class="mini-btn" type="button" data-evidence-action="brief">Add brief</button>
-              <button class="mini-btn" type="button" data-evidence-action="jump">Jump</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    })
-    .join('');
-
-  const scopeLabel =
-    state.evidenceScope === 'filtered'
-      ? 'filtered timeline'
-      : state.evidenceScope === 'brief'
-        ? 'brief selection'
-        : state.evidenceScope === 'pinned'
-          ? 'pinned events'
-          : 'all events';
-  setStatus(dom.evidenceStatus, `${events.length} events in matrix · scope: ${scopeLabel}.`);
-};
-
-const renderNotebookEventOptions = () => {
-  if (!dom.notebookEvent) {
-    return;
-  }
-  const current = dom.notebookEvent.value;
-  const options = [
-    '<option value="">General note (not tied to one event)</option>',
-    ...[...EVENTS]
-      .sort((a, b) => b.date.localeCompare(a.date))
-      .map((event) => `<option value="${event.id}">${formatDate(event.date)} · ${escapeHtml(event.title)}</option>`),
-  ];
-  dom.notebookEvent.innerHTML = options.join('');
-  if (current && validEventIds.has(current)) {
-    dom.notebookEvent.value = current;
-  }
-};
-
-const getFilteredNotebookEntries = () => {
-  const rows = [...state.notebook].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  if (state.notebookFilter === 'event-linked') {
-    return rows.filter((row) => row.eventId);
-  }
-  if (state.notebookFilter === 'general') {
-    return rows.filter((row) => !row.eventId);
-  }
-  if (state.notebookFilter === 'open-questions') {
-    return rows.filter((row) => row.text.includes('?') || /open|question|verify/i.test(row.tag));
-  }
-  return rows;
-};
-
-const composeNotebookMarkdown = () => {
-  const entries = getFilteredNotebookEntries();
-  const lines = ['# Investigation Notebook', `Generated: ${new Date().toLocaleString()}`, ''];
-
-  if (entries.length === 0) {
-    lines.push('- No notebook entries.');
-    return lines.join('\n');
-  }
-
-  entries.forEach((entry, index) => {
-    const event = entry.eventId ? getEvent(entry.eventId) : null;
-    lines.push(`## ${index + 1}. ${new Date(entry.createdAt).toLocaleString()}`);
-    lines.push(`- Event: ${event ? event.title : 'General note'}`);
-    lines.push(`- Tag: ${entry.tag || 'none'}`);
-    lines.push('- Note:');
-    lines.push(entry.text);
-    lines.push('');
-  });
-
-  return lines.join('\n');
-};
-
-const composeResearchReport = () => {
-  const sourceRows = SOURCES.map((source) => {
-    const sourceState = state.sourceState[source.id] || { read: false, verified: false };
-    return {
-      ...source,
-      read: sourceState.read,
-      verified: sourceState.verified,
-    };
-  });
-  const readCount = sourceRows.filter((row) => row.read).length;
-  const verifiedCount = sourceRows.filter((row) => row.verified).length;
-  const evidenceRows = getEvidenceScopeEvents().slice(0, 12);
-  const notebookRows = getFilteredNotebookEntries().slice(0, 20);
-  const selectedEvents = getEventCollectionByIds(state.brief, true);
-
-  const lines = [];
-  lines.push('# Jeffrey Epstein Investigative Report');
-  lines.push(`Generated: ${new Date().toLocaleString()}`);
-  lines.push('');
-  lines.push('## Working Filter Context');
-  lines.push(`- Timeline phase: ${state.phase}`);
-  lines.push(`- Year window: ${state.yearStart}-${state.yearEnd}`);
-  lines.push(`- Timeline search: ${state.search || 'none'}`);
-  lines.push(`- Source filter: ${state.sourceType} / ${state.sourceSearch || 'none'}`);
-  lines.push(`- Evidence scope: ${state.evidenceScope}`);
-  lines.push('');
-  lines.push('## Evidence Matrix Snapshot');
-  if (evidenceRows.length === 0) {
-    lines.push('- No evidence rows in current scope.');
-  } else {
-    evidenceRows.forEach((event, index) => {
-      const stats = getEvidenceStatsForEvent(event);
-      lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
-      lines.push(`   Confidence: ${stats.score}/100 · Sources: ${stats.sourceCount} total, ${stats.readCount} read, ${stats.verifiedCount} verified`);
-    });
-  }
-  lines.push('');
-  lines.push('## Brief Event Set');
-  if (selectedEvents.length === 0) {
-    lines.push('- No events in brief selection.');
-  } else {
-    selectedEvents.forEach((event, index) => {
-      lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
-      lines.push(`   ${event.summary}`);
-    });
-  }
-  lines.push('');
-  lines.push('## Notebook Highlights');
-  if (notebookRows.length === 0) {
-    lines.push('- No notebook entries.');
-  } else {
-    notebookRows.forEach((entry) => {
-      const event = entry.eventId ? getEvent(entry.eventId) : null;
-      lines.push(`- [${new Date(entry.createdAt).toLocaleString()}] ${event ? event.title : 'General'}${entry.tag ? ` (#${entry.tag})` : ''}`);
-      lines.push(`  ${entry.text}`);
-    });
-  }
-  lines.push('');
-  lines.push('## Source Coverage Progress');
-  lines.push(`- ${readCount}/${SOURCES.length} marked read`);
-  lines.push(`- ${verifiedCount}/${SOURCES.length} marked verified`);
-  lines.push('');
-  lines.push('## Generated Brief Output');
-  lines.push('```text');
-  lines.push(composeBrief());
-  lines.push('```');
-
-  return lines.join('\n');
-};
-
-const exportReportMarkdown = () => {
-  const report = composeResearchReport();
-  downloadText('investigative-report.md', report);
-  setStatus(dom.briefStatus, 'Report exported as investigative-report.md.');
-};
-
-const exportReportPdf = () => {
-  const report = composeResearchReport();
-  const reportHtml = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Investigative Report</title>
-  <style>
-    body { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin: 24px; line-height: 1.5; color: #111827; }
-    h1 { font-size: 22px; margin-bottom: 14px; }
-    pre { white-space: pre-wrap; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <h1>Jeffrey Epstein Investigative Report</h1>
-  <pre>${escapeHtml(report)}</pre>
-</body>
-</html>`;
-  const popup = window.open('', '_blank', 'noopener,noreferrer');
-  if (!popup) {
-    downloadText('investigative-report.md', report);
-    setStatus(dom.briefStatus, 'Popup blocked. Downloaded Markdown report instead.');
-    return;
-  }
-  popup.document.open();
-  popup.document.write(reportHtml);
-  popup.document.close();
-  popup.focus();
-  window.setTimeout(() => popup.print(), 350);
-  setStatus(dom.briefStatus, 'Print dialog opened. Save as PDF from your browser.');
-};
-
-const renderNotebook = () => {
-  if (!dom.notebookList) {
-    return;
-  }
-
-  const entries = getFilteredNotebookEntries();
-  setStatus(dom.notebookSummary, `${entries.length} notebook entr${entries.length === 1 ? 'y' : 'ies'}.`);
-
-  if (entries.length === 0) {
-    dom.notebookList.innerHTML = '<li class="placeholder">No notebook entries yet.</li>';
-    return;
-  }
-
-  dom.notebookList.innerHTML = entries
-    .map((entry) => {
-      const event = entry.eventId ? getEvent(entry.eventId) : null;
-      const eventTitle = event ? event.title : 'General note';
-      const created = new Date(entry.createdAt).toLocaleString();
-
-      return `
-        <li data-note-id="${entry.id}">
-          <div class="note-head">
-            <p class="list-title">${escapeHtml(eventTitle)}</p>
-            ${entry.tag ? `<span class="note-tag">${escapeHtml(entry.tag)}</span>` : ''}
-          </div>
-          <p class="note-meta">${created}</p>
-          <p class="note-text">${escapeHtml(entry.text)}</p>
-          <div class="list-actions">
-            ${event ? '<button class="mini-btn" type="button" data-note-action="jump">Jump to event</button>' : ''}
-            <button class="mini-btn" type="button" data-note-action="delete">Delete</button>
-          </div>
-        </li>
       `;
     })
     .join('');
 };
 
 const renderSources = () => {
-  const rows = getFilteredSources();
+  const sourceIds = state.sourceFocusIds || getDossierSourceIds();
+  const sources = sourceIds
+    .map((id) => getSource(id))
+    .filter(Boolean)
+    .sort((a, b) => b.date.localeCompare(a.date));
 
-  let readCount = 0;
-  let verifiedCount = 0;
-
-  if (rows.length === 0) {
-    dom.sourceTableBody.innerHTML = `
+  if (sources.length === 0) {
+    dom.sourceBody.innerHTML = `
       <tr>
-        <td colspan="6"><p class="status">No sources match the current filters.</p></td>
+        <td colspan="6"><p class="status">No sources available in this view.</p></td>
       </tr>
     `;
-  } else {
-    dom.sourceTableBody.innerHTML = rows
-      .map((source) => {
-        const entry = state.sourceState[source.id] || { read: false, verified: false };
-        if (entry.read) {
-          readCount += 1;
-        }
-        if (entry.verified) {
-          verifiedCount += 1;
-        }
-
-        const focusedClass = state.sourceFocusIds && state.sourceFocusIds.includes(source.id) ? 'focused' : '';
-
-        return `
-          <tr class="${focusedClass}" data-source-id="${source.id}">
-            <td>${formatDate(source.date)}</td>
-            <td>
-              <p class="source-title">${source.title}</p>
-              <p class="source-pub">${source.publisher}</p>
-            </td>
-            <td>${source.type}</td>
-            <td><input type="checkbox" data-source-flag="read" ${entry.read ? 'checked' : ''} /></td>
-            <td><input type="checkbox" data-source-flag="verified" ${entry.verified ? 'checked' : ''} /></td>
-            <td><a class="source-open" href="${source.url}" target="_blank" rel="noreferrer">Open</a></td>
-          </tr>
-        `;
-      })
-      .join('');
+    setStatus(dom.sourceStatus, '0 sources shown.');
+    return;
   }
 
-  const focusText = state.sourceFocusIds ? ' · focus mode active' : '';
-  setStatus(dom.sourceSummary, `${rows.length} sources shown · ${readCount} read · ${verifiedCount} verified${focusText}.`);
-  renderEvidenceMatrix();
+  dom.sourceBody.innerHTML = sources
+    .map((source) => {
+      const linked = getLinkedEventTitlesForSource(source.id);
+      const linkedText = linked.length === 0 ? 'No linked events' : linked.slice(0, 3).join(' · ');
+      const extra = linked.length > 3 ? ` +${linked.length - 3} more` : '';
+
+      return `
+        <tr>
+          <td>${formatDate(source.date)}</td>
+          <td><p class="source-title">${source.title}</p></td>
+          <td>${source.publisher}</td>
+          <td>${source.type}</td>
+          <td>${linkedText}${extra}</td>
+          <td><a class="source-open" href="${source.url}" target="_blank" rel="noreferrer">Open</a></td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  const focusText = state.sourceFocusIds ? ' · focused by event' : '';
+  setStatus(dom.sourceStatus, `${sources.length} source${sources.length === 1 ? '' : 's'} shown${focusText}.`);
 };
 
-const composeBrief = () => {
-  const tone = state.briefTone;
-  const selectedEvents = [...state.brief]
-    .map((id) => getEvent(id))
-    .filter(Boolean)
-    .sort((a, b) => a.date.localeCompare(b.date));
+const applyTimelineControls = () => {
+  dom.timelineSearch.value = state.search;
+  dom.yearStart.value = String(state.yearStart);
+  dom.yearEnd.value = String(state.yearEnd);
+};
 
-  const pinnedEvents = [...state.pins]
-    .map((id) => getEvent(id))
-    .filter(Boolean)
-    .sort((a, b) => a.date.localeCompare(b.date));
-
-  const lines = [];
-  lines.push('# Jeffrey Epstein Case Working Brief');
-  lines.push(`Generated: ${new Date().toLocaleString()}`);
-  lines.push(`Tone: ${tone}`);
-  lines.push('');
-
-  if (tone === 'chronological') {
-    lines.push('## Chronology Focus');
-  } else if (tone === 'legal') {
-    lines.push('## Legal-Process Focus');
-  } else {
-    lines.push('## Neutral Situation Overview');
+const setDossier = (dossierId) => {
+  const dossier = DOSSIERS.find((row) => row.id === dossierId);
+  if (!dossier) {
+    return;
   }
 
-  if (selectedEvents.length === 0) {
-    lines.push('- No events selected yet. Add events from the timeline to build the brief.');
+  state.dossierId = dossier.id;
+  state.search = '';
+  state.sourceFocusIds = null;
+  state.yearStart = dossier.yearStart;
+  state.yearEnd = dossier.yearEnd;
+
+  renderDossierMenu();
+  renderDossierDetail();
+  applyTimelineControls();
+  renderTimeline();
+  renderSources();
+};
+
+const resetTimelineFilters = () => {
+  const dossier = getActiveDossier();
+  state.search = '';
+  state.yearStart = dossier.yearStart;
+  state.yearEnd = dossier.yearEnd;
+  state.sourceFocusIds = null;
+
+  applyTimelineControls();
+  renderTimeline();
+  renderSources();
+};
+
+const exportCurrentDossier = () => {
+  const dossier = getActiveDossier();
+  const events = getVisibleEvents();
+  const sources = getDossierSourceIds(dossier.id)
+    .map((id) => getSource(id))
+    .filter(Boolean)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const lines = [];
+  lines.push(`# ${dossier.title}`);
+  lines.push(`Generated: ${new Date().toLocaleString()}`);
+  lines.push(`Coverage period: ${dossier.period}`);
+  lines.push('');
+  lines.push('## Summary');
+  lines.push(dossier.summary);
+  lines.push('');
+  lines.push('## Key Points');
+  dossier.points.forEach((point) => lines.push(`- ${point}`));
+  lines.push('');
+  lines.push('## Open Questions');
+  dossier.questions.forEach((question) => lines.push(`- ${question}`));
+  lines.push('');
+  lines.push('## Timeline Events (current filters)');
+
+  if (events.length === 0) {
+    lines.push('- No events matched current filters.');
   } else {
-    selectedEvents.forEach((event, index) => {
+    events.forEach((event, index) => {
       lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
       lines.push(`   ${event.summary}`);
     });
   }
 
   lines.push('');
-  lines.push('## Pinned Working Set');
-  if (pinnedEvents.length === 0) {
-    lines.push('- No pinned events.');
-  } else {
-    pinnedEvents.forEach((event) => {
-      lines.push(`- ${formatDate(event.date)} - ${event.title}`);
-    });
-  }
-
-  lines.push('');
-  lines.push('## Research Notes');
-  if (state.briefNotes.trim().length === 0) {
-    lines.push('- No notes entered.');
-  } else {
-    lines.push(state.briefNotes.trim());
-  }
-
-  return lines.join('\n');
-};
-
-const renderBrief = () => {
-  renderBriefSelection();
-  dom.briefOutput.textContent = composeBrief();
-  renderEvidenceMatrix();
-};
-
-const updateMetrics = () => {
-  dom.metricEvents.textContent = String(EVENTS.length);
-  dom.metricSources.textContent = String(SOURCES.length);
-  dom.metricEntities.textContent = String(ENTITIES.length);
-};
-
-const jumpToEvent = (eventId) => {
-  const event = getEvent(eventId);
-  if (!event) {
-    return;
-  }
-
-  const year = new Date(event.date).getFullYear();
-  state.yearStart = Math.min(state.yearStart, year);
-  state.yearEnd = Math.max(state.yearEnd, year);
-
-  dom.yearStart.value = String(state.yearStart);
-  dom.yearEnd.value = String(state.yearEnd);
-  renderTimeline();
-
-  requestAnimationFrame(() => {
-    const node = dom.timelineResults.querySelector(`[data-event-id="${eventId}"]`);
-    if (node) {
-      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      node.animate(
-        [
-          { transform: 'scale(1)', boxShadow: 'none' },
-          { transform: 'scale(1.01)', boxShadow: '0 0 0 2px rgba(18, 102, 125, 0.35)' },
-          { transform: 'scale(1)', boxShadow: 'none' },
-        ],
-        { duration: 800 }
-      );
-    }
-  });
-};
-
-const togglePin = (eventId) => {
-  if (!validEventIds.has(eventId)) {
-    return;
-  }
-
-  if (state.pins.has(eventId)) {
-    state.pins.delete(eventId);
-  } else {
-    state.pins.add(eventId);
-  }
-
-  savePins();
-  renderTimeline();
-  renderPinned();
-  renderBrief();
-};
-
-const toggleBriefEvent = (eventId) => {
-  if (!validEventIds.has(eventId)) {
-    return;
-  }
-
-  if (state.brief.has(eventId)) {
-    state.brief.delete(eventId);
-  } else {
-    state.brief.add(eventId);
-  }
-
-  saveBrief();
-  renderTimeline();
-  renderBrief();
-};
-
-const runQuestionQuery = (question) => {
-  const tokens = tokenize(question);
-  state.query = question;
-
-  if (tokens.length === 0) {
-    dom.questionResults.textContent = 'Run a question to receive ranked matches.';
-    return;
-  }
-
-  const rankedEvents = EVENTS.map((event) => {
-    const score = scoreByTokens(eventSearchHaystack(event), tokens);
-    return { event, score };
-  })
-    .filter((row) => row.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
-
-  const rankedSources = SOURCES.map((source) => {
-    const text = `${source.title} ${source.publisher} ${source.type}`.toLowerCase();
-    const score = scoreByTokens(text, tokens);
-    return { source, score };
-  })
-    .filter((row) => row.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4);
-
-  const eventList =
-    rankedEvents.length > 0
-      ? rankedEvents
-          .map(
-            ({ event, score }) => `
-              <li class="query-item" data-event-id="${event.id}">
-                <p class="query-title">${event.title}</p>
-                <p class="query-meta">${formatDate(event.date)} · score ${score}</p>
-                <div class="inline-actions">
-                  <button class="mini-btn" type="button" data-query-action="add-brief">Add to brief</button>
-                  <button class="mini-btn" type="button" data-query-action="jump">Jump</button>
-                </div>
-              </li>
-            `
-          )
-          .join('')
-      : '<li class="query-item"><p class="query-meta">No event matches for this question.</p></li>';
-
-  const sourceList =
-    rankedSources.length > 0
-      ? rankedSources
-          .map(
-            ({ source, score }) => `
-              <li class="query-item">
-                <p class="query-title">${source.title}</p>
-                <p class="query-meta">${source.publisher} · score ${score}</p>
-                <a class="source-open" href="${source.url}" target="_blank" rel="noreferrer">Open source</a>
-              </li>
-            `
-          )
-          .join('')
-      : '<li class="query-item"><p class="query-meta">No source matches for this question.</p></li>';
-
-  dom.questionResults.innerHTML = `
-    <div class="query-block">
-      <p class="query-title">Top event matches</p>
-      <ul class="query-list">${eventList}</ul>
-      <p class="query-title">Top source matches</p>
-      <ul class="query-list">${sourceList}</ul>
-    </div>
-  `;
-};
-
-const exportPins = () => {
-  const events = [...state.pins]
-    .map((id) => getEvent(id))
-    .filter(Boolean)
-    .sort((a, b) => a.date.localeCompare(b.date));
-
-  if (events.length === 0) {
-    setStatus(dom.pinSummary, 'Nothing to export. Pin events first.');
-    return;
-  }
-
-  const lines = ['Pinned Events', `Generated: ${new Date().toLocaleString()}`, ''];
-  events.forEach((event, index) => {
-    lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
+  lines.push('## Source Index');
+  sources.forEach((source) => {
+    lines.push(`- ${formatDate(source.date)} | ${source.title} | ${source.publisher} | ${source.url}`);
   });
 
-  downloadText('pinned-events.txt', lines.join('\n'));
-  setStatus(dom.pinSummary, `${events.length} events pinned. Export complete.`);
+  downloadText(`dossier-${dossier.id}.md`, lines.join('\n'));
 };
 
-const exportSession = () => {
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    filters: {
-      phase: state.phase,
-      yearStart: state.yearStart,
-      yearEnd: state.yearEnd,
-      search: state.search,
-      sort: state.sort,
-      sourceType: state.sourceType,
-      sourceSearch: state.sourceSearch,
-    },
-    pins: [...state.pins],
-    brief: [...state.brief],
-    sourceState: state.sourceState,
-    briefTone: state.briefTone,
-    briefNotes: state.briefNotes,
-    evidenceScope: state.evidenceScope,
-    notebook: state.notebook,
-    gameBest: state.gameBest,
-  };
-
-  downloadText('research-session.json', JSON.stringify(payload, null, 2));
-  setStatus(dom.sessionStatus, 'Session exported to research-session.json.');
-};
-
-const resetSession = () => {
-  state.phase = 'all';
-  state.yearStart = minYear;
-  state.yearEnd = maxYear;
-  state.search = '';
-  state.sort = 'newest';
-  state.sourceType = 'all';
-  state.sourceSearch = '';
-  state.sourceFocusIds = null;
-  state.pins = new Set();
-  state.brief = new Set();
-  state.sourceState = {};
-  state.briefTone = 'neutral';
-  state.briefNotes = '';
-  state.flowSelectedId = 'foundation';
-  state.flowCluster = 'official';
-  state.evidenceScope = 'filtered';
-  state.notebook = [];
-  state.notebookFilter = 'all';
-  state.gameBest = 0;
-
-  safeStore.remove(STORAGE_KEYS.pins);
-  safeStore.remove(STORAGE_KEYS.brief);
-  safeStore.remove(STORAGE_KEYS.sourceState);
-  safeStore.remove(STORAGE_KEYS.briefNotes);
-  safeStore.remove(STORAGE_KEYS.briefTone);
-  safeStore.remove(STORAGE_KEYS.notebook);
-  safeStore.remove(STORAGE_KEYS.gameBest);
-
-  dom.timelineSearch.value = '';
-  dom.timelineSort.value = 'newest';
-  dom.yearStart.value = String(minYear);
-  dom.yearEnd.value = String(maxYear);
-  dom.sourceTypeFilter.value = 'all';
-  dom.sourceSearch.value = '';
-  dom.briefTone.value = 'neutral';
-  dom.briefNotes.value = '';
-  if (dom.evidenceScope) {
-    dom.evidenceScope.value = 'filtered';
-  }
-  if (dom.notebookFilter) {
-    dom.notebookFilter.value = 'all';
-  }
-  if (dom.notebookEvent) {
-    dom.notebookEvent.value = '';
-  }
-  if (dom.notebookTag) {
-    dom.notebookTag.value = '';
-  }
-  if (dom.notebookText) {
-    dom.notebookText.value = '';
-  }
-
-  dom.phaseFilters.querySelectorAll('.phase-btn').forEach((button) => {
-    button.classList.toggle('active', button.dataset.phase === 'all');
-  });
-
-  renderTimeline();
-  renderPinned();
-  renderFlowMap();
-  renderSources();
-  renderBrief();
-  renderNotebook();
-  resetGame();
-  setStatus(dom.sessionStatus, 'Session reset complete.');
-};
-
-const setTheme = (theme) => {
-  state.theme = theme;
-  dom.body.dataset.theme = theme;
-  saveTheme();
-  graphState.redraw();
-  renderGameFrame();
-};
-
-const toggleTheme = () => {
-  setTheme(state.theme === 'light' ? 'dark' : 'light');
-};
-
-const updateHeaderAndProgress = () => {
-  const y = window.scrollY;
-  dom.header.classList.toggle('scrolled', y > 8);
-
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const value = maxScroll > 0 ? Math.min((y / maxScroll) * 100, 100) : 0;
-  dom.scrollProgress.style.width = `${value}%`;
-};
-
-const setupReveal = () => {
-  const sections = Array.from(document.querySelectorAll('.reveal'));
-
-  if (!('IntersectionObserver' in window)) {
-    sections.forEach((section) => section.classList.add('visible'));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries, instance) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          instance.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.12 }
-  );
-
-  sections.forEach((section, index) => {
-    section.style.transitionDelay = `${Math.min(index * 55, 240)}ms`;
-    observer.observe(section);
-  });
-};
-
-const setupActiveNav = () => {
-  const targets = Array.from(document.querySelectorAll('main section[id]'));
-
-  if (!('IntersectionObserver' in window)) {
-    return;
-  }
-
-  const byHash = new Map(dom.navLinks.map((link) => [link.getAttribute('href'), link]));
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        const id = entry.target.getAttribute('id');
-        if (!id) {
-          return;
-        }
-
-        dom.navLinks.forEach((link) => link.classList.remove('active'));
-        const active = byHash.get(`#${id}`);
-        if (active) {
-          active.classList.add('active');
-        }
-      });
-    },
-    {
-      rootMargin: '-30% 0px -55% 0px',
-      threshold: 0.05,
-    }
-  );
-
-  targets.forEach((target) => observer.observe(target));
-};
-
-const applyTimelineControlState = () => {
-  dom.yearStart.value = String(state.yearStart);
-  dom.yearEnd.value = String(state.yearEnd);
-  dom.timelineSearch.value = state.search;
-  dom.timelineSort.value = state.sort;
-
-  dom.phaseFilters.querySelectorAll('.phase-btn').forEach((button) => {
-    button.classList.toggle('active', button.dataset.phase === state.phase);
-  });
-};
-
-const applySourceControlState = () => {
-  dom.sourceTypeFilter.value = state.sourceType;
-  dom.sourceSearch.value = state.sourceSearch;
-};
-
-const initYearSelects = () => {
+const initYearOptions = () => {
   const options = [];
   for (let year = minYear; year <= maxYear; year += 1) {
     options.push(`<option value="${year}">${year}</option>`);
   }
   dom.yearStart.innerHTML = options.join('');
   dom.yearEnd.innerHTML = options.join('');
-  applyTimelineControlState();
-};
-
-const updateYearRange = () => {
-  const start = Number(dom.yearStart.value);
-  const end = Number(dom.yearEnd.value);
-
-  if (start <= end) {
-    state.yearStart = start;
-    state.yearEnd = end;
-  } else {
-    state.yearStart = Math.min(start, end);
-    state.yearEnd = Math.max(start, end);
-    dom.yearStart.value = String(state.yearStart);
-    dom.yearEnd.value = String(state.yearEnd);
-  }
-};
-
-const renderEntityPanel = (entityId) => {
-  const entity = entityId ? getEntity(entityId) : null;
-
-  if (!entity) {
-    dom.entityPanel.innerHTML = `
-      <h3>Entity Inspector</h3>
-      <p class="status">Select a node in the graph to inspect connections.</p>
-      <button class="tool-btn ghost" id="network-reset" type="button">Reset graph focus</button>
-    `;
-    dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
-      graphState.selectedNodeId = null;
-      graphState.redraw();
-      renderEntityPanel(null);
-    });
-    return;
-  }
-
-  const relatedEvents = EVENTS.filter((event) => event.entities.includes(entity.id));
-
-  const relatedMarkup = relatedEvents
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map(
-      (event) => `
-        <li data-event-id="${event.id}">
-          <div>
-            <p class="list-title">${event.title}</p>
-            <p class="list-meta">${formatDate(event.date)}</p>
-          </div>
-          <div class="list-actions">
-            <button class="mini-btn" type="button" data-entity-action="brief">Add</button>
-            <button class="mini-btn" type="button" data-entity-action="jump">Jump</button>
-          </div>
-        </li>
-      `
-    )
-    .join('');
-
-  dom.entityPanel.innerHTML = `
-    <h3>${entity.label}</h3>
-    <p class="status">${entity.type.toUpperCase()} · ${entity.blurb}</p>
-    <ul class="entity-list">${relatedMarkup}</ul>
-    <button class="tool-btn ghost" id="network-reset" type="button">Reset graph focus</button>
-  `;
-
-  dom.entityPanel.querySelector('#network-reset')?.addEventListener('click', () => {
-    graphState.selectedNodeId = null;
-    graphState.redraw();
-    renderEntityPanel(null);
-  });
-
-  dom.entityPanel.querySelectorAll('[data-entity-action]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const li = button.closest('li[data-event-id]');
-      const eventId = li?.getAttribute('data-event-id');
-      if (!eventId) {
-        return;
-      }
-      const action = button.getAttribute('data-entity-action');
-      if (action === 'brief') {
-        state.brief.add(eventId);
-        saveBrief();
-        renderTimeline();
-        renderBrief();
-      } else if (action === 'jump') {
-        jumpToEvent(eventId);
-      }
-    });
-  });
-};
-
-const graphState = {
-  nodes: [],
-  edges: [],
-  selectedNodeId: null,
-  hoverNodeId: null,
-  width: 0,
-  height: 0,
-  ctx: null,
-  redraw: () => {},
-};
-
-const entityColor = (type) => {
-  if (type === 'person') {
-    return '#d06b49';
-  }
-  if (type === 'institution') {
-    return '#3da0bd';
-  }
-  if (type === 'media') {
-    return '#9b7bd9';
-  }
-  return '#58a37d';
-};
-
-const getGraphDegreeMap = () => {
-  const degree = new Map(ENTITIES.map((entity) => [entity.id, 0]));
-  EDGES.forEach(([a, b]) => {
-    degree.set(a, (degree.get(a) || 0) + 1);
-    degree.set(b, (degree.get(b) || 0) + 1);
-  });
-  return degree;
-};
-
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
-const initGraph = () => {
-  const canvas = dom.networkCanvas;
-  if (!canvas) {
-    return;
-  }
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    return;
-  }
-  graphState.ctx = ctx;
-
-  const degree = getGraphDegreeMap();
-  const adjacency = new Map(ENTITIES.map((entity) => [entity.id, new Set()]));
-  EDGES.forEach(([a, b]) => {
-    adjacency.get(a)?.add(b);
-    adjacency.get(b)?.add(a);
-  });
-
-  const typeOrder = {
-    person: 0,
-    institution: 1,
-    group: 2,
-    media: 3,
-  };
-
-  const sortEntityIds = (ids) =>
-    [...ids].sort((a, b) => {
-      const entityA = getEntity(a);
-      const entityB = getEntity(b);
-      if (!entityA || !entityB) {
-        return a.localeCompare(b);
-      }
-      if ((degree.get(b) || 0) !== (degree.get(a) || 0)) {
-        return (degree.get(b) || 0) - (degree.get(a) || 0);
-      }
-      if ((typeOrder[entityA.type] || 99) !== (typeOrder[entityB.type] || 99)) {
-        return (typeOrder[entityA.type] || 99) - (typeOrder[entityB.type] || 99);
-      }
-      return entityA.label.localeCompare(entityB.label);
-    });
-
-  const buildLayout = () => {
-    const centerX = graphState.width / 2;
-    const centerY = graphState.height / 2;
-    const safeWidth = Math.max(graphState.width, 240);
-    const safeHeight = Math.max(graphState.height, 240);
-
-    let centerId = ENTITIES[0]?.id || null;
-    ENTITIES.forEach((entity) => {
-      if (!centerId || (degree.get(entity.id) || 0) > (degree.get(centerId) || 0)) {
-        centerId = entity.id;
-      }
-    });
-
-    const basePosition = new Map();
-    if (centerId) {
-      basePosition.set(centerId, {
-        x: centerX,
-        y: centerY,
-      });
-    }
-
-    const firstRing = centerId ? sortEntityIds([...adjacency.get(centerId)]) : [];
-    const ringRadiusX = clamp(safeWidth * 0.28, 130, 290);
-    const ringRadiusY = clamp(safeHeight * 0.25, 95, 220);
-    firstRing.forEach((id, index) => {
-      const angle = -Math.PI / 2 + (index / Math.max(firstRing.length, 1)) * Math.PI * 2;
-      basePosition.set(id, {
-        x: centerX + Math.cos(angle) * ringRadiusX,
-        y: centerY + Math.sin(angle) * ringRadiusY,
-      });
-    });
-
-    const remaining = sortEntityIds(
-      ENTITIES.map((entity) => entity.id).filter((id) => !basePosition.has(id))
-    );
-    const satellitesByAnchor = new Map();
-
-    remaining.forEach((id) => {
-      const neighbors = [...(adjacency.get(id) || [])];
-      const anchorId =
-        neighbors
-          .filter((neighborId) => basePosition.has(neighborId))
-          .sort((a, b) => (degree.get(b) || 0) - (degree.get(a) || 0))[0] || centerId;
-
-      const key = anchorId || 'orphan';
-      if (!satellitesByAnchor.has(key)) {
-        satellitesByAnchor.set(key, []);
-      }
-      satellitesByAnchor.get(key).push(id);
-    });
-
-    satellitesByAnchor.forEach((ids, anchorId) => {
-      const anchor = basePosition.get(anchorId) || { x: centerX, y: centerY };
-      const anchorAngle = Math.atan2(anchor.y - centerY, anchor.x - centerX);
-      const spread = Math.PI * 0.78;
-      const orbitX = clamp(safeWidth * 0.12, 72, 125);
-      const orbitY = clamp(safeHeight * 0.1, 56, 98);
-
-      sortEntityIds(ids).forEach((id, index) => {
-        const ratio = ids.length <= 1 ? 0 : index / (ids.length - 1);
-        const angle = anchorAngle - spread / 2 + ratio * spread;
-        const depth = 1 + Math.floor(index / 2) * 0.14;
-        basePosition.set(id, {
-          x: anchor.x + Math.cos(angle) * orbitX * depth,
-          y: anchor.y + Math.sin(angle) * orbitY * depth,
-        });
-      });
-    });
-
-    const nodes = ENTITIES.map((entity) => {
-      const base = basePosition.get(entity.id) || { x: centerX, y: centerY };
-      return {
-        ...entity,
-        x: base.x,
-        y: base.y,
-        baseX: base.x,
-        baseY: base.y,
-        degree: degree.get(entity.id) || 0,
-        r: entity.id === centerId ? 13 : 11,
-        labelX: base.x,
-        labelY: base.y,
-        labelAlign: 'center',
-      };
-    });
-
-    // Light deterministic relaxation so node circles never overlap.
-    const margin = 26;
-    for (let iteration = 0; iteration < 90; iteration += 1) {
-      for (let i = 0; i < nodes.length; i += 1) {
-        for (let j = i + 1; j < nodes.length; j += 1) {
-          const a = nodes[i];
-          const b = nodes[j];
-          const dx = b.x - a.x;
-          const dy = b.y - a.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-          const minDistance = a.r + b.r + 18;
-
-          if (dist < minDistance) {
-            const push = ((minDistance - dist) / dist) * 0.34;
-            const fx = dx * push;
-            const fy = dy * push;
-            if (a.id !== centerId) {
-              a.x -= fx * 0.5;
-              a.y -= fy * 0.5;
-            }
-            if (b.id !== centerId) {
-              b.x += fx * 0.5;
-              b.y += fy * 0.5;
-            }
-          }
-        }
-      }
-
-      nodes.forEach((node) => {
-        if (node.id !== centerId) {
-          node.x += (node.baseX - node.x) * 0.1;
-          node.y += (node.baseY - node.y) * 0.1;
-        }
-        node.x = clamp(node.x, margin, graphState.width - margin);
-        node.y = clamp(node.y, margin, graphState.height - margin);
-      });
-    }
-
-    const labelGap = 16;
-    const top = 16;
-    const bottom = graphState.height - 12;
-    const left = nodes.filter((node) => node.x < centerX).sort((a, b) => a.y - b.y);
-    const right = nodes.filter((node) => node.x >= centerX).sort((a, b) => a.y - b.y);
-
-    const placeLabelColumn = (list, side) => {
-      let cursor = top;
-      list.forEach((node, index) => {
-        const remainingCount = list.length - index - 1;
-        const maxY = bottom - remainingCount * labelGap;
-        const target = clamp(node.y, top, bottom);
-        const y = clamp(Math.max(target, cursor), top, maxY);
-        cursor = y + labelGap;
-        node.labelY = y;
-        if (side === 'left') {
-          node.labelAlign = 'right';
-          node.labelX = node.x - (node.r + 10);
-        } else {
-          node.labelAlign = 'left';
-          node.labelX = node.x + (node.r + 10);
-        }
-      });
-    };
-
-    placeLabelColumn(left, 'left');
-    placeLabelColumn(right, 'right');
-
-    return nodes;
-  };
-
-  const draw = () => {
-    const context = graphState.ctx;
-    if (!context) {
-      return;
-    }
-
-    context.clearRect(0, 0, graphState.width, graphState.height);
-    const map = new Map(graphState.nodes.map((node) => [node.id, node]));
-    const selectedAdjacency = graphState.selectedNodeId ? adjacency.get(graphState.selectedNodeId) || new Set() : null;
-    const labelColor = dom.body.dataset.theme === 'dark' ? 'rgba(233, 241, 255, 0.88)' : 'rgba(20, 26, 37, 0.88)';
-    const wireColor = dom.body.dataset.theme === 'dark' ? 'rgba(201, 219, 241, 0.22)' : 'rgba(61, 78, 107, 0.26)';
-
-    graphState.edges.forEach((edge) => {
-      const a = map.get(edge.a);
-      const b = map.get(edge.b);
-      if (!a || !b) {
-        return;
-      }
-
-      const selectedEdge =
-        graphState.selectedNodeId && (edge.a === graphState.selectedNodeId || edge.b === graphState.selectedNodeId);
-      const hoveredEdge = graphState.hoverNodeId && (edge.a === graphState.hoverNodeId || edge.b === graphState.hoverNodeId);
-
-      context.beginPath();
-      context.strokeStyle = selectedEdge
-        ? 'rgba(18, 102, 125, 0.7)'
-        : hoveredEdge
-          ? 'rgba(151, 63, 39, 0.56)'
-          : wireColor;
-      context.lineWidth = selectedEdge ? 2.2 : hoveredEdge ? 1.6 : 1;
-      context.moveTo(a.x, a.y);
-      context.lineTo(b.x, b.y);
-      context.stroke();
-    });
-
-    graphState.nodes.forEach((node) => {
-      const hovered = graphState.hoverNodeId === node.id;
-      const selected = graphState.selectedNodeId === node.id;
-      const connectedToSelection = selectedAdjacency?.has(node.id);
-      const faded = graphState.selectedNodeId && !selected && !connectedToSelection;
-
-      context.beginPath();
-      context.fillStyle = entityColor(node.type);
-      context.globalAlpha = faded ? 0.45 : selected ? 1 : hovered ? 0.95 : 0.85;
-      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
-      context.fill();
-      context.globalAlpha = 1;
-
-      context.beginPath();
-      context.strokeStyle = selected ? '#ffffff' : 'rgba(255, 255, 255, 0.5)';
-      context.lineWidth = selected ? 2.4 : 1.2;
-      context.arc(node.x, node.y, selected ? node.r + 2 : node.r, 0, Math.PI * 2);
-      context.stroke();
-    });
-
-    context.font = "11px 'Space Mono', monospace";
-    context.fillStyle = labelColor;
-    graphState.nodes.forEach((node) => {
-      const hovered = graphState.hoverNodeId === node.id;
-      const selected = graphState.selectedNodeId === node.id;
-      const connected = graphState.selectedNodeId ? adjacency.get(graphState.selectedNodeId)?.has(node.id) : false;
-      const faded = graphState.selectedNodeId && !selected && !connected;
-
-      context.beginPath();
-      context.strokeStyle = faded ? 'rgba(123, 138, 162, 0.2)' : 'rgba(114, 132, 158, 0.42)';
-      context.lineWidth = 1;
-      context.moveTo(node.x, node.y);
-      const connectorX = node.labelAlign === 'right' ? node.labelX - 4 : node.labelX + 4;
-      context.lineTo(connectorX, node.labelY - 3);
-      context.stroke();
-
-      context.textAlign = node.labelAlign;
-      context.textBaseline = 'middle';
-      context.globalAlpha = faded ? 0.4 : selected || hovered ? 1 : 0.82;
-      context.fillText(node.label, node.labelX, node.labelY);
-      context.globalAlpha = 1;
-    });
-  };
-
-  const setCanvasSize = (rebuild = true) => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) {
-      return;
-    }
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    graphState.width = rect.width;
-    graphState.height = rect.height;
-    if (rebuild) {
-      graphState.nodes = buildLayout();
-      graphState.edges = EDGES.map(([a, b]) => ({ a, b }));
-    }
-    draw();
-  };
-
-  graphState.redraw = draw;
-  setCanvasSize(true);
-  window.addEventListener('resize', () => setCanvasSize(true));
-
-  const getPointerNode = (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    let hit = null;
-    let hitDist = Infinity;
-    graphState.nodes.forEach((node) => {
-      const dx = x - node.x;
-      const dy = y - node.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < node.r + 8 && dist < hitDist) {
-        hit = node;
-        hitDist = dist;
-      }
-    });
-    return hit;
-  };
-
-  canvas.addEventListener('mousemove', (event) => {
-    const node = getPointerNode(event);
-    const nextId = node ? node.id : null;
-    if (nextId !== graphState.hoverNodeId) {
-      graphState.hoverNodeId = nextId;
-      draw();
-    }
-    canvas.style.cursor = node ? 'pointer' : 'default';
-  });
-
-  canvas.addEventListener('mouseleave', () => {
-    if (graphState.hoverNodeId !== null) {
-      graphState.hoverNodeId = null;
-      draw();
-    }
-    canvas.style.cursor = 'default';
-  });
-
-  canvas.addEventListener('click', (event) => {
-    const node = getPointerNode(event);
-    graphState.selectedNodeId = node ? node.id : null;
-    draw();
-    renderEntityPanel(graphState.selectedNodeId);
-  });
-};
-
-const focusEntity = (entityId) => {
-  if (!validEntityIds.has(entityId)) {
-    return;
-  }
-  graphState.selectedNodeId = entityId;
-  graphState.redraw();
-  renderEntityPanel(entityId);
-  document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
-const GAME_LEAD_TYPES = {
-  official: { label: 'Official', color: '#58a37d', points: 5, bad: false },
-  court: { label: 'Court', color: '#3da0bd', points: 4, bad: false },
-  media: { label: 'Media', color: '#9b7bd9', points: 2, bad: false },
-  analysis: { label: 'Analysis', color: '#de7f4d', points: 1, bad: false },
-  decoy: { label: 'Decoy', color: '#973f27', points: -4, bad: true },
-};
-
-const getGameDifficultyConfig = (difficulty) => {
-  if (difficulty === 'casual') {
-    return {
-      duration: 65,
-      lives: 4,
-      spawnMs: 760,
-      minSpeed: 94,
-      maxSpeed: 138,
-      weights: ['official', 'official', 'court', 'court', 'media', 'analysis', 'analysis', 'decoy'],
-    };
-  }
-  if (difficulty === 'intense') {
-    return {
-      duration: 55,
-      lives: 3,
-      spawnMs: 520,
-      minSpeed: 128,
-      maxSpeed: 196,
-      weights: ['official', 'court', 'media', 'analysis', 'decoy', 'decoy', 'decoy'],
-    };
-  }
-  return {
-    duration: 60,
-    lives: 3,
-    spawnMs: 640,
-    minSpeed: 108,
-    maxSpeed: 166,
-    weights: ['official', 'official', 'court', 'court', 'media', 'analysis', 'decoy', 'decoy'],
-  };
-};
-
-const gameState = {
-  ctx: null,
-  width: 0,
-  height: 0,
-  running: false,
-  paused: false,
-  difficulty: 'standard',
-  score: 0,
-  lives: 3,
-  timeLeft: 60,
-  tokens: [],
-  spawnClock: 0,
-  playerX: 0,
-  playerY: 0,
-  playerWidth: 78,
-  playerHeight: 16,
-  moveLeft: false,
-  moveRight: false,
-  playerSpeed: 330,
-  lastFrame: 0,
-  raf: 0,
-};
-
-const setGameStatus = (text) => {
-  setStatus(dom.gameStatus, text);
-};
-
-const syncGameHud = () => {
-  if (dom.gameScore) {
-    dom.gameScore.textContent = String(Math.max(0, Math.round(gameState.score)));
-  }
-  if (dom.gameLives) {
-    dom.gameLives.textContent = String(Math.max(0, Math.round(gameState.lives)));
-  }
-  if (dom.gameTime) {
-    dom.gameTime.textContent = String(Math.max(0, Math.ceil(gameState.timeLeft)));
-  }
-  if (dom.gameBest) {
-    dom.gameBest.textContent = String(Math.max(0, Math.round(state.gameBest)));
-  }
-};
-
-const drawRoundedRect = (context, x, y, width, height, radius) => {
-  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
-  context.beginPath();
-  context.moveTo(x + r, y);
-  context.lineTo(x + width - r, y);
-  context.quadraticCurveTo(x + width, y, x + width, y + r);
-  context.lineTo(x + width, y + height - r);
-  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-  context.lineTo(x + r, y + height);
-  context.quadraticCurveTo(x, y + height, x, y + height - r);
-  context.lineTo(x, y + r);
-  context.quadraticCurveTo(x, y, x + r, y);
-  context.closePath();
-};
-
-const getGameTheme = () =>
-  dom.body.dataset.theme === 'dark'
-    ? {
-        bgTop: 'rgba(18, 33, 53, 0.96)',
-        bgBottom: 'rgba(8, 16, 27, 0.98)',
-        grid: 'rgba(191, 211, 236, 0.14)',
-        text: 'rgba(236, 245, 255, 0.86)',
-        player: '#4eb9d7',
-      }
-    : {
-        bgTop: 'rgba(231, 240, 252, 0.95)',
-        bgBottom: 'rgba(212, 224, 240, 0.96)',
-        grid: 'rgba(38, 62, 93, 0.13)',
-        text: 'rgba(23, 31, 45, 0.85)',
-        player: '#12667d',
-      };
-
-const renderGameFrame = () => {
-  const context = gameState.ctx;
-  if (!context || gameState.width <= 0 || gameState.height <= 0) {
-    return;
-  }
-
-  const theme = getGameTheme();
-  const gradient = context.createLinearGradient(0, 0, 0, gameState.height);
-  gradient.addColorStop(0, theme.bgTop);
-  gradient.addColorStop(1, theme.bgBottom);
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, gameState.width, gameState.height);
-
-  context.strokeStyle = theme.grid;
-  context.lineWidth = 1;
-  for (let x = 20; x < gameState.width; x += 26) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, gameState.height);
-    context.stroke();
-  }
-  for (let y = 20; y < gameState.height; y += 24) {
-    context.beginPath();
-    context.moveTo(0, y);
-    context.lineTo(gameState.width, y);
-    context.stroke();
-  }
-
-  gameState.tokens.forEach((token) => {
-    context.beginPath();
-    context.fillStyle = token.color;
-    context.globalAlpha = token.bad ? 0.95 : 0.88;
-    context.arc(token.x, token.y, token.r, 0, Math.PI * 2);
-    context.fill();
-    context.globalAlpha = 1;
-
-    context.fillStyle = '#ffffff';
-    context.font = "10px 'Space Mono', monospace";
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(token.label.charAt(0), token.x, token.y + 0.3);
-  });
-
-  context.fillStyle = theme.player;
-  drawRoundedRect(
-    context,
-    gameState.playerX,
-    gameState.playerY,
-    gameState.playerWidth,
-    gameState.playerHeight,
-    9
-  );
-  context.fill();
-
-  context.fillStyle = theme.text;
-  context.font = "12px 'Space Mono', monospace";
-  context.textAlign = 'left';
-  context.fillText('Signal vs Noise', 14, 18);
-
-  if (!gameState.running || gameState.paused) {
-    context.fillStyle = 'rgba(7, 10, 16, 0.46)';
-    drawRoundedRect(context, gameState.width * 0.19, gameState.height * 0.34, gameState.width * 0.62, 74, 16);
-    context.fill();
-    context.fillStyle = '#f8fbff';
-    context.textAlign = 'center';
-    context.font = "14px 'Space Mono', monospace";
-    context.fillText(
-      gameState.paused ? 'Paused - press Pause to resume' : 'Press Start to launch the mission',
-      gameState.width / 2,
-      gameState.height * 0.34 + 40
-    );
-  }
-};
-
-const pickGameTokenKind = () => {
-  const config = getGameDifficultyConfig(gameState.difficulty);
-  const pool = config.weights;
-  return pool[Math.floor(Math.random() * pool.length)] || 'analysis';
-};
-
-const spawnGameToken = () => {
-  const kind = pickGameTokenKind();
-  const data = GAME_LEAD_TYPES[kind] || GAME_LEAD_TYPES.analysis;
-  const config = getGameDifficultyConfig(gameState.difficulty);
-  const radius = 12;
-  const token = {
-    id: `tok-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    kind,
-    label: data.label,
-    color: data.color,
-    bad: data.bad,
-    points: data.points,
-    r: radius,
-    x: radius + Math.random() * Math.max(1, gameState.width - radius * 2),
-    y: -radius,
-    speed: config.minSpeed + Math.random() * (config.maxSpeed - config.minSpeed),
-  };
-  gameState.tokens.push(token);
-};
-
-const tokenHitsPlayer = (token) => {
-  const closestX = clamp(token.x, gameState.playerX, gameState.playerX + gameState.playerWidth);
-  const closestY = clamp(token.y, gameState.playerY, gameState.playerY + gameState.playerHeight);
-  const dx = token.x - closestX;
-  const dy = token.y - closestY;
-  return dx * dx + dy * dy <= token.r * token.r;
-};
-
-const finalizeGameRound = (reason) => {
-  gameState.running = false;
-  gameState.paused = false;
-  gameState.moveLeft = false;
-  gameState.moveRight = false;
-  if (gameState.raf) {
-    cancelAnimationFrame(gameState.raf);
-    gameState.raf = 0;
-  }
-  if (gameState.score > state.gameBest) {
-    state.gameBest = Math.max(0, Math.round(gameState.score));
-    saveGameBest();
-    setGameStatus(`${reason} New high score: ${state.gameBest}.`);
-  } else {
-    setGameStatus(reason);
-  }
-  if (dom.gamePause) {
-    dom.gamePause.textContent = 'Pause';
-  }
-  syncGameHud();
-  renderGameFrame();
-};
-
-const updateGameStep = (deltaSeconds) => {
-  if (!gameState.running || gameState.paused) {
-    return;
-  }
-
-  if (gameState.moveLeft) {
-    gameState.playerX -= gameState.playerSpeed * deltaSeconds;
-  }
-  if (gameState.moveRight) {
-    gameState.playerX += gameState.playerSpeed * deltaSeconds;
-  }
-  gameState.playerX = clamp(gameState.playerX, 10, gameState.width - gameState.playerWidth - 10);
-
-  const config = getGameDifficultyConfig(gameState.difficulty);
-  gameState.spawnClock += deltaSeconds * 1000;
-  while (gameState.spawnClock >= config.spawnMs) {
-    spawnGameToken();
-    gameState.spawnClock -= config.spawnMs;
-  }
-
-  for (let i = gameState.tokens.length - 1; i >= 0; i -= 1) {
-    const token = gameState.tokens[i];
-    token.y += token.speed * deltaSeconds;
-
-    if (tokenHitsPlayer(token)) {
-      if (token.bad) {
-        gameState.lives -= 1;
-        gameState.score = Math.max(0, gameState.score - 4);
-        setGameStatus('Bad intel intercepted your channel. Lose 1 life.');
-      } else {
-        gameState.score += token.points;
-      }
-      gameState.tokens.splice(i, 1);
-      continue;
-    }
-
-    if (token.y - token.r > gameState.height) {
-      if (!token.bad) {
-        gameState.score = Math.max(0, gameState.score - 1);
-      }
-      gameState.tokens.splice(i, 1);
-    }
-  }
-
-  gameState.timeLeft -= deltaSeconds;
-  if (gameState.lives <= 0) {
-    finalizeGameRound('Mission failed. You ran out of lives.');
-    return;
-  }
-  if (gameState.timeLeft <= 0) {
-    gameState.timeLeft = 0;
-    finalizeGameRound('Time is up. Round complete.');
-    return;
-  }
-
-  syncGameHud();
-};
-
-const gameLoop = (timestamp) => {
-  if (!gameState.running || gameState.paused) {
-    return;
-  }
-
-  const deltaSeconds = Math.min((timestamp - gameState.lastFrame) / 1000, 0.06);
-  gameState.lastFrame = timestamp;
-
-  updateGameStep(deltaSeconds);
-  renderGameFrame();
-
-  if (gameState.running && !gameState.paused) {
-    gameState.raf = requestAnimationFrame(gameLoop);
-  }
-};
-
-const startGameRound = () => {
-  if (!dom.gameCanvas || !gameState.ctx) {
-    return;
-  }
-  gameState.difficulty = dom.gameDifficulty?.value || 'standard';
-  const config = getGameDifficultyConfig(gameState.difficulty);
-  gameState.running = true;
-  gameState.paused = false;
-  gameState.score = 0;
-  gameState.lives = config.lives;
-  gameState.timeLeft = config.duration;
-  gameState.tokens = [];
-  gameState.spawnClock = 0;
-  gameState.moveLeft = false;
-  gameState.moveRight = false;
-  gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
-  gameState.playerY = gameState.height - 30;
-  gameState.lastFrame = performance.now();
-  if (gameState.raf) {
-    cancelAnimationFrame(gameState.raf);
-  }
-  gameState.raf = requestAnimationFrame(gameLoop);
-  if (dom.gamePause) {
-    dom.gamePause.textContent = 'Pause';
-  }
-  setGameStatus('Mission running. Collect reliable leads and dodge red decoys.');
-  syncGameHud();
-  renderGameFrame();
-};
-
-const toggleGamePause = () => {
-  if (!gameState.running) {
-    return;
-  }
-  gameState.paused = !gameState.paused;
-  if (gameState.paused) {
-    if (gameState.raf) {
-      cancelAnimationFrame(gameState.raf);
-      gameState.raf = 0;
-    }
-    if (dom.gamePause) {
-      dom.gamePause.textContent = 'Resume';
-    }
-    setGameStatus('Game paused.');
-    renderGameFrame();
-    return;
-  }
-
-  gameState.lastFrame = performance.now();
-  gameState.raf = requestAnimationFrame(gameLoop);
-  if (dom.gamePause) {
-    dom.gamePause.textContent = 'Pause';
-  }
-  setGameStatus('Game resumed.');
-  renderGameFrame();
-};
-
-const resetGame = () => {
-  if (gameState.raf) {
-    cancelAnimationFrame(gameState.raf);
-    gameState.raf = 0;
-  }
-  gameState.running = false;
-  gameState.paused = false;
-  gameState.moveLeft = false;
-  gameState.moveRight = false;
-  gameState.tokens = [];
-  gameState.score = 0;
-  gameState.lives = getGameDifficultyConfig(dom.gameDifficulty?.value || gameState.difficulty).lives;
-  gameState.timeLeft = getGameDifficultyConfig(dom.gameDifficulty?.value || gameState.difficulty).duration;
-  gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
-  gameState.playerY = gameState.height - 30;
-  if (dom.gamePause) {
-    dom.gamePause.textContent = 'Pause';
-  }
-  setGameStatus('Game reset. Press Start when ready.');
-  syncGameHud();
-  renderGameFrame();
-};
-
-const initGame = () => {
-  const canvas = dom.gameCanvas;
-  if (!canvas) {
-    return;
-  }
-  const context = canvas.getContext('2d');
-  if (!context) {
-    return;
-  }
-
-  gameState.ctx = context;
-  gameState.difficulty = dom.gameDifficulty?.value || 'standard';
-  const config = getGameDifficultyConfig(gameState.difficulty);
-  gameState.lives = config.lives;
-  gameState.timeLeft = config.duration;
-
-  const setGameCanvasSize = () => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) {
-      return;
-    }
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    gameState.width = rect.width;
-    gameState.height = rect.height;
-    if (gameState.playerX === 0) {
-      gameState.playerX = (gameState.width - gameState.playerWidth) / 2;
-    }
-    gameState.playerY = gameState.height - 30;
-    renderGameFrame();
-  };
-
-  setGameCanvasSize();
-  window.addEventListener('resize', setGameCanvasSize);
-
-  canvas.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    gameState.playerX = clamp(x - gameState.playerWidth / 2, 10, gameState.width - gameState.playerWidth - 10);
-    if (!gameState.running || gameState.paused) {
-      renderGameFrame();
-    }
-  });
-
-  canvas.addEventListener(
-    'touchmove',
-    (event) => {
-      const touch = event.touches[0];
-      if (!touch) {
-        return;
-      }
-      const rect = canvas.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      gameState.playerX = clamp(x - gameState.playerWidth / 2, 10, gameState.width - gameState.playerWidth - 10);
-      if (!gameState.running || gameState.paused) {
-        renderGameFrame();
-      }
-      event.preventDefault();
-    },
-    { passive: false }
-  );
-
-  const setMove = (direction, value) => {
-    if (direction === 'left') {
-      gameState.moveLeft = value;
-    } else {
-      gameState.moveRight = value;
-    }
-  };
-
-  const bindTouchMoveButton = (button, direction) => {
-    if (!button) {
-      return;
-    }
-    button.addEventListener('mousedown', () => setMove(direction, true));
-    button.addEventListener('mouseup', () => setMove(direction, false));
-    button.addEventListener('mouseleave', () => setMove(direction, false));
-    button.addEventListener('touchstart', () => setMove(direction, true), { passive: true });
-    button.addEventListener('touchend', () => setMove(direction, false), { passive: true });
-    button.addEventListener('touchcancel', () => setMove(direction, false), { passive: true });
-  };
-
-  bindTouchMoveButton(dom.gameLeft, 'left');
-  bindTouchMoveButton(dom.gameRight, 'right');
-
-  window.addEventListener('keydown', (event) => {
-    const target = event.target;
-    if (target instanceof HTMLElement) {
-      const tag = target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
-        return;
-      }
-    }
-
-    if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-      gameState.moveLeft = true;
-      event.preventDefault();
-    } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
-      gameState.moveRight = true;
-      event.preventDefault();
-    } else if (event.key === ' ' && gameState.running) {
-      toggleGamePause();
-      event.preventDefault();
-    }
-  });
-
-  window.addEventListener('keyup', (event) => {
-    if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-      gameState.moveLeft = false;
-    } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
-      gameState.moveRight = false;
-    }
-  });
-
-  syncGameHud();
-  setGameStatus('Press Start to begin. Arrow keys or A/D to move.');
-  renderGameFrame();
-};
-
-const renderCommandPalette = () => {
-  const commandInput = dom.commandInput.value.trim().toLowerCase();
-
-  const actions = [
-    {
-      id: 'jump-overview',
-      label: 'Jump to Overview',
-      hint: 'Navigate to the hero dashboard',
-      run: () => document.querySelector('#overview')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-workbench',
-      label: 'Jump to Workbench',
-      hint: 'Open query and session controls',
-      run: () => document.querySelector('#workbench')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-game',
-      label: 'Jump to Game',
-      hint: 'Open Signal vs Noise mini-game',
-      run: () => document.querySelector('#game')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-timeline',
-      label: 'Jump to Timeline',
-      hint: 'Go to the event explorer',
-      run: () => document.querySelector('#timeline')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-evidence',
-      label: 'Jump to Evidence Matrix',
-      hint: 'Audit source support and confidence',
-      run: () => document.querySelector('#evidence')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-network',
-      label: 'Jump to Network Graph',
-      hint: 'Inspect entity relationships',
-      run: () => document.querySelector('#network')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-flow',
-      label: 'Jump to Flow Map',
-      hint: 'Open phase map and source-cluster drilldowns',
-      run: () => document.querySelector('#flow')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-sources',
-      label: 'Jump to Sources',
-      hint: 'Open source intelligence table',
-      run: () => document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-notebook',
-      label: 'Jump to Notebook',
-      hint: 'Review and capture investigation notes',
-      run: () => document.querySelector('#notebook')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'jump-brief',
-      label: 'Jump to Brief Builder',
-      hint: 'Generate and export your brief',
-      run: () => document.querySelector('#brief')?.scrollIntoView({ behavior: 'smooth' }),
-    },
-    {
-      id: 'reset-filters',
-      label: 'Reset timeline filters',
-      hint: 'Set phase/year/search to defaults',
-      run: () => {
-        state.phase = 'all';
-        state.yearStart = minYear;
-        state.yearEnd = maxYear;
-        state.search = '';
-        state.sort = 'newest';
-        applyTimelineControlState();
-        renderTimeline();
-      },
-    },
-    {
-      id: 'apply-flow',
-      label: 'Apply selected flow phase to timeline',
-      hint: 'Sync timeline controls with active flow phase',
-      run: () => applyFlowToTimeline(),
-    },
-    {
-      id: 'generate-brief',
-      label: 'Generate brief output',
-      hint: 'Rebuild memo from current selection',
-      run: () => {
-        dom.briefOutput.textContent = composeBrief();
-        setStatus(dom.briefStatus, 'Brief regenerated.');
-      },
-    },
-    {
-      id: 'export-pins',
-      label: 'Export pinned events',
-      hint: 'Download pin set as text file',
-      run: () => exportPins(),
-    },
-    {
-      id: 'export-report',
-      label: 'Export full report',
-      hint: 'Download Markdown report from current research state',
-      run: () => exportReportMarkdown(),
-    },
-    {
-      id: 'start-game',
-      label: 'Start game round',
-      hint: 'Launch a fresh Signal vs Noise mission',
-      run: () => startGameRound(),
-    },
-    {
-      id: 'toggle-theme',
-      label: 'Toggle theme',
-      hint: 'Switch between light and dark rendering',
-      run: () => toggleTheme(),
-    },
-  ];
-
-  commandState.filtered = actions.filter((action) => {
-    if (!commandInput) {
-      return true;
-    }
-    const haystack = `${action.label} ${action.hint}`.toLowerCase();
-    return haystack.includes(commandInput);
-  });
-
-  if (commandState.activeIndex >= commandState.filtered.length) {
-    commandState.activeIndex = 0;
-  }
-
-  dom.commandList.innerHTML =
-    commandState.filtered.length === 0
-      ? '<li class="command-item"><p class="command-hint">No commands match your input.</p></li>'
-      : commandState.filtered
-          .map(
-            (action, index) => `
-              <li class="command-item ${index === commandState.activeIndex ? 'active' : ''}" data-command-id="${action.id}">
-                <p class="command-label">${action.label}</p>
-                <p class="command-hint">${action.hint}</p>
-              </li>
-            `
-          )
-          .join('');
-};
-
-const openCommandPalette = () => {
-  commandState.open = true;
-  commandState.activeIndex = 0;
-  dom.commandShell.hidden = false;
-  dom.commandInput.value = '';
-  renderCommandPalette();
-  dom.commandInput.focus();
-};
-
-const closeCommandPalette = () => {
-  commandState.open = false;
-  dom.commandShell.hidden = true;
-};
-
-const runActiveCommand = () => {
-  const command = commandState.filtered[commandState.activeIndex];
-  if (!command) {
-    return;
-  }
-  command.run();
-  closeCommandPalette();
 };
 
 const bindEvents = () => {
-  dom.themeToggle.addEventListener('click', toggleTheme);
-  dom.commandOpen.addEventListener('click', openCommandPalette);
-
-  dom.questionForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const value = dom.questionInput.value.trim();
-    runQuestionQuery(value);
-  });
-
-  dom.questionClear.addEventListener('click', () => {
-    dom.questionInput.value = '';
-    dom.questionResults.textContent = 'Run a question to receive ranked matches.';
-  });
-
-  dom.questionResults.addEventListener('click', (event) => {
+  dom.dossierMenu.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
       return;
     }
 
-    const action = target.getAttribute('data-query-action');
-    if (!action) {
+    const button = target.closest('[data-dossier-id]');
+    const dossierId = button?.getAttribute('data-dossier-id');
+    if (!dossierId) {
       return;
     }
 
-    const item = target.closest('[data-event-id]');
-    const eventId = item?.getAttribute('data-event-id');
-    if (!eventId) {
-      return;
-    }
-
-    if (action === 'add-brief') {
-      state.brief.add(eventId);
-      saveBrief();
-      renderTimeline();
-      renderBrief();
-      setStatus(dom.briefStatus, 'Event added from query results.');
-    } else if (action === 'jump') {
-      jumpToEvent(eventId);
-    }
-  });
-
-  dom.exportSession.addEventListener('click', exportSession);
-  dom.clearSession.addEventListener('click', () => {
-    if (!window.confirm('Reset local session data (pins, brief selection, notes, and source statuses)?')) {
-      return;
-    }
-    resetSession();
-  });
-
-  dom.phaseFilters.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-    const button = target.closest('.phase-btn');
-    if (!button) {
-      return;
-    }
-
-    state.phase = button.getAttribute('data-phase') || 'all';
-    applyTimelineControlState();
-    renderTimeline();
-  });
-
-  dom.yearStart.addEventListener('change', () => {
-    updateYearRange();
-    renderTimeline();
-  });
-
-  dom.yearEnd.addEventListener('change', () => {
-    updateYearRange();
-    renderTimeline();
+    setDossier(dossierId);
   });
 
   dom.timelineSearch.addEventListener('input', () => {
     state.search = dom.timelineSearch.value;
-    renderTimeline();
-  });
-
-  dom.timelineSort.addEventListener('change', () => {
-    state.sort = dom.timelineSort.value;
-    renderTimeline();
-  });
-
-  dom.timelineClear.addEventListener('click', () => {
-    state.phase = 'all';
-    state.yearStart = minYear;
-    state.yearEnd = maxYear;
-    state.search = '';
-    state.sort = 'newest';
-    applyTimelineControlState();
-    renderTimeline();
-  });
-
-  dom.gameStart?.addEventListener('click', () => {
-    startGameRound();
-  });
-
-  dom.gamePause?.addEventListener('click', () => {
-    toggleGamePause();
-  });
-
-  dom.gameReset?.addEventListener('click', () => {
-    resetGame();
-  });
-
-  dom.gameDifficulty?.addEventListener('change', () => {
-    gameState.difficulty = dom.gameDifficulty?.value || 'standard';
-    if (!gameState.running) {
-      resetGame();
-    } else {
-      setGameStatus(`Difficulty switched to ${gameState.difficulty}. It applies next round.`);
-    }
-  });
-
-  dom.evidenceScope?.addEventListener('change', () => {
-    if (dom.evidenceScope) {
-      state.evidenceScope = dom.evidenceScope.value;
-    }
-    renderEvidenceMatrix();
-  });
-
-  dom.evidenceRefresh?.addEventListener('click', () => {
-    renderEvidenceMatrix();
-  });
-
-  dom.evidenceBody?.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const action = target.getAttribute('data-evidence-action');
-    if (!action) {
-      return;
-    }
-
-    const row = target.closest('[data-evidence-event-id]');
-    const eventId = row?.getAttribute('data-evidence-event-id');
-    if (!eventId) {
-      return;
-    }
-
-    const eventRow = getEvent(eventId);
-    if (!eventRow) {
-      return;
-    }
-
-    if (action === 'sources') {
-      setSourceFocus(eventRow.sources);
-      document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else if (action === 'brief') {
-      state.brief.add(eventId);
-      saveBrief();
-      renderTimeline();
-      renderBrief();
-      setStatus(dom.briefStatus, 'Event added from Evidence Matrix.');
-    } else if (action === 'jump') {
-      jumpToEvent(eventId);
-    }
-  });
-
-  dom.flowTrack.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const button = target.closest('.flow-node[data-flow-id]');
-    if (!button) {
-      return;
-    }
-
-    const flowId = button.getAttribute('data-flow-id');
-    if (!flowId) {
-      return;
-    }
-
-    state.flowSelectedId = flowId;
-    state.flowCluster = 'official';
-    renderFlowMap();
-  });
-
-  dom.clusterTabs.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const button = target.closest('.cluster-btn[data-cluster]');
-    if (!button) {
-      return;
-    }
-
-    const cluster = button.getAttribute('data-cluster');
-    if (!cluster) {
-      return;
-    }
-
-    state.flowCluster = cluster;
-    renderFlowMap();
-  });
-
-  dom.clusterList.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const action = target.getAttribute('data-cluster-action');
-    if (!action) {
-      return;
-    }
-
-    const row = target.closest('[data-source-id]');
-    const sourceId = row?.getAttribute('data-source-id');
-    if (!sourceId) {
-      return;
-    }
-
-    if (action === 'focus-one') {
-      state.sourceType = 'all';
-      state.sourceSearch = '';
-      applySourceControlState();
-      setSourceFocus([sourceId]);
-      document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-
-  dom.flowApplyTimeline.addEventListener('click', () => {
-    applyFlowToTimeline();
-    document.querySelector('#timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  dom.flowFocusSources.addEventListener('click', () => {
-    focusFlowSources('all');
-    document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  dom.flowAddBrief.addEventListener('click', () => {
-    const phase = getCurrentFlowPhase();
-    phase.eventIds.forEach((eventId) => {
-      if (validEventIds.has(eventId)) {
-        state.brief.add(eventId);
-      }
-    });
-    saveBrief();
-    renderTimeline();
-    renderBrief();
-    setStatus(dom.briefStatus, `Added ${phase.eventIds.length} phase event(s) to brief selection.`);
-    document.querySelector('#brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  dom.timelineResults.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const card = target.closest('[data-event-id]');
-    if (!card) {
-      return;
-    }
-
-    const eventId = card.getAttribute('data-event-id');
-    if (!eventId) {
-      return;
-    }
-
-    const action = target.getAttribute('data-action');
-    if (!action) {
-      return;
-    }
-
-    const row = getEvent(eventId);
-
-    if (action === 'pin') {
-      togglePin(eventId);
-    } else if (action === 'brief') {
-      toggleBriefEvent(eventId);
-    } else if (action === 'focus') {
-      const entityId = target.getAttribute('data-entity') || row?.entities[0];
-      if (entityId) {
-        focusEntity(entityId);
-      }
-    } else if (action === 'sources' && row) {
-      setSourceFocus(row.sources);
-      document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-
-  dom.pinnedEvents.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const action = target.getAttribute('data-pin-action');
-    if (!action) {
-      return;
-    }
-
-    const item = target.closest('[data-event-id]');
-    const eventId = item?.getAttribute('data-event-id');
-    if (!eventId) {
-      return;
-    }
-
-    if (action === 'remove') {
-      state.pins.delete(eventId);
-      savePins();
-      renderTimeline();
-      renderPinned();
-      renderBrief();
-    } else if (action === 'jump') {
-      jumpToEvent(eventId);
-    }
-  });
-
-  dom.pinsExport.addEventListener('click', exportPins);
-  dom.pinsClear.addEventListener('click', () => {
-    state.pins.clear();
-    savePins();
-    renderTimeline();
-    renderPinned();
-    renderBrief();
-  });
-
-  dom.sourceTypeFilter.addEventListener('change', () => {
-    state.sourceType = dom.sourceTypeFilter.value;
-    renderSources();
-  });
-
-  dom.sourceSearch.addEventListener('input', () => {
-    state.sourceSearch = dom.sourceSearch.value;
-    renderSources();
-  });
-
-  dom.sourceReset.addEventListener('click', () => {
-    state.sourceType = 'all';
-    state.sourceSearch = '';
     state.sourceFocusIds = null;
-    applySourceControlState();
-    renderSources();
-  });
-
-  dom.sourceTableBody.addEventListener('change', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) {
-      return;
-    }
-
-    const row = target.closest('tr[data-source-id]');
-    const sourceId = row?.getAttribute('data-source-id');
-    const flag = target.getAttribute('data-source-flag');
-    if (!sourceId || !flag) {
-      return;
-    }
-
-    if (!state.sourceState[sourceId]) {
-      state.sourceState[sourceId] = { read: false, verified: false };
-    }
-
-    state.sourceState[sourceId][flag] = target.checked;
-    saveSourceState();
-    renderSources();
-  });
-
-  dom.briefTone.addEventListener('change', () => {
-    state.briefTone = dom.briefTone.value;
-    saveBriefTone();
-    dom.briefOutput.textContent = composeBrief();
-  });
-
-  dom.briefNotes.addEventListener('input', () => {
-    state.briefNotes = dom.briefNotes.value;
-    saveBriefNotes();
-    setStatus(dom.briefStatus, `Notes saved locally at ${new Date().toLocaleTimeString()}.`);
-  });
-
-  dom.briefGenerate.addEventListener('click', () => {
-    dom.briefOutput.textContent = composeBrief();
-    setStatus(dom.briefStatus, 'Brief generated from current state.');
-  });
-
-  dom.briefCopy.addEventListener('click', async () => {
-    const copied = await copyText(dom.briefOutput.textContent).catch(() => false);
-    setStatus(dom.briefStatus, copied ? 'Brief copied to clipboard.' : 'Could not copy brief.');
-  });
-
-  dom.briefDownload.addEventListener('click', () => {
-    downloadText('case-brief.txt', dom.briefOutput.textContent);
-    setStatus(dom.briefStatus, 'Brief downloaded as case-brief.txt.');
-  });
-
-  dom.reportExportMd?.addEventListener('click', () => {
-    exportReportMarkdown();
-  });
-
-  dom.reportExportPdf?.addEventListener('click', () => {
-    exportReportPdf();
-  });
-
-  dom.briefClear.addEventListener('click', () => {
-    state.brief.clear();
-    saveBrief();
     renderTimeline();
-    renderBrief();
-    setStatus(dom.briefStatus, 'Brief selection cleared.');
+    renderSources();
   });
 
-  dom.briefEvents.addEventListener('click', (event) => {
+  const updateYearRange = () => {
+    const start = Number(dom.yearStart.value);
+    const end = Number(dom.yearEnd.value);
+
+    if (start <= end) {
+      state.yearStart = start;
+      state.yearEnd = end;
+    } else {
+      state.yearStart = Math.min(start, end);
+      state.yearEnd = Math.max(start, end);
+      dom.yearStart.value = String(state.yearStart);
+      dom.yearEnd.value = String(state.yearEnd);
+    }
+
+    state.sourceFocusIds = null;
+    renderTimeline();
+    renderSources();
+  };
+
+  dom.yearStart.addEventListener('change', updateYearRange);
+  dom.yearEnd.addEventListener('change', updateYearRange);
+
+  dom.timelineReset.addEventListener('click', resetTimelineFilters);
+
+  dom.timelineList.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) {
       return;
     }
 
-    const action = target.getAttribute('data-brief-action');
-    if (!action) {
+    const action = target.getAttribute('data-event-action');
+    if (action !== 'sources') {
       return;
     }
 
-    const row = target.closest('[data-event-id]');
-    const eventId = row?.getAttribute('data-event-id');
-    if (!eventId) {
-      return;
-    }
-
-    if (action === 'remove') {
-      state.brief.delete(eventId);
-      saveBrief();
-      renderTimeline();
-      renderBrief();
-    }
-  });
-
-  dom.notebookSave?.addEventListener('click', () => {
-    if (!dom.notebookText || !dom.notebookEvent || !dom.notebookTag) {
-      return;
-    }
-    const text = dom.notebookText.value.trim();
-    const eventId = dom.notebookEvent.value.trim();
-    const tag = dom.notebookTag.value.trim().slice(0, 40);
-
-    if (!text) {
-      setStatus(dom.notebookEditorStatus, 'Write a note first.');
-      return;
-    }
-
-    const cleanEventId = eventId && validEventIds.has(eventId) ? eventId : '';
-    const entry = {
-      id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      createdAt: new Date().toISOString(),
-      eventId: cleanEventId,
-      tag,
-      text,
-    };
-
-    state.notebook.unshift(entry);
-    saveNotebook();
-    renderNotebook();
-
-    dom.notebookText.value = '';
-    dom.notebookTag.value = '';
-    setStatus(dom.notebookEditorStatus, `Notebook entry saved at ${new Date().toLocaleTimeString()}.`);
-  });
-
-  dom.notebookClearInput?.addEventListener('click', () => {
-    if (!dom.notebookEvent || !dom.notebookTag || !dom.notebookText) {
-      return;
-    }
-    dom.notebookEvent.value = '';
-    dom.notebookTag.value = '';
-    dom.notebookText.value = '';
-    setStatus(dom.notebookEditorStatus, 'Notebook editor cleared.');
-  });
-
-  dom.notebookExport?.addEventListener('click', () => {
-    downloadText('investigation-notebook.md', composeNotebookMarkdown());
-    setStatus(dom.notebookEditorStatus, 'Notebook exported as investigation-notebook.md.');
-  });
-
-  dom.notebookFilter?.addEventListener('change', () => {
-    if (dom.notebookFilter) {
-      state.notebookFilter = dom.notebookFilter.value;
-    }
-    renderNotebook();
-  });
-
-  dom.notebookList?.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    const action = target.getAttribute('data-note-action');
-    if (!action) {
-      return;
-    }
-
-    const row = target.closest('[data-note-id]');
-    const noteId = row?.getAttribute('data-note-id');
-    if (!noteId) {
-      return;
-    }
-
-    const note = state.notebook.find((entry) => entry.id === noteId);
-    if (!note) {
-      return;
-    }
-
-    if (action === 'delete') {
-      state.notebook = state.notebook.filter((entry) => entry.id !== noteId);
-      saveNotebook();
-      renderNotebook();
-      setStatus(dom.notebookEditorStatus, 'Notebook entry removed.');
-      return;
-    }
-
-    if (action === 'jump' && note.eventId) {
-      jumpToEvent(note.eventId);
-    }
-  });
-
-  dom.commandShell.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-
-    if (target.hasAttribute('data-close-command')) {
-      closeCommandPalette();
-      return;
-    }
-
-    const item = target.closest('.command-item[data-command-id]');
+    const eventId = target.getAttribute('data-event-id');
+    const item = eventId ? getEvent(eventId) : null;
     if (!item) {
       return;
     }
 
-    const commandId = item.getAttribute('data-command-id');
-    const index = commandState.filtered.findIndex((command) => command.id === commandId);
-    if (index !== -1) {
-      commandState.activeIndex = index;
-      runActiveCommand();
-    }
+    state.sourceFocusIds = item.sources;
+    renderSources();
+    document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  dom.commandInput.addEventListener('input', () => {
-    commandState.activeIndex = 0;
-    renderCommandPalette();
-  });
-
-  dom.commandInput.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      commandState.activeIndex = Math.min(commandState.activeIndex + 1, commandState.filtered.length - 1);
-      renderCommandPalette();
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      commandState.activeIndex = Math.max(commandState.activeIndex - 1, 0);
-      renderCommandPalette();
-    } else if (event.key === 'Enter') {
-      event.preventDefault();
-      runActiveCommand();
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      closeCommandPalette();
-    }
-  });
-
-  window.addEventListener('keydown', (event) => {
-    if ((event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) || event.key === 'F1') {
-      event.preventDefault();
-      if (commandState.open) {
-        closeCommandPalette();
-      } else {
-        openCommandPalette();
-      }
-    }
-
-    if (event.key === 'Escape' && commandState.open) {
-      closeCommandPalette();
-    }
-  });
-
-  window.addEventListener('scroll', updateHeaderAndProgress, { passive: true });
-  window.addEventListener('resize', updateHeaderAndProgress);
+  dom.dossierExport.addEventListener('click', exportCurrentDossier);
 };
 
 const init = () => {
@@ -3557,41 +714,9 @@ const init = () => {
     dom.yearNode.textContent = String(new Date().getFullYear());
   }
 
-  setTheme(state.theme === 'dark' ? 'dark' : 'light');
-  updateMetrics();
-  initYearSelects();
-  applySourceControlState();
-  if (dom.evidenceScope) {
-    dom.evidenceScope.value = state.evidenceScope;
-  }
-  if (dom.notebookFilter) {
-    dom.notebookFilter.value = state.notebookFilter;
-  }
-  if (dom.gameDifficulty) {
-    dom.gameDifficulty.value = gameState.difficulty;
-  }
-  renderNotebookEventOptions();
-
-  if (dom.briefTone) {
-    dom.briefTone.value = state.briefTone;
-  }
-  if (dom.briefNotes) {
-    dom.briefNotes.value = state.briefNotes;
-  }
-
-  initGame();
+  initYearOptions();
+  setDossier(state.dossierId);
   bindEvents();
-  renderTimeline();
-  renderPinned();
-  renderFlowMap();
-  renderSources();
-  renderBrief();
-  renderNotebook();
-  setupReveal();
-  setupActiveNav();
-  updateHeaderAndProgress();
-  initGraph();
-  renderEntityPanel(null);
 };
 
 init();
