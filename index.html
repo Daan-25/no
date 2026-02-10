@@ -1,545 +1,172 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JeffreyEpsteins.org | Investigative Research OS</title>
-    <meta
-      name="description"
-      content="An interactive research operating system for navigating the Jeffrey Epstein case timeline, sources, entities, and working notes."
-    />
-    <meta property="og:title" content="JeffreyEpsteins.org | Investigative Research OS" />
-    <meta
-      property="og:description"
-      content="Filter timeline events, run question queries, inspect source confidence, and generate a structured brief."
-    />
-    <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css?v=20260210-4" />
-  </head>
-  <body data-theme="light">
-    <div class="aurora" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This Website Has Been Seized</title>
+    <link rel="icon" href="FBI_SEAL.png" />
+    <style>
+       
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <div class="progress-shell" aria-hidden="true">
-      <div class="progress-fill" id="scroll-progress"></div>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.8)), 
+                        url('background.png') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .glass-container {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 45px;
+            width: 90%;
+            max-width: 650px; 
+            
+            /* Vertical/Horizontal Centering for content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Dual Logo Layout */
+        .logo-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .side-logo {
+            width: 120px; 
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 18px;
+            color: #f8fafc;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 35px;
+            max-width: 520px;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn {
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 24px;
+        }
+
+        .btn-primary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        /*Desktop 4:3 Aspect Ratio*/
+        @media (min-width: 768px) {
+            .glass-container {
+                aspect-ratio: 4 / 3;
+                padding: 60px;
+            }
+            .btn-wrapper { flex-direction: row; }
+            .btn { flex: 1; }
+            h1 { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .side-logo { width: 90px; height: 90px; }
+            h1 { font-size: 1.5rem; }
+            .glass-container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <div class="logo-group">
+            <img src="FBI_SEAL.png" alt="Portal Logo Left" class="side-logo">
+            <img src="DOJ_SEAL.png" alt="Portal Logo Right" class="side-logo">
+        </div>
+
+        <h1 id="title">THIS WEBSITE HAS BEEN SEIZED</h1>
+        
+        <p id="description">
+            This domain has been seized by the Federal Bureau of Investigation in accordance with a seizure warrant issued by the United States District Court for the District of Hawaii pursuant to 18 U.S.C § 981 and 982.
+        </p>
+        
+        <div class="btn-wrapper">
+            <a href="https://www.ic3.gov" class="btn btn-primary">File IC3 Report</a>
+            <a href="https://www.fbi.gov/how-we-can-help-you/victim-services/national-crimes-and-victim-resources/cryptocurrency-investment-fraud" class="btn btn-secondary">Crypto Fraud Info</a>
+        </div>
     </div>
 
-    <header class="site-header" id="top">
-      <a class="logo" href="#overview">
-        <span class="logo-line">JeffreyEpsteins.org</span>
-        <span class="logo-sub">Investigative Research OS</span>
-      </a>
-
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="#overview">Overview</a>
-        <a href="#workbench">Workbench</a>
-        <a href="#game">Game</a>
-        <a href="#timeline">Timeline</a>
-        <a href="#evidence">Evidence</a>
-        <a href="#flow">Flow Map</a>
-        <a href="#network">Network</a>
-        <a href="#sources">Sources</a>
-        <a href="#brief">Brief Builder</a>
-        <a href="#notebook">Notebook</a>
-      </nav>
-
-      <div class="header-actions">
-        <button class="header-btn" id="theme-toggle" type="button">Theme</button>
-        <button class="header-btn accent" id="command-open" type="button">Command</button>
-      </div>
-    </header>
-
-    <main>
-      <section class="panel hero reveal" id="overview">
-        <div class="hero-copy">
-          <p class="eyebrow">Public Record Intelligence Interface</p>
-          <h1>From static reading to active investigation.</h1>
-          <p class="lead">
-            This website is built as a practical research surface: query case milestones, filter
-            evidence tracks, inspect source confidence, map entity relationships, and generate a
-            working brief from selected events.
-          </p>
-          <div class="hero-actions">
-            <a class="hero-link primary" href="#workbench">Open Workbench</a>
-            <a class="hero-link ghost" href="#timeline">Enter Timeline</a>
-          </div>
-        </div>
-
-        <div class="hero-metrics" aria-label="Interface metrics">
-          <article class="metric">
-            <p class="metric-value" id="metric-events">0</p>
-            <p class="metric-label">Mapped events</p>
-          </article>
-          <article class="metric">
-            <p class="metric-value" id="metric-sources">0</p>
-            <p class="metric-label">Tracked sources</p>
-          </article>
-          <article class="metric">
-            <p class="metric-value" id="metric-entities">0</p>
-            <p class="metric-label">Linked entities</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="workbench">
-        <div class="section-head">
-          <p class="eyebrow">Workbench</p>
-          <h2>Ask questions and control your research session</h2>
-        </div>
-
-        <div class="workbench-grid">
-          <article class="tool-card">
-            <h3>Question Engine</h3>
-            <p>
-              Type a specific question. The engine ranks relevant events and sources from this archive.
-            </p>
-
-            <form id="question-form" class="stack" autocomplete="off">
-              <label class="field">
-                <span>Research question</span>
-                <input
-                  id="question-input"
-                  type="text"
-                  placeholder="Example: Which events led to the 2019 federal case?"
-                />
-              </label>
-              <div class="inline-actions">
-                <button class="tool-btn" type="submit">Run query</button>
-                <button class="tool-btn ghost" type="button" id="question-clear">Clear</button>
-              </div>
-            </form>
-
-            <div class="question-results" id="question-results">
-              Run a question to receive ranked matches.
-            </div>
-          </article>
-
-          <article class="tool-card">
-            <h3>Session Controls</h3>
-            <p>Manage pinned data, local notebook state, and offline handoff files.</p>
-            <div class="stack">
-              <button class="tool-btn" id="export-session" type="button">Export session JSON</button>
-              <button class="tool-btn ghost" id="clear-session" type="button">Reset local session</button>
-            </div>
-            <p class="status" id="session-status">Session ready.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="game">
-        <div class="section-head">
-          <p class="eyebrow">Mini Game</p>
-          <h2>Signal vs Noise: catch credible leads, avoid bad intel</h2>
-        </div>
-
-        <div class="game-layout">
-          <div class="game-canvas-wrap">
-            <canvas id="case-game-canvas" aria-label="Signal vs Noise game canvas"></canvas>
-          </div>
-
-          <article class="tool-card game-panel">
-            <h3>Mission Console</h3>
-            <p class="status" id="game-status">Press Start to begin. Arrow keys or A/D to move.</p>
-
-            <div class="game-stats">
-              <p><strong>Score:</strong> <span id="game-score">0</span></p>
-              <p><strong>Lives:</strong> <span id="game-lives">3</span></p>
-              <p><strong>Time:</strong> <span id="game-time">60</span>s</p>
-              <p><strong>Best:</strong> <span id="game-best">0</span></p>
-            </div>
-
-            <label class="field small">
-              <span>Difficulty</span>
-              <select id="game-difficulty">
-                <option value="casual">Casual</option>
-                <option value="standard" selected>Standard</option>
-                <option value="intense">Intense</option>
-              </select>
-            </label>
-
-            <div class="inline-actions">
-              <button class="tool-btn" id="game-start" type="button">Start</button>
-              <button class="tool-btn ghost" id="game-pause" type="button">Pause</button>
-              <button class="tool-btn ghost" id="game-reset" type="button">Reset</button>
-            </div>
-
-            <div class="inline-actions game-touch-controls" aria-label="Touch controls">
-              <button class="tool-btn ghost" id="game-left" type="button">Move Left</button>
-              <button class="tool-btn ghost" id="game-right" type="button">Move Right</button>
-            </div>
-
-            <p class="status">
-              Good leads: Official, Court, Media, Analysis. Red decoys cost lives. Survive until the timer ends.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="timeline">
-        <div class="section-head">
-          <p class="eyebrow">Timeline Explorer</p>
-          <h2>Filter chronology with analyst controls</h2>
-        </div>
-
-        <div class="timeline-controls">
-          <div class="phase-filters" id="phase-filters" role="tablist" aria-label="Timeline phase filters">
-            <button class="phase-btn active" type="button" data-phase="all">All</button>
-            <button class="phase-btn" type="button" data-phase="investigation">Investigation</button>
-            <button class="phase-btn" type="button" data-phase="legal">Legal</button>
-            <button class="phase-btn" type="button" data-phase="custody">Custody</button>
-            <button class="phase-btn" type="button" data-phase="aftermath">Aftermath</button>
-            <button class="phase-btn" type="button" data-phase="media">Media pressure</button>
-          </div>
-
-          <label class="field small">
-            <span>Start year</span>
-            <select id="year-start"></select>
-          </label>
-
-          <label class="field small">
-            <span>End year</span>
-            <select id="year-end"></select>
-          </label>
-
-          <label class="field grow">
-            <span>Keyword</span>
-            <input id="timeline-search" type="search" placeholder="Search events, entities, and notes" />
-          </label>
-
-          <label class="field small">
-            <span>Sort</span>
-            <select id="timeline-sort">
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="relevance">Relevance</option>
-            </select>
-          </label>
-
-          <button class="tool-btn ghost" id="timeline-clear" type="button">Reset</button>
-        </div>
-
-        <p class="status" id="timeline-status">Showing 0 events.</p>
-
-        <div class="timeline-layout">
-          <div class="timeline-results" id="timeline-results"></div>
-
-          <aside class="pinned-panel" aria-label="Pinned events">
-            <h3>Pinned Events</h3>
-            <p class="status" id="pin-summary">0 events pinned.</p>
-            <ul class="pinned-list" id="pinned-events">
-              <li class="placeholder">No pinned events yet.</li>
-            </ul>
-            <div class="inline-actions">
-              <button class="tool-btn" id="pins-export" type="button">Export pins</button>
-              <button class="tool-btn ghost" id="pins-clear" type="button">Clear pins</button>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="network">
-        <div class="section-head">
-          <p class="eyebrow">Entity Network</p>
-          <h2>Visualize relationships and jump back into timeline context</h2>
-        </div>
-
-        <div class="network-layout">
-          <div class="network-canvas-wrap">
-            <canvas id="network-canvas" aria-label="Entity relationship graph"></canvas>
-          </div>
-
-          <article class="entity-panel" id="entity-panel">
-            <h3>Entity Inspector</h3>
-            <p class="status">Select a node in the graph to inspect connections.</p>
-            <button class="tool-btn ghost" id="network-reset" type="button">Reset graph focus</button>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="evidence">
-        <div class="section-head">
-          <p class="eyebrow">Evidence Matrix</p>
-          <h2>Score event support quality and move directly to source review</h2>
-        </div>
-
-        <div class="source-controls">
-          <label class="field small">
-            <span>Scope</span>
-            <select id="evidence-scope">
-              <option value="filtered">Filtered timeline</option>
-              <option value="brief">Brief selection</option>
-              <option value="pinned">Pinned events</option>
-              <option value="all">All events</option>
-            </select>
-          </label>
-
-          <button class="tool-btn ghost" id="evidence-refresh" type="button">Refresh matrix</button>
-        </div>
-
-        <p class="status" id="evidence-status">Evidence matrix ready.</p>
-
-        <div class="table-wrap">
-          <table class="source-table evidence-table">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Sources</th>
-                <th>Type spread</th>
-                <th>Quality score</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="evidence-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="flow">
-        <div class="section-head">
-          <p class="eyebrow">Case Flow Map</p>
-          <h2>Follow the case phases and drill into source clusters</h2>
-        </div>
-
-        <div class="flow-layout">
-          <div class="flow-track" id="flow-track">
-            <button class="flow-node active" type="button" data-flow-id="foundation">
-              <span class="flow-step">01</span>
-              <span class="flow-title">Foundation</span>
-              <span class="flow-meta">2005-2008 · Investigation and first legal outcomes</span>
-            </button>
-
-            <button class="flow-node" type="button" data-flow-id="media-reopening">
-              <span class="flow-step">02</span>
-              <span class="flow-title">Media Reopening</span>
-              <span class="flow-meta">2015-2018 · Reporting pressure and renewed scrutiny</span>
-            </button>
-
-            <button class="flow-node" type="button" data-flow-id="federal-2019">
-              <span class="flow-step">03</span>
-              <span class="flow-title">Federal 2019 Case</span>
-              <span class="flow-meta">2019 · Arrest, indictment, and prosecution track</span>
-            </button>
-
-            <button class="flow-node" type="button" data-flow-id="custody-pivot">
-              <span class="flow-step">04</span>
-              <span class="flow-title">Custody Pivot</span>
-              <span class="flow-meta">2019 · Detention and death in custody</span>
-            </button>
-
-            <button class="flow-node" type="button" data-flow-id="related-prosecution">
-              <span class="flow-step">05</span>
-              <span class="flow-title">Related Prosecution</span>
-              <span class="flow-meta">2020-2022 · Maxwell arrest, conviction, sentencing</span>
-            </button>
-
-            <button class="flow-node" type="button" data-flow-id="records-aftershock">
-              <span class="flow-step">06</span>
-              <span class="flow-title">Records Aftershock</span>
-              <span class="flow-meta">2022-present · Ongoing filings and transparency pressure</span>
-            </button>
-          </div>
-
-          <article class="tool-card flow-inspector">
-            <h3 id="flow-title">Foundation</h3>
-            <p class="status" id="flow-summary">
-              Starting phase selected. Use controls below to drive timeline and sources from this
-              phase definition.
-            </p>
-
-            <div class="inline-actions">
-              <button class="tool-btn" id="flow-apply-timeline" type="button">Apply phase to timeline</button>
-              <button class="tool-btn ghost" id="flow-focus-sources" type="button">Focus phase sources</button>
-              <button class="tool-btn ghost" id="flow-add-brief" type="button">Add phase events to brief</button>
-            </div>
-
-            <div class="cluster-tabs" id="cluster-tabs"></div>
-            <ul class="cluster-list" id="cluster-list">
-              <li class="placeholder">Select a phase cluster to inspect sources.</li>
-            </ul>
-            <p class="status" id="cluster-status">Cluster drilldown ready.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="sources">
-        <div class="section-head">
-          <p class="eyebrow">Source Intelligence</p>
-          <h2>Track coverage confidence and reading progress</h2>
-        </div>
-
-        <div class="source-controls">
-          <label class="field small">
-            <span>Type</span>
-            <select id="source-type-filter">
-              <option value="all">All types</option>
-              <option value="official">Official</option>
-              <option value="court">Court</option>
-              <option value="media">Media</option>
-              <option value="analysis">Analysis</option>
-            </select>
-          </label>
-
-          <label class="field grow">
-            <span>Search source</span>
-            <input id="source-search" type="search" placeholder="Search by title or publisher" />
-          </label>
-
-          <button class="tool-btn ghost" id="source-reset" type="button">Reset</button>
-        </div>
-
-        <p class="status" id="source-summary">0 sources shown.</p>
-
-        <div class="table-wrap">
-          <table class="source-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Source</th>
-                <th>Type</th>
-                <th>Read</th>
-                <th>Verified</th>
-                <th>Open</th>
-              </tr>
-            </thead>
-            <tbody id="source-table-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="brief">
-        <div class="section-head">
-          <p class="eyebrow">Brief Builder</p>
-          <h2>Generate a structured case memo from your selected events</h2>
-        </div>
-
-        <div class="brief-layout">
-          <article class="tool-card">
-            <h3>Selected Events</h3>
-            <p class="status" id="brief-count">0 events selected.</p>
-            <ul class="brief-list" id="brief-events">
-              <li class="placeholder">Add events from the timeline or question results.</li>
-            </ul>
-            <button class="tool-btn ghost" id="brief-clear" type="button">Clear selection</button>
-          </article>
-
-          <article class="tool-card">
-            <h3>Draft Controls</h3>
-
-            <label class="field small">
-              <span>Tone</span>
-              <select id="brief-tone">
-                <option value="neutral">Neutral summary</option>
-                <option value="chronological">Chronological brief</option>
-                <option value="legal">Legal-focused brief</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>Research notes</span>
-              <textarea
-                id="brief-notes"
-                rows="6"
-                placeholder="Write your own observations, open questions, and follow-up tasks..."
-              ></textarea>
-            </label>
-
-            <div class="inline-actions">
-              <button class="tool-btn" id="brief-generate" type="button">Generate brief</button>
-              <button class="tool-btn" id="brief-copy" type="button">Copy</button>
-              <button class="tool-btn ghost" id="brief-download" type="button">Download</button>
-              <button class="tool-btn" id="report-export-md" type="button">Export report (MD)</button>
-              <button class="tool-btn ghost" id="report-export-pdf" type="button">Print / PDF</button>
-            </div>
-
-            <p class="status" id="brief-status">Brief output ready.</p>
-            <pre class="brief-output" id="brief-output">Generate a brief to start.</pre>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel reveal" id="notebook">
-        <div class="section-head">
-          <p class="eyebrow">Investigation Notebook</p>
-          <h2>Capture leads, hypotheses, and event-linked notes while you research</h2>
-        </div>
-
-        <div class="brief-layout">
-          <article class="tool-card">
-            <h3>New Entry</h3>
-
-            <label class="field small">
-              <span>Attach event</span>
-              <select id="notebook-event">
-                <option value="">General note (not tied to one event)</option>
-              </select>
-            </label>
-
-            <label class="field small">
-              <span>Tag</span>
-              <input id="notebook-tag" type="text" placeholder="lead, contradiction, follow-up..." />
-            </label>
-
-            <label class="field">
-              <span>Note</span>
-              <textarea
-                id="notebook-text"
-                rows="7"
-                placeholder="Write what matters: what happened, what is confirmed, what still needs verification."
-              ></textarea>
-            </label>
-
-            <div class="inline-actions">
-              <button class="tool-btn" id="notebook-save" type="button">Save entry</button>
-              <button class="tool-btn ghost" id="notebook-clear-input" type="button">Clear</button>
-              <button class="tool-btn ghost" id="notebook-export" type="button">Export notebook</button>
-            </div>
-
-            <p class="status" id="notebook-editor-status">Notebook editor ready.</p>
-          </article>
-
-          <article class="tool-card">
-            <h3>Notebook Entries</h3>
-
-            <div class="source-controls">
-              <label class="field small">
-                <span>Filter</span>
-                <select id="notebook-filter">
-                  <option value="all">All entries</option>
-                  <option value="event-linked">Event-linked only</option>
-                  <option value="general">General notes only</option>
-                  <option value="open-questions">Open questions</option>
-                </select>
-              </label>
-            </div>
-
-            <p class="status" id="notebook-summary">0 notebook entries.</p>
-            <ul class="brief-list notebook-list" id="notebook-list">
-              <li class="placeholder">No notebook entries yet.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <p>JeffreyEpsteins.org · Investigative Research OS</p>
-      <p>Independent public-record interface · <span id="year"></span></p>
-    </footer>
-
-    <div class="command-shell" id="command-shell" hidden>
-      <button class="command-backdrop" type="button" data-close-command aria-label="Close command palette"></button>
-      <div class="command-dialog" role="dialog" aria-modal="true" aria-label="Command palette">
-        <input id="command-input" type="text" placeholder="Type a command..." />
-        <ul id="command-list" class="command-list"></ul>
-      </div>
-    </div>
-
-    <script src="script.js?v=20260210-4"></script>
-  </body>
+    <script>
+        (function() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            window.APP_ENV = isMobile ? 'MOBILE' : 'WORKSTATION';
+        })();
+    </script>
+</body>
 </html>
