@@ -1,160 +1,171 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JeffreyEpsteins.org | Public Dossier</title>
-    <meta
-      name="description"
-      content="Public dossier site with case chronology, legal context, source index, and open investigative questions."
-    />
-    <meta property="og:title" content="JeffreyEpsteins.org | Public Dossier" />
-    <meta
-      property="og:description"
-      content="Structured public-record dossier with timelines, sources, and investigative context."
-    />
-    <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css?v=20260210-5" />
-  </head>
-  <body>
-    <header class="site-header" id="top">
-      <a class="logo" href="#overview">
-        <span class="logo-line">JeffreyEpsteins.org</span>
-        <span class="logo-sub">Public Record Dossier</span>
-      </a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This Website Has Been Seized</title>
+    <link rel="icon" href="FBI_SEAL.png" />
+    <style>
+       
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="#overview">Overview</a>
-        <a href="#dossiers">Dossiers</a>
-        <a href="#timeline">Timeline</a>
-        <a href="#sources">Sources</a>
-        <a href="#questions">Open Questions</a>
-      </nav>
-    </header>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    <main>
-      <section class="panel hero" id="overview">
-        <div class="hero-copy">
-          <p class="eyebrow">Public Dossier</p>
-          <h1>A structured dossier built for reading, not noise.</h1>
-          <p class="lead">
-            This site organizes publicly reported information into clear dossiers: chronology,
-            legal process, institutional context, source trails, and unresolved questions.
-          </p>
+        body {
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.8)), 
+                        url('background.png') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .glass-container {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 45px;
+            width: 90%;
+            max-width: 650px; 
+            
+            /* Vertical/Horizontal Centering for content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Dual Logo Layout */
+        .logo-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .side-logo {
+            width: 120px; 
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 18px;
+            color: #f8fafc;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 35px;
+            max-width: 520px;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn {
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 24px;
+        }
+
+        .btn-primary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        /*Desktop 4:3 Aspect Ratio*/
+        @media (min-width: 768px) {
+            .glass-container {
+                aspect-ratio: 4 / 3;
+                padding: 60px;
+            }
+            .btn-wrapper { flex-direction: row; }
+            .btn { flex: 1; }
+            h1 { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .side-logo { width: 90px; height: 90px; }
+            h1 { font-size: 1.5rem; }
+            .glass-container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <div class="logo-group">
+            <img src="FBI_SEAL.png" alt="Portal Logo Left" class="side-logo">
+            <img src="DOJ_SEAL.png" alt="Portal Logo Right" class="side-logo">
         </div>
 
-        <div class="hero-meta">
-          <p><strong>Scope:</strong> public-record information design</p>
-          <p><strong>Coverage:</strong> 2005 to 2024</p>
-          <p><strong>Method:</strong> event-source linking with transparent references</p>
-          <p><strong>Disclaimer:</strong> not an official court or government publication</p>
-        </div>
-      </section>
-
-      <section class="panel" id="dossiers">
-        <div class="section-head">
-          <p class="eyebrow">Dossier Hub</p>
-          <h2>Choose a dossier lens and follow the evidence trail</h2>
-        </div>
-
-        <div class="dossier-layout">
-          <aside class="dossier-menu" id="dossier-menu" aria-label="Dossier navigation"></aside>
-
-          <article class="dossier-detail">
-            <h3 id="dossier-title">Chronology Dossier</h3>
-            <p class="status" id="dossier-summary"></p>
-            <ul class="dossier-points" id="dossier-points"></ul>
-
-            <div class="meta-grid">
-              <p id="dossier-period">Coverage period:</p>
-              <p id="dossier-counts">Events and source counts:</p>
-            </div>
-
-            <div class="inline-actions">
-              <button class="tool-btn" id="dossier-export" type="button">Download dossier (.md)</button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel" id="timeline">
-        <div class="section-head">
-          <p class="eyebrow">Timeline</p>
-          <h2>Filter dossier events and inspect key milestones</h2>
-        </div>
-
-        <div class="timeline-controls">
-          <label class="field grow">
-            <span>Search</span>
-            <input id="timeline-search" type="search" placeholder="Search title, summary, or phase" />
-          </label>
-
-          <label class="field small">
-            <span>Start year</span>
-            <select id="year-start"></select>
-          </label>
-
-          <label class="field small">
-            <span>End year</span>
-            <select id="year-end"></select>
-          </label>
-
-          <button class="tool-btn ghost" id="timeline-reset" type="button">Reset</button>
-        </div>
-
-        <p class="status" id="timeline-status">Showing 0 events.</p>
-        <div class="timeline-list" id="timeline-list"></div>
-      </section>
-
-      <section class="panel" id="sources">
-        <div class="section-head">
-          <p class="eyebrow">Sources</p>
-          <h2>Primary links and coverage references for the active dossier</h2>
-        </div>
-
-        <p class="status" id="source-status">0 sources shown.</p>
-
-        <div class="table-wrap">
-          <table class="source-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Source</th>
-                <th>Publisher</th>
-                <th>Type</th>
-                <th>Linked events</th>
-                <th>Open</th>
-              </tr>
-            </thead>
-            <tbody id="source-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel" id="questions">
-        <div class="section-head">
-          <p class="eyebrow">Open Questions</p>
-          <h2>What remains contested, unclear, or institutionally unresolved</h2>
-        </div>
-
-        <p class="status">
-          These are research questions, not conclusions. Verify with primary records where possible.
+        <h1 id="title">THIS WEBSITE HAS BEEN SEIZED</h1>
+        
+        <p id="description">
+            This domain has been seized by the Federal Bureau of Investigation in accordance with a seizure warrant issued by the United States District Court for the District of Hawaii pursuant to 18 U.S.C § 981 and 982.
         </p>
-        <ul class="question-list" id="question-list"></ul>
-      </section>
-    </main>
+        
+        <div class="btn-wrapper">
+            <a href="https://www.ic3.gov" class="btn btn-primary">File IC3 Report</a>
+            <a href="https://www.fbi.gov/how-we-can-help-you/victim-services/national-crimes-and-victim-resources/cryptocurrency-investment-fraud" class="btn btn-secondary">Crypto Fraud Info</a>
+        </div>
+    </div>
 
-    <footer class="site-footer">
-      <p>JeffreyEpsteins.org · Public Record Dossier</p>
-      <p>Independent information-design project · <span id="year"></span></p>
-    </footer>
-
-    <script src="script.js?v=20260210-5"></script>
-  </body>
+    <script>
+        (function() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            window.APP_ENV = isMobile ? 'MOBILE' : 'WORKSTATION';
+        })();
+    </script>
+</body>
 </html>
