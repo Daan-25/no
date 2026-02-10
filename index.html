@@ -20,7 +20,7 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260210-1" />
+    <link rel="stylesheet" href="styles.css?v=20260210-2" />
   </head>
   <body data-theme="light">
     <div class="aurora" aria-hidden="true"></div>
@@ -40,10 +40,12 @@
         <a href="#overview">Overview</a>
         <a href="#workbench">Workbench</a>
         <a href="#timeline">Timeline</a>
+        <a href="#evidence">Evidence</a>
         <a href="#flow">Flow Map</a>
         <a href="#network">Network</a>
         <a href="#sources">Sources</a>
         <a href="#brief">Brief Builder</a>
+        <a href="#notebook">Notebook</a>
       </nav>
 
       <div class="header-actions">
@@ -210,6 +212,44 @@
         </div>
       </section>
 
+      <section class="panel reveal" id="evidence">
+        <div class="section-head">
+          <p class="eyebrow">Evidence Matrix</p>
+          <h2>Score event support quality and move directly to source review</h2>
+        </div>
+
+        <div class="source-controls">
+          <label class="field small">
+            <span>Scope</span>
+            <select id="evidence-scope">
+              <option value="filtered">Filtered timeline</option>
+              <option value="brief">Brief selection</option>
+              <option value="pinned">Pinned events</option>
+              <option value="all">All events</option>
+            </select>
+          </label>
+
+          <button class="tool-btn ghost" id="evidence-refresh" type="button">Refresh matrix</button>
+        </div>
+
+        <p class="status" id="evidence-status">Evidence matrix ready.</p>
+
+        <div class="table-wrap">
+          <table class="source-table evidence-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Sources</th>
+                <th>Type spread</th>
+                <th>Quality score</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="evidence-body"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="panel reveal" id="flow">
         <div class="section-head">
           <p class="eyebrow">Case Flow Map</p>
@@ -363,10 +403,75 @@
               <button class="tool-btn" id="brief-generate" type="button">Generate brief</button>
               <button class="tool-btn" id="brief-copy" type="button">Copy</button>
               <button class="tool-btn ghost" id="brief-download" type="button">Download</button>
+              <button class="tool-btn" id="report-export-md" type="button">Export report (MD)</button>
+              <button class="tool-btn ghost" id="report-export-pdf" type="button">Print / PDF</button>
             </div>
 
             <p class="status" id="brief-status">Brief output ready.</p>
             <pre class="brief-output" id="brief-output">Generate a brief to start.</pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal" id="notebook">
+        <div class="section-head">
+          <p class="eyebrow">Investigation Notebook</p>
+          <h2>Capture leads, hypotheses, and event-linked notes while you research</h2>
+        </div>
+
+        <div class="brief-layout">
+          <article class="tool-card">
+            <h3>New Entry</h3>
+
+            <label class="field small">
+              <span>Attach event</span>
+              <select id="notebook-event">
+                <option value="">General note (not tied to one event)</option>
+              </select>
+            </label>
+
+            <label class="field small">
+              <span>Tag</span>
+              <input id="notebook-tag" type="text" placeholder="lead, contradiction, follow-up..." />
+            </label>
+
+            <label class="field">
+              <span>Note</span>
+              <textarea
+                id="notebook-text"
+                rows="7"
+                placeholder="Write what matters: what happened, what is confirmed, what still needs verification."
+              ></textarea>
+            </label>
+
+            <div class="inline-actions">
+              <button class="tool-btn" id="notebook-save" type="button">Save entry</button>
+              <button class="tool-btn ghost" id="notebook-clear-input" type="button">Clear</button>
+              <button class="tool-btn ghost" id="notebook-export" type="button">Export notebook</button>
+            </div>
+
+            <p class="status" id="notebook-editor-status">Notebook editor ready.</p>
+          </article>
+
+          <article class="tool-card">
+            <h3>Notebook Entries</h3>
+
+            <div class="source-controls">
+              <label class="field small">
+                <span>Filter</span>
+                <select id="notebook-filter">
+                  <option value="all">All entries</option>
+                  <option value="event-linked">Event-linked only</option>
+                  <option value="general">General notes only</option>
+                  <option value="open-questions">Open questions</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="status" id="notebook-summary">0 notebook entries.</p>
+            <ul class="brief-list notebook-list" id="notebook-list">
+              <li class="placeholder">No notebook entries yet.</li>
+            </ul>
           </article>
         </div>
       </section>
@@ -385,6 +490,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260210-1"></script>
+    <script src="script.js?v=20260210-2"></script>
   </body>
 </html>

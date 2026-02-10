@@ -436,6 +436,7 @@ const STORAGE_KEYS = {
   briefNotes: 'jef_brief_notes_v2',
   briefTone: 'jef_brief_tone_v2',
   theme: 'jef_theme_v2',
+  notebook: 'jef_notebook_v1',
 };
 
 const safeStore = {
@@ -476,6 +477,21 @@ const validEntityIds = new Set(ENTITIES.map((entity) => entity.id));
 
 const initialPins = (safeStore.get(STORAGE_KEYS.pins, []) || []).filter((id) => validEventIds.has(id));
 const initialBrief = (safeStore.get(STORAGE_KEYS.brief, []) || []).filter((id) => validEventIds.has(id));
+const sanitizeNotebookEntries = (rows) => {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  return rows
+    .map((row) => ({
+      id: typeof row?.id === 'string' && row.id.trim() ? row.id : `note-${Math.random().toString(36).slice(2, 9)}`,
+      createdAt: typeof row?.createdAt === 'string' ? row.createdAt : new Date().toISOString(),
+      eventId: typeof row?.eventId === 'string' && validEventIds.has(row.eventId) ? row.eventId : '',
+      tag: typeof row?.tag === 'string' ? row.tag.trim().slice(0, 40) : '',
+      text: typeof row?.text === 'string' ? row.text.trim().slice(0, 8000) : '',
+    }))
+    .filter((row) => row.text.length > 0);
+};
+const initialNotebook = sanitizeNotebookEntries(safeStore.get(STORAGE_KEYS.notebook, []));
 
 const state = {
   phase: 'all',
@@ -495,6 +511,9 @@ const state = {
   query: '',
   flowSelectedId: 'foundation',
   flowCluster: 'official',
+  evidenceScope: 'filtered',
+  notebook: initialNotebook,
+  notebookFilter: 'all',
 };
 
 const dom = {
@@ -529,6 +548,11 @@ const dom = {
   timelineStatus: document.querySelector('#timeline-status'),
   timelineResults: document.querySelector('#timeline-results'),
 
+  evidenceScope: document.querySelector('#evidence-scope'),
+  evidenceRefresh: document.querySelector('#evidence-refresh'),
+  evidenceStatus: document.querySelector('#evidence-status'),
+  evidenceBody: document.querySelector('#evidence-body'),
+
   flowTrack: document.querySelector('#flow-track'),
   flowTitle: document.querySelector('#flow-title'),
   flowSummary: document.querySelector('#flow-summary'),
@@ -561,9 +585,22 @@ const dom = {
   briefGenerate: document.querySelector('#brief-generate'),
   briefCopy: document.querySelector('#brief-copy'),
   briefDownload: document.querySelector('#brief-download'),
+  reportExportMd: document.querySelector('#report-export-md'),
+  reportExportPdf: document.querySelector('#report-export-pdf'),
   briefClear: document.querySelector('#brief-clear'),
   briefStatus: document.querySelector('#brief-status'),
   briefOutput: document.querySelector('#brief-output'),
+
+  notebookEvent: document.querySelector('#notebook-event'),
+  notebookTag: document.querySelector('#notebook-tag'),
+  notebookText: document.querySelector('#notebook-text'),
+  notebookSave: document.querySelector('#notebook-save'),
+  notebookClearInput: document.querySelector('#notebook-clear-input'),
+  notebookExport: document.querySelector('#notebook-export'),
+  notebookFilter: document.querySelector('#notebook-filter'),
+  notebookSummary: document.querySelector('#notebook-summary'),
+  notebookList: document.querySelector('#notebook-list'),
+  notebookEditorStatus: document.querySelector('#notebook-editor-status'),
 
   commandShell: document.querySelector('#command-shell'),
   commandInput: document.querySelector('#command-input'),
@@ -628,6 +665,7 @@ const saveSourceState = () => safeStore.set(STORAGE_KEYS.sourceState, state.sour
 const saveBriefNotes = () => safeStore.set(STORAGE_KEYS.briefNotes, state.briefNotes);
 const saveBriefTone = () => safeStore.set(STORAGE_KEYS.briefTone, state.briefTone);
 const saveTheme = () => safeStore.set(STORAGE_KEYS.theme, state.theme);
+const saveNotebook = () => safeStore.set(STORAGE_KEYS.notebook, state.notebook);
 
 const setStatus = (node, text) => {
   if (node) {
@@ -636,6 +674,33 @@ const setStatus = (node, text) => {
 };
 
 const getPhaseText = (phase) => PHASE_LABEL[phase] || phase;
+
+const escapeHtml = (value) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const getEventCollectionByIds = (ids, ascending = true) =>
+  [...ids]
+    .map((id) => getEvent(id))
+    .filter(Boolean)
+    .sort((a, b) => (ascending ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)));
+
+const getEvidenceSourceWeight = (sourceType) => {
+  if (sourceType === 'official') {
+    return 1;
+  }
+  if (sourceType === 'court') {
+    return 0.95;
+  }
+  if (sourceType === 'media') {
+    return 0.7;
+  }
+  return 0.58;
+};
 
 const eventSearchHaystack = (event) => {
   const entityNames = event.entities.map((id) => getEntity(id)?.label || '').join(' ');
@@ -803,6 +868,7 @@ const renderTimeline = () => {
 
   if (events.length === 0) {
     dom.timelineResults.innerHTML = `<article class="event-card"><p class="status">No events match your filters. Try a wider year range or fewer keywords.</p></article>`;
+    renderEvidenceMatrix();
     return;
   }
 
@@ -841,6 +907,7 @@ const renderTimeline = () => {
       `;
     })
     .join('');
+  renderEvidenceMatrix();
 };
 
 const renderPinned = () => {
@@ -927,6 +994,327 @@ const getFilteredSources = () => {
   });
 };
 
+const getEvidenceScopeEvents = () => {
+  if (state.evidenceScope === 'all') {
+    return [...EVENTS].sort((a, b) => b.date.localeCompare(a.date));
+  }
+  if (state.evidenceScope === 'pinned') {
+    return getEventCollectionByIds(state.pins, false);
+  }
+  if (state.evidenceScope === 'brief') {
+    return getEventCollectionByIds(state.brief, false);
+  }
+  return getFilteredEvents();
+};
+
+const getEvidenceStatsForEvent = (event) => {
+  const sources = event.sources.map((sourceId) => getSource(sourceId)).filter(Boolean);
+  const typeCounts = {
+    official: 0,
+    court: 0,
+    media: 0,
+    analysis: 0,
+  };
+
+  let scoreAccumulator = 0;
+  let readCount = 0;
+  let verifiedCount = 0;
+
+  sources.forEach((source) => {
+    typeCounts[source.type] += 1;
+    const sourceState = state.sourceState[source.id] || { read: false, verified: false };
+    if (sourceState.read) {
+      readCount += 1;
+    }
+    if (sourceState.verified) {
+      verifiedCount += 1;
+    }
+
+    let weightedScore = getEvidenceSourceWeight(source.type);
+    if (sourceState.read) {
+      weightedScore += 0.08;
+    }
+    if (sourceState.verified) {
+      weightedScore += 0.19;
+    }
+    scoreAccumulator += weightedScore;
+  });
+
+  const averageScore = sources.length > 0 ? scoreAccumulator / sources.length : 0;
+  const normalizedScore = Math.round((Math.min(averageScore, 1.27) / 1.27) * 100);
+
+  return {
+    sourceCount: sources.length,
+    readCount,
+    verifiedCount,
+    typeCounts,
+    score: normalizedScore,
+  };
+};
+
+const renderEvidenceMatrix = () => {
+  if (!dom.evidenceBody) {
+    return;
+  }
+
+  const events = getEvidenceScopeEvents();
+  if (events.length === 0) {
+    dom.evidenceBody.innerHTML = `
+      <tr>
+        <td colspan="5"><p class="status">No events available for this matrix scope.</p></td>
+      </tr>
+    `;
+    setStatus(dom.evidenceStatus, '0 events in matrix scope.');
+    return;
+  }
+
+  dom.evidenceBody.innerHTML = events
+    .map((event) => {
+      const stats = getEvidenceStatsForEvent(event);
+      const spread = [
+        `Official ${stats.typeCounts.official}`,
+        `Court ${stats.typeCounts.court}`,
+        `Media ${stats.typeCounts.media}`,
+        `Analysis ${stats.typeCounts.analysis}`,
+      ].join(' · ');
+
+      return `
+        <tr data-evidence-event-id="${event.id}">
+          <td>
+            <p class="evidence-event-title">${event.title}</p>
+            <p class="evidence-event-meta">${formatDate(event.date)} · ${getPhaseText(event.phase)}</p>
+          </td>
+          <td>
+            <p class="evidence-types">${stats.sourceCount} total · ${stats.readCount} read · ${stats.verifiedCount} verified</p>
+          </td>
+          <td><p class="evidence-types">${spread}</p></td>
+          <td>
+            <div class="evidence-score">
+              <div class="evidence-meter"><div class="evidence-fill" style="width:${stats.score}%"></div></div>
+              <p class="evidence-score-label">${stats.score}/100 confidence</p>
+            </div>
+          </td>
+          <td>
+            <div class="list-actions">
+              <button class="mini-btn" type="button" data-evidence-action="sources">Sources</button>
+              <button class="mini-btn" type="button" data-evidence-action="brief">Add brief</button>
+              <button class="mini-btn" type="button" data-evidence-action="jump">Jump</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  const scopeLabel =
+    state.evidenceScope === 'filtered'
+      ? 'filtered timeline'
+      : state.evidenceScope === 'brief'
+        ? 'brief selection'
+        : state.evidenceScope === 'pinned'
+          ? 'pinned events'
+          : 'all events';
+  setStatus(dom.evidenceStatus, `${events.length} events in matrix · scope: ${scopeLabel}.`);
+};
+
+const renderNotebookEventOptions = () => {
+  if (!dom.notebookEvent) {
+    return;
+  }
+  const current = dom.notebookEvent.value;
+  const options = [
+    '<option value="">General note (not tied to one event)</option>',
+    ...[...EVENTS]
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .map((event) => `<option value="${event.id}">${formatDate(event.date)} · ${escapeHtml(event.title)}</option>`),
+  ];
+  dom.notebookEvent.innerHTML = options.join('');
+  if (current && validEventIds.has(current)) {
+    dom.notebookEvent.value = current;
+  }
+};
+
+const getFilteredNotebookEntries = () => {
+  const rows = [...state.notebook].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  if (state.notebookFilter === 'event-linked') {
+    return rows.filter((row) => row.eventId);
+  }
+  if (state.notebookFilter === 'general') {
+    return rows.filter((row) => !row.eventId);
+  }
+  if (state.notebookFilter === 'open-questions') {
+    return rows.filter((row) => row.text.includes('?') || /open|question|verify/i.test(row.tag));
+  }
+  return rows;
+};
+
+const composeNotebookMarkdown = () => {
+  const entries = getFilteredNotebookEntries();
+  const lines = ['# Investigation Notebook', `Generated: ${new Date().toLocaleString()}`, ''];
+
+  if (entries.length === 0) {
+    lines.push('- No notebook entries.');
+    return lines.join('\n');
+  }
+
+  entries.forEach((entry, index) => {
+    const event = entry.eventId ? getEvent(entry.eventId) : null;
+    lines.push(`## ${index + 1}. ${new Date(entry.createdAt).toLocaleString()}`);
+    lines.push(`- Event: ${event ? event.title : 'General note'}`);
+    lines.push(`- Tag: ${entry.tag || 'none'}`);
+    lines.push('- Note:');
+    lines.push(entry.text);
+    lines.push('');
+  });
+
+  return lines.join('\n');
+};
+
+const composeResearchReport = () => {
+  const sourceRows = SOURCES.map((source) => {
+    const sourceState = state.sourceState[source.id] || { read: false, verified: false };
+    return {
+      ...source,
+      read: sourceState.read,
+      verified: sourceState.verified,
+    };
+  });
+  const readCount = sourceRows.filter((row) => row.read).length;
+  const verifiedCount = sourceRows.filter((row) => row.verified).length;
+  const evidenceRows = getEvidenceScopeEvents().slice(0, 12);
+  const notebookRows = getFilteredNotebookEntries().slice(0, 20);
+  const selectedEvents = getEventCollectionByIds(state.brief, true);
+
+  const lines = [];
+  lines.push('# Jeffrey Epstein Investigative Report');
+  lines.push(`Generated: ${new Date().toLocaleString()}`);
+  lines.push('');
+  lines.push('## Working Filter Context');
+  lines.push(`- Timeline phase: ${state.phase}`);
+  lines.push(`- Year window: ${state.yearStart}-${state.yearEnd}`);
+  lines.push(`- Timeline search: ${state.search || 'none'}`);
+  lines.push(`- Source filter: ${state.sourceType} / ${state.sourceSearch || 'none'}`);
+  lines.push(`- Evidence scope: ${state.evidenceScope}`);
+  lines.push('');
+  lines.push('## Evidence Matrix Snapshot');
+  if (evidenceRows.length === 0) {
+    lines.push('- No evidence rows in current scope.');
+  } else {
+    evidenceRows.forEach((event, index) => {
+      const stats = getEvidenceStatsForEvent(event);
+      lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
+      lines.push(`   Confidence: ${stats.score}/100 · Sources: ${stats.sourceCount} total, ${stats.readCount} read, ${stats.verifiedCount} verified`);
+    });
+  }
+  lines.push('');
+  lines.push('## Brief Event Set');
+  if (selectedEvents.length === 0) {
+    lines.push('- No events in brief selection.');
+  } else {
+    selectedEvents.forEach((event, index) => {
+      lines.push(`${index + 1}. ${formatDate(event.date)} - ${event.title}`);
+      lines.push(`   ${event.summary}`);
+    });
+  }
+  lines.push('');
+  lines.push('## Notebook Highlights');
+  if (notebookRows.length === 0) {
+    lines.push('- No notebook entries.');
+  } else {
+    notebookRows.forEach((entry) => {
+      const event = entry.eventId ? getEvent(entry.eventId) : null;
+      lines.push(`- [${new Date(entry.createdAt).toLocaleString()}] ${event ? event.title : 'General'}${entry.tag ? ` (#${entry.tag})` : ''}`);
+      lines.push(`  ${entry.text}`);
+    });
+  }
+  lines.push('');
+  lines.push('## Source Coverage Progress');
+  lines.push(`- ${readCount}/${SOURCES.length} marked read`);
+  lines.push(`- ${verifiedCount}/${SOURCES.length} marked verified`);
+  lines.push('');
+  lines.push('## Generated Brief Output');
+  lines.push('```text');
+  lines.push(composeBrief());
+  lines.push('```');
+
+  return lines.join('\n');
+};
+
+const exportReportMarkdown = () => {
+  const report = composeResearchReport();
+  downloadText('investigative-report.md', report);
+  setStatus(dom.briefStatus, 'Report exported as investigative-report.md.');
+};
+
+const exportReportPdf = () => {
+  const report = composeResearchReport();
+  const reportHtml = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Investigative Report</title>
+  <style>
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin: 24px; line-height: 1.5; color: #111827; }
+    h1 { font-size: 22px; margin-bottom: 14px; }
+    pre { white-space: pre-wrap; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Jeffrey Epstein Investigative Report</h1>
+  <pre>${escapeHtml(report)}</pre>
+</body>
+</html>`;
+  const popup = window.open('', '_blank', 'noopener,noreferrer');
+  if (!popup) {
+    downloadText('investigative-report.md', report);
+    setStatus(dom.briefStatus, 'Popup blocked. Downloaded Markdown report instead.');
+    return;
+  }
+  popup.document.open();
+  popup.document.write(reportHtml);
+  popup.document.close();
+  popup.focus();
+  window.setTimeout(() => popup.print(), 350);
+  setStatus(dom.briefStatus, 'Print dialog opened. Save as PDF from your browser.');
+};
+
+const renderNotebook = () => {
+  if (!dom.notebookList) {
+    return;
+  }
+
+  const entries = getFilteredNotebookEntries();
+  setStatus(dom.notebookSummary, `${entries.length} notebook entr${entries.length === 1 ? 'y' : 'ies'}.`);
+
+  if (entries.length === 0) {
+    dom.notebookList.innerHTML = '<li class="placeholder">No notebook entries yet.</li>';
+    return;
+  }
+
+  dom.notebookList.innerHTML = entries
+    .map((entry) => {
+      const event = entry.eventId ? getEvent(entry.eventId) : null;
+      const eventTitle = event ? event.title : 'General note';
+      const created = new Date(entry.createdAt).toLocaleString();
+
+      return `
+        <li data-note-id="${entry.id}">
+          <div class="note-head">
+            <p class="list-title">${escapeHtml(eventTitle)}</p>
+            ${entry.tag ? `<span class="note-tag">${escapeHtml(entry.tag)}</span>` : ''}
+          </div>
+          <p class="note-meta">${created}</p>
+          <p class="note-text">${escapeHtml(entry.text)}</p>
+          <div class="list-actions">
+            ${event ? '<button class="mini-btn" type="button" data-note-action="jump">Jump to event</button>' : ''}
+            <button class="mini-btn" type="button" data-note-action="delete">Delete</button>
+          </div>
+        </li>
+      `;
+    })
+    .join('');
+};
+
 const renderSources = () => {
   const rows = getFilteredSources();
 
@@ -971,6 +1359,7 @@ const renderSources = () => {
 
   const focusText = state.sourceFocusIds ? ' · focus mode active' : '';
   setStatus(dom.sourceSummary, `${rows.length} sources shown · ${readCount} read · ${verifiedCount} verified${focusText}.`);
+  renderEvidenceMatrix();
 };
 
 const composeBrief = () => {
@@ -1032,6 +1421,7 @@ const composeBrief = () => {
 const renderBrief = () => {
   renderBriefSelection();
   dom.briefOutput.textContent = composeBrief();
+  renderEvidenceMatrix();
 };
 
 const updateMetrics = () => {
@@ -1209,6 +1599,8 @@ const exportSession = () => {
     sourceState: state.sourceState,
     briefTone: state.briefTone,
     briefNotes: state.briefNotes,
+    evidenceScope: state.evidenceScope,
+    notebook: state.notebook,
   };
 
   downloadText('research-session.json', JSON.stringify(payload, null, 2));
@@ -1231,12 +1623,16 @@ const resetSession = () => {
   state.briefNotes = '';
   state.flowSelectedId = 'foundation';
   state.flowCluster = 'official';
+  state.evidenceScope = 'filtered';
+  state.notebook = [];
+  state.notebookFilter = 'all';
 
   safeStore.remove(STORAGE_KEYS.pins);
   safeStore.remove(STORAGE_KEYS.brief);
   safeStore.remove(STORAGE_KEYS.sourceState);
   safeStore.remove(STORAGE_KEYS.briefNotes);
   safeStore.remove(STORAGE_KEYS.briefTone);
+  safeStore.remove(STORAGE_KEYS.notebook);
 
   dom.timelineSearch.value = '';
   dom.timelineSort.value = 'newest';
@@ -1246,6 +1642,11 @@ const resetSession = () => {
   dom.sourceSearch.value = '';
   dom.briefTone.value = 'neutral';
   dom.briefNotes.value = '';
+  dom.evidenceScope.value = 'filtered';
+  dom.notebookFilter.value = 'all';
+  dom.notebookEvent.value = '';
+  dom.notebookTag.value = '';
+  dom.notebookText.value = '';
 
   dom.phaseFilters.querySelectorAll('.phase-btn').forEach((button) => {
     button.classList.toggle('active', button.dataset.phase === 'all');
@@ -1256,6 +1657,7 @@ const resetSession = () => {
   renderFlowMap();
   renderSources();
   renderBrief();
+  renderNotebook();
   setStatus(dom.sessionStatus, 'Session reset complete.');
 };
 
@@ -1862,6 +2264,12 @@ const renderCommandPalette = () => {
       run: () => document.querySelector('#timeline')?.scrollIntoView({ behavior: 'smooth' }),
     },
     {
+      id: 'jump-evidence',
+      label: 'Jump to Evidence Matrix',
+      hint: 'Audit source support and confidence',
+      run: () => document.querySelector('#evidence')?.scrollIntoView({ behavior: 'smooth' }),
+    },
+    {
       id: 'jump-network',
       label: 'Jump to Network Graph',
       hint: 'Inspect entity relationships',
@@ -1878,6 +2286,12 @@ const renderCommandPalette = () => {
       label: 'Jump to Sources',
       hint: 'Open source intelligence table',
       run: () => document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth' }),
+    },
+    {
+      id: 'jump-notebook',
+      label: 'Jump to Notebook',
+      hint: 'Review and capture investigation notes',
+      run: () => document.querySelector('#notebook')?.scrollIntoView({ behavior: 'smooth' }),
     },
     {
       id: 'jump-brief',
@@ -1919,6 +2333,12 @@ const renderCommandPalette = () => {
       label: 'Export pinned events',
       hint: 'Download pin set as text file',
       run: () => exportPins(),
+    },
+    {
+      id: 'export-report',
+      label: 'Export full report',
+      hint: 'Download Markdown report from current research state',
+      run: () => exportReportMarkdown(),
     },
     {
       id: 'toggle-theme',
@@ -2072,6 +2492,51 @@ const bindEvents = () => {
     state.sort = 'newest';
     applyTimelineControlState();
     renderTimeline();
+  });
+
+  dom.evidenceScope.addEventListener('change', () => {
+    state.evidenceScope = dom.evidenceScope.value;
+    renderEvidenceMatrix();
+  });
+
+  dom.evidenceRefresh.addEventListener('click', () => {
+    renderEvidenceMatrix();
+  });
+
+  dom.evidenceBody.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const action = target.getAttribute('data-evidence-action');
+    if (!action) {
+      return;
+    }
+
+    const row = target.closest('[data-evidence-event-id]');
+    const eventId = row?.getAttribute('data-evidence-event-id');
+    if (!eventId) {
+      return;
+    }
+
+    const eventRow = getEvent(eventId);
+    if (!eventRow) {
+      return;
+    }
+
+    if (action === 'sources') {
+      setSourceFocus(eventRow.sources);
+      document.querySelector('#sources')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (action === 'brief') {
+      state.brief.add(eventId);
+      saveBrief();
+      renderTimeline();
+      renderBrief();
+      setStatus(dom.briefStatus, 'Event added from Evidence Matrix.');
+    } else if (action === 'jump') {
+      jumpToEvent(eventId);
+    }
   });
 
   dom.flowTrack.addEventListener('click', (event) => {
@@ -2307,6 +2772,14 @@ const bindEvents = () => {
     setStatus(dom.briefStatus, 'Brief downloaded as case-brief.txt.');
   });
 
+  dom.reportExportMd.addEventListener('click', () => {
+    exportReportMarkdown();
+  });
+
+  dom.reportExportPdf.addEventListener('click', () => {
+    exportReportPdf();
+  });
+
   dom.briefClear.addEventListener('click', () => {
     state.brief.clear();
     saveBrief();
@@ -2337,6 +2810,86 @@ const bindEvents = () => {
       saveBrief();
       renderTimeline();
       renderBrief();
+    }
+  });
+
+  dom.notebookSave.addEventListener('click', () => {
+    const text = dom.notebookText.value.trim();
+    const eventId = dom.notebookEvent.value.trim();
+    const tag = dom.notebookTag.value.trim().slice(0, 40);
+
+    if (!text) {
+      setStatus(dom.notebookEditorStatus, 'Write a note first.');
+      return;
+    }
+
+    const cleanEventId = eventId && validEventIds.has(eventId) ? eventId : '';
+    const entry = {
+      id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      createdAt: new Date().toISOString(),
+      eventId: cleanEventId,
+      tag,
+      text,
+    };
+
+    state.notebook.unshift(entry);
+    saveNotebook();
+    renderNotebook();
+
+    dom.notebookText.value = '';
+    dom.notebookTag.value = '';
+    setStatus(dom.notebookEditorStatus, `Notebook entry saved at ${new Date().toLocaleTimeString()}.`);
+  });
+
+  dom.notebookClearInput.addEventListener('click', () => {
+    dom.notebookEvent.value = '';
+    dom.notebookTag.value = '';
+    dom.notebookText.value = '';
+    setStatus(dom.notebookEditorStatus, 'Notebook editor cleared.');
+  });
+
+  dom.notebookExport.addEventListener('click', () => {
+    downloadText('investigation-notebook.md', composeNotebookMarkdown());
+    setStatus(dom.notebookEditorStatus, 'Notebook exported as investigation-notebook.md.');
+  });
+
+  dom.notebookFilter.addEventListener('change', () => {
+    state.notebookFilter = dom.notebookFilter.value;
+    renderNotebook();
+  });
+
+  dom.notebookList.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const action = target.getAttribute('data-note-action');
+    if (!action) {
+      return;
+    }
+
+    const row = target.closest('[data-note-id]');
+    const noteId = row?.getAttribute('data-note-id');
+    if (!noteId) {
+      return;
+    }
+
+    const note = state.notebook.find((entry) => entry.id === noteId);
+    if (!note) {
+      return;
+    }
+
+    if (action === 'delete') {
+      state.notebook = state.notebook.filter((entry) => entry.id !== noteId);
+      saveNotebook();
+      renderNotebook();
+      setStatus(dom.notebookEditorStatus, 'Notebook entry removed.');
+      return;
+    }
+
+    if (action === 'jump' && note.eventId) {
+      jumpToEvent(note.eventId);
     }
   });
 
@@ -2415,6 +2968,9 @@ const init = () => {
   updateMetrics();
   initYearSelects();
   applySourceControlState();
+  dom.evidenceScope.value = state.evidenceScope;
+  dom.notebookFilter.value = state.notebookFilter;
+  renderNotebookEventOptions();
 
   dom.briefTone.value = state.briefTone;
   dom.briefNotes.value = state.briefNotes;
@@ -2425,6 +2981,7 @@ const init = () => {
   renderFlowMap();
   renderSources();
   renderBrief();
+  renderNotebook();
   setupReveal();
   setupActiveNav();
   updateHeaderAndProgress();
