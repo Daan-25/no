@@ -13,33 +13,6 @@ No frameworks. No build tools. No PR spin doctor.
 - `Conspiracy One-Liner Generator`
 - Scroll reveal animations
 
-## Run on Ubuntu
-
-From the project folder:
-
-```bash
-python3 -m http.server 8080
-```
-
-Open:
-
-- http://localhost:8080
-
-If your browser says "this is cursed," that means it's working.
-
-## Deploy to GitHub Pages
-
-1. Push this repo to GitHub.
-2. Go to `Settings` -> `Pages`.
-3. Under `Build and deployment`, choose:
-4. `Source`: `Deploy from a branch`
-5. `Branch`: `main`
-6. `Folder`: `/ (root)`
-
-Live URL format:
-
-- `https://<your-username>.github.io/<repo-name>/`
-
 ## Project structure
 
 - `index.html` -> page content
