@@ -1035,6 +1035,294 @@ function renderBarChart(elementId, countsObj, limit) {
         </div>`;
     }).join('');
 }
+
+// ===== SIX DEGREES OF EPSTEIN =====
+const sixDegState = { graph: null, initialized: false };
+
+function buildSixDegreesGraph() {
+    if (sixDegState.graph) return sixDegState.graph;
+    const adj = {}; // adjacency list: name -> Set of { name, via, evidence }
+    const nameMap = {}; // normalized name -> display name
+
+    function normName(n) { return (n || '').trim().toLowerCase(); }
+    function addNode(name) {
+        const k = normName(name);
+        if (!k) return k;
+        if (!nameMap[k]) nameMap[k] = name;
+        if (!adj[k]) adj[k] = {};
+        return k;
+    }
+    function addEdge(a, b, via, evidence) {
+        const ka = addNode(a);
+        const kb = addNode(b);
+        if (!ka || !kb || ka === kb) return;
+        if (!adj[ka][kb]) adj[ka][kb] = { via: new Set(), evidence: [] };
+        adj[ka][kb].via.add(via);
+        adj[ka][kb].evidence.push(evidence);
+        if (!adj[kb][ka]) adj[kb][ka] = { via: new Set(), evidence: [] };
+        adj[kb][ka].via.add(via);
+        adj[kb][ka].evidence.push(evidence);
+    }
+
+    // Build from emails
+    const contactByEmail = {};
+    for (const c of state.contacts) {
+        contactByEmail[(c.e || '').toLowerCase()] = c.n;
+    }
+    for (const e of state.allLoaded) {
+        const fromName = e.f || contactByEmail[(e.fe || '').toLowerCase()] || e.fe;
+        const toName = e.t || '';
+        if (fromName && toName) {
+            addEdge(fromName, toName, 'email', `📧 "${(e.s || 'No subject').substring(0, 60)}" (${e.d || '?'})`);
+        }
+    }
+
+    // Build from flights
+    if (flightState.data && flightState.data.flights) {
+        for (const fl of flightState.data.flights) {
+            const allPax = [...(fl.passengers || [])];
+            for (let i = 0; i < allPax.length; i++) {
+                for (let j = i + 1; j < allPax.length; j++) {
+                    addEdge(allPax[i], allPax[j], 'flight',
+                        `✈️ ${fl.dep}→${fl.arr} on ${fl.date} (${fl.aircraft})`);
+                }
+            }
+        }
+    }
+
+    sixDegState.graph = { adj, nameMap };
+    return sixDegState.graph;
+}
+
+function sixDegreesBFS(graph, startName) {
+    const { adj, nameMap } = graph;
+    const startKey = startName.trim().toLowerCase();
+    // Find Epstein key
+    const epsteinKey = Object.keys(nameMap).find(k => k.includes('epstein') && k.includes('j'));
+    if (!epsteinKey) return null;
+    if (startKey === epsteinKey) return [{ name: nameMap[epsteinKey], key: epsteinKey }];
+
+    if (!adj[startKey]) return null;
+
+    const visited = new Set([startKey]);
+    const queue = [[startKey]];
+    while (queue.length > 0) {
+        const path = queue.shift();
+        const current = path[path.length - 1];
+        const neighbors = adj[current] || {};
+        for (const nk of Object.keys(neighbors)) {
+            if (visited.has(nk)) continue;
+            visited.add(nk);
+            const newPath = [...path, nk];
+            if (nk === epsteinKey) {
+                return newPath.map(k => ({ name: nameMap[k], key: k }));
+            }
+            if (newPath.length < 8) queue.push(newPath);
+        }
+    }
+    return null;
+}
+
+function getEdgeInfo(graph, keyA, keyB) {
+    const edge = graph.adj[keyA] && graph.adj[keyA][keyB];
+    if (!edge) return { via: 'unknown', evidence: [] };
+    const vias = [...edge.via];
+    const via = vias.length > 1 ? 'both' : vias[0];
+    return { via, evidence: edge.evidence.slice(0, 5) };
+}
+
+function initSixDegrees() {
+    if (sixDegState.initialized) return;
+    sixDegState.initialized = true;
+
+    const input = document.getElementById('sixdeg-input');
+    const sugBox = document.getElementById('sixdeg-suggestions');
+    const searchBtn = document.getElementById('sixdeg-search-btn');
+    const quickPicks = document.getElementById('sixdeg-quick-picks');
+
+    // Build graph
+    const graph = buildSixDegreesGraph();
+    const allNames = Object.entries(graph.nameMap)
+        .map(([k, v]) => ({ key: k, name: v }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Quick picks
+    const picks = ['B. Clinton', 'Prince Andrew', 'A. Dershowitz', 'G. Maxwell', 'L. Wexner', 'E. Barak'];
+    for (const p of picks) {
+        const found = allNames.find(n => n.name === p);
+        if (found) {
+            const btn = document.createElement('button');
+            btn.className = 'sixdeg-pick';
+            btn.textContent = p;
+            btn.onclick = () => { input.value = p; runSixDegreesSearch(p); };
+            quickPicks.appendChild(btn);
+        }
+    }
+
+    // Autocomplete
+    let selectedSug = -1;
+    input.addEventListener('input', () => {
+        const q = input.value.trim().toLowerCase();
+        sugBox.innerHTML = '';
+        selectedSug = -1;
+        if (q.length < 2) { sugBox.classList.remove('active'); return; }
+        const matches = allNames.filter(n => n.name.toLowerCase().includes(q)).slice(0, 12);
+        if (!matches.length) { sugBox.classList.remove('active'); return; }
+        for (const m of matches) {
+            const div = document.createElement('div');
+            div.className = 'sixdeg-sug-item';
+            // Check if in flights or emails
+            const inFlights = flightState.data && flightState.data.flights &&
+                flightState.data.flights.some(f => f.passengers.some(p => p.toLowerCase() === m.key));
+            const inEmails = state.contacts.some(c => (c.n || '').toLowerCase() === m.key || (c.e || '').toLowerCase() === m.key);
+            div.innerHTML = `<span>${m.name}</span>
+                ${inFlights ? '<span class="sug-type flight">Flight</span>' : ''}
+                ${inEmails ? '<span class="sug-type email">Email</span>' : ''}`;
+            div.onclick = () => {
+                input.value = m.name;
+                sugBox.classList.remove('active');
+                runSixDegreesSearch(m.name);
+            };
+            sugBox.appendChild(div);
+        }
+        sugBox.classList.add('active');
+    });
+
+    input.addEventListener('keydown', (e) => {
+        const items = sugBox.querySelectorAll('.sixdeg-sug-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedSug = Math.min(selectedSug + 1, items.length - 1);
+            items.forEach((it, i) => it.style.background = i === selectedSug ? 'var(--bg-hover)' : '');
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedSug = Math.max(selectedSug - 1, 0);
+            items.forEach((it, i) => it.style.background = i === selectedSug ? 'var(--bg-hover)' : '');
+        } else if (e.key === 'Enter') {
+            if (selectedSug >= 0 && items[selectedSug]) {
+                items[selectedSug].click();
+            } else {
+                runSixDegreesSearch(input.value);
+            }
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.sixdeg-input-wrap')) sugBox.classList.remove('active');
+    });
+
+    searchBtn.addEventListener('click', () => runSixDegreesSearch(input.value));
+}
+
+function runSixDegreesSearch(query) {
+    const graph = sixDegState.graph;
+    if (!graph || !query.trim()) return;
+
+    const resultWrap = document.getElementById('sixdeg-result');
+    const emptyEl = document.getElementById('sixdeg-empty');
+    const pathWrap = document.getElementById('sixdeg-path-wrap');
+    const noResult = document.getElementById('sixdeg-noresult');
+    const sugBox = document.getElementById('sixdeg-suggestions');
+    sugBox.classList.remove('active');
+
+    emptyEl.style.display = 'none';
+    pathWrap.style.display = 'none';
+    noResult.style.display = 'none';
+
+    // Find closest matching name
+    const q = query.trim().toLowerCase();
+    const match = Object.keys(graph.nameMap).find(k => k === q) ||
+        Object.keys(graph.nameMap).find(k => graph.nameMap[k].toLowerCase() === q) ||
+        Object.keys(graph.nameMap).find(k => k.includes(q));
+
+    if (!match) {
+        noResult.style.display = 'block';
+        noResult.querySelector('p').textContent = `"${query}" not found in the dataset.`;
+        return;
+    }
+
+    const path = sixDegreesBFS(graph, graph.nameMap[match]);
+    if (!path) {
+        noResult.style.display = 'block';
+        noResult.querySelector('p').textContent = `No connection path found from ${graph.nameMap[match]} to J. Epstein.`;
+        return;
+    }
+
+    // Show result
+    pathWrap.style.display = 'block';
+    const degrees = path.length - 1;
+    const headerEl = document.getElementById('sixdeg-path-header');
+    headerEl.innerHTML = `
+        <div class="deg-count">${degrees}</div>
+        <div class="deg-label">degree${degrees !== 1 ? 's' : ''} of separation</div>`;
+
+    // Build chain
+    const chainEl = document.getElementById('sixdeg-chain');
+    chainEl.innerHTML = '';
+    const colors = ['#2980b9', '#8e44ad', '#27ae60', '#e67e22', '#c0392b', '#16a085', '#d35400'];
+
+    for (let i = 0; i < path.length; i++) {
+        const node = path[i];
+        const isFirst = i === 0;
+        const isLast = i === path.length - 1;
+        const initials = node.name.split(/[\s.]+/).filter(Boolean).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        const color = isLast ? '' : isFirst ? '' : colors[i % colors.length];
+        const delay = i * 300;
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = 'sixdeg-node';
+        nodeEl.style.animationDelay = delay + 'ms';
+
+        const circleClass = isLast ? 'epstein' : isFirst ? 'target' : 'mid';
+        const roleText = isLast ? 'Target' : isFirst ? 'Start' : `Degree ${i}`;
+
+        nodeEl.innerHTML = `
+            <div class="sixdeg-node-circle ${circleClass}" ${circleClass === 'mid' ? `style="background:linear-gradient(135deg,${color},${color}cc)"` : ''}>
+                ${initials}
+                <div class="node-ring"></div>
+            </div>
+            <div class="sixdeg-node-name">${node.name}</div>
+            <div class="sixdeg-node-role">${roleText}</div>`;
+        chainEl.appendChild(nodeEl);
+
+        // Add link between nodes
+        if (i < path.length - 1) {
+            const edge = getEdgeInfo(graph, path[i].key, path[i + 1].key);
+            const linkEl = document.createElement('div');
+            linkEl.className = 'sixdeg-link';
+            linkEl.style.animationDelay = (delay + 150) + 'ms';
+            const viaClass = edge.via === 'both' ? 'via-both' : edge.via === 'flight' ? 'via-flight' : 'via-email';
+            const viaText = edge.via === 'both' ? '✈️ + 📧' : edge.via === 'flight' ? '✈️ Flight' : '📧 Email';
+            linkEl.innerHTML = `
+                <div class="sixdeg-link-line"></div>
+                <span class="sixdeg-link-type ${viaClass}">${viaText}</span>`;
+            chainEl.appendChild(linkEl);
+        }
+    }
+
+    // Build details
+    const detailsEl = document.getElementById('sixdeg-details');
+    detailsEl.innerHTML = '';
+    for (let i = 0; i < path.length - 1; i++) {
+        const edge = getEdgeInfo(graph, path[i].key, path[i + 1].key);
+        const card = document.createElement('div');
+        card.className = 'sixdeg-detail-card';
+        card.style.animationDelay = ((path.length * 300) + i * 200) + 'ms';
+
+        let evHtml = edge.evidence.map(ev =>
+            `<div class="ev-item"><span class="ev-icon">${ev.startsWith('✈') ? '✈️' : '📧'}</span><span>${ev.replace(/^[✈📧️\s]+/, '')}</span></div>`
+        ).join('');
+
+        card.innerHTML = `
+            <div class="sixdeg-detail-step">
+                <div class="step-num">${i + 1}</div>
+                <div class="step-names">${path[i].name} <span class="arrow">→</span> ${path[i + 1].name}</div>
+            </div>
+            <div class="sixdeg-detail-evidence">${evHtml || '<em>Connection via shared communications</em>'}</div>`;
+        detailsEl.appendChild(card);
+    }
+}
+
 function switchView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + viewId).classList.add('active');
@@ -1048,6 +1336,7 @@ function switchView(viewId) {
     if (viewId === 'bookmarks') renderBookmarks();
     if (viewId === 'profiles') renderProfiles();
     if (viewId === 'board') initBoard();
+    if (viewId === 'sixdegrees') initSixDegrees();
 }
 
 // === FOLDER / FILTER / SEARCH ===

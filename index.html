@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -124,6 +124,10 @@
                 <button class="app-btn" data-view="board" title="Evidence Board">
                     <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8V9zm0 3h4v2h-4v-2zm0-6h8v2h-8V6z"/></svg>
                     <span class="app-label">Board</span>
+                </button>
+                <button class="app-btn" data-view="sixdegrees" title="Six Degrees of Epstein">
+                    <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <span class="app-label">6 Degrees</span>
                 </button>
             </div>
             <div class="sidebar-folders" id="sidebar-folders">
@@ -475,6 +479,50 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Six Degrees of Epstein -->
+            <div class="view" id="view-sixdegrees">
+                <div class="sixdeg-container">
+                    <div class="sixdeg-header">
+                        <div class="sixdeg-title">
+                            <span class="sixdeg-icon">🌐</span>
+                            <h2>Six Degrees of Epstein</h2>
+                        </div>
+                        <p class="sixdeg-subtitle">Find the shortest connection path between any person and Jeffrey Epstein through emails &amp; flights</p>
+                    </div>
+                    <div class="sixdeg-search-area">
+                        <div class="sixdeg-input-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                            <input type="text" id="sixdeg-input" placeholder="Type a name (e.g. Bill Clinton, Prince Andrew, Alan Dershowitz...)" autocomplete="off">
+                            <div class="sixdeg-suggestions" id="sixdeg-suggestions"></div>
+                        </div>
+                        <button class="sixdeg-search-btn" id="sixdeg-search-btn">Find Path</button>
+                    </div>
+                    <div class="sixdeg-quick-picks" id="sixdeg-quick-picks">
+                        <span class="sixdeg-pick-label">Try:</span>
+                    </div>
+                    <div class="sixdeg-result" id="sixdeg-result">
+                        <div class="sixdeg-empty" id="sixdeg-empty">
+                            <div class="sixdeg-globe">
+                                <div class="sixdeg-globe-ring"></div>
+                                <div class="sixdeg-globe-ring r2"></div>
+                                <div class="sixdeg-globe-ring r3"></div>
+                                <div class="sixdeg-globe-dot"></div>
+                            </div>
+                            <p>Search for anyone in the dataset to reveal<br>their connection chain to Jeffrey Epstein</p>
+                        </div>
+                        <div class="sixdeg-path-wrap" id="sixdeg-path-wrap" style="display:none">
+                            <div class="sixdeg-path-header" id="sixdeg-path-header"></div>
+                            <div class="sixdeg-chain" id="sixdeg-chain"></div>
+                            <div class="sixdeg-details" id="sixdeg-details"></div>
+                        </div>
+                        <div class="sixdeg-noresult" id="sixdeg-noresult" style="display:none">
+                            <span class="sixdeg-noresult-icon">🚫</span>
+                            <p>No connection path found in the dataset.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -547,6 +595,6 @@
     <!-- Sidebar mobile overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html>
