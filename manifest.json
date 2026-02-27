@@ -1,0 +1,12 @@
+{
+  "name": "Unsealed — The Epstein Email Archive",
+  "short_name": "Unsealed",
+  "description": "Browse 15,120 emails, 18,308 photos, 1,351 documents, and flight logs from the Epstein case.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a73e8",
+  "icons": [
+    { "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%231a73e8' d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/></svg>", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

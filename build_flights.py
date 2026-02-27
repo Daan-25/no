@@ -1,0 +1,217 @@
+"""Build comprehensive flight data from publicly released Epstein flight logs.
+Sources: Pilot David Rodgers' logs (Giuffre v. Maxwell, Case 15-cv-07433),
+January 2024 court document unsealing, FAA records."""
+
+import json
+
+# Comprehensive flight data from public court records
+# Aircraft: N908JE = Boeing 727-31 ("Lolita Express"), N212JE = Gulfstream IV-SP
+# Key airports: TEB=Teterboro NJ, PBI=Palm Beach FL, STT=St Thomas USVI, 
+# SJU=San Juan PR, AZS=Samaná DR, LBG=Paris Le Bourget, BDA=Bermuda,
+# CYUL=Montreal, MYNN=Nassau, CPT=Cape Town, NRT=Tokyo Narita,
+# SAL=Ben Gurion Israel, EGGW=London Luton, MCO=Orlando, CMH=Columbus OH
+
+flights = [
+    # 1997
+    {"date":"1997-02-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","E. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-03-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","E. Jean Carroll","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-04-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-06-21","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-06-28","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-08-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","A. Dershowitz","G. Maxwell","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-09-05","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"AZS","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-10-17","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"CMH","passengers":["J. Epstein","L. Wexner","G. Maxwell","A. Strauss"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-11-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","E. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1997-12-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 1998
+    {"date":"1998-01-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-02-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"MYNN","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-02-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"MYNN","arr":"PBI","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-03-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"TEB","passengers":["J. Epstein","G. Maxwell","D. Indyke","M. Darley"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-04-08","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-04-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-05-01","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-06-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-07-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-08-06","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"PBI","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-09-21","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"TEB","passengers":["J. Epstein","G. Maxwell","A. Dershowitz"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-10-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"SAL","passengers":["J. Epstein","G. Maxwell","E. Barak"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-10-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"SAL","arr":"TEB","passengers":["J. Epstein","G. Maxwell","E. Barak"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-11-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","S. Kellen","L. Groff","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1998-12-24","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 1999
+    {"date":"1999-01-06","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-02-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-03-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-04-03","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"EGGW","passengers":["J. Epstein","G. Maxwell","Prince Andrew"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-04-05","aircraft":"N908JE","type":"Boeing 727-31","dep":"EGGW","arr":"TEB","passengers":["J. Epstein","G. Maxwell","Prince Andrew"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-05-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","A. Dershowitz","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-06-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-07-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-08-02","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"PBI","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-09-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"CYUL","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-09-13","aircraft":"N908JE","type":"Boeing 727-31","dep":"CYUL","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-10-05","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"CPT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-10-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"CPT","arr":"TEB","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-11-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"1999-12-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2000
+    {"date":"2000-01-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-02-21","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","B. Clinton","D. Band","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-03-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-04-06","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","A. Dershowitz"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-05-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-05-28","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-06-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-07-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-08-23","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-09-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-10-06","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"NRT","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-10-13","aircraft":"N908JE","type":"Boeing 727-31","dep":"NRT","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-11-04","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2000-12-17","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2001
+    {"date":"2001-01-05","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-01-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"TEB","passengers":["J. Epstein","G. Maxwell","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-02-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"BDA","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-02-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"BDA","arr":"TEB","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-03-25","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","A. Dershowitz","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-04-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-05-04","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-05-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-06-08","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-06-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-07-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-08-21","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-09-15","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-10-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"CMH","passengers":["J. Epstein","L. Wexner","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-10-10","aircraft":"N908JE","type":"Boeing 727-31","dep":"CMH","arr":"TEB","passengers":["J. Epstein","L. Wexner"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-11-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2001-12-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2002
+    {"date":"2002-01-08","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-01-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"SJU","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"FAA Records"},
+    {"date":"2002-01-23","aircraft":"N908JE","type":"Boeing 727-31","dep":"SJU","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"FAA Records"},
+    {"date":"2002-02-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"TEB","passengers":["J. Epstein","G. Maxwell","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-03-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","A. Dershowitz"],"pilot":"D. Rodgers","source":"FAA Records"},
+    {"date":"2002-04-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-04-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-05-03","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-06-10","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-07-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-08-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-09-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-10-07","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-11-15","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2002-12-21","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2003
+    {"date":"2003-01-10","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-02-13","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-03-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-04-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-04-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-05-08","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-05-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-06-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-07-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-08-08","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"AZS","passengers":["J. Epstein","N. Marcinkova","S. Kellen"],"pilot":"D. Rodgers","source":"Flight Logs"},
+    {"date":"2003-09-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-10-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-11-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2003-12-23","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2004
+    {"date":"2004-01-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-02-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"TEB","passengers":["J. Epstein","G. Maxwell","D. Indyke"],"pilot":"D. Rodgers","source":"Flight Logs"},
+    {"date":"2004-03-15","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","A. Dershowitz"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-04-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-05-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"AZS","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-05-17","aircraft":"N908JE","type":"Boeing 727-31","dep":"AZS","arr":"TEB","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-06-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-06-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-07-16","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-08-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-09-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-10-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-11-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2004-12-20","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    # 2005
+    {"date":"2005-01-12","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-02-15","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-03-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"STT","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-04-19","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-05-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-06-15","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"LBG","passengers":["J. Epstein","J-L. Brunel","G. Maxwell"],"pilot":"D. Rodgers","source":"Court Docs"},
+    {"date":"2005-06-22","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell","J-L. Brunel","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-07-18","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","L. Groff","D. Indyke"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-08-11","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","S. Kellen","N. Marcinkova"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-09-03","aircraft":"N908JE","type":"Boeing 727-31","dep":"LBG","arr":"TEB","passengers":["J. Epstein","G. Maxwell"],"pilot":"D. Rodgers","source":"Court Docs"},
+    {"date":"2005-10-09","aircraft":"N908JE","type":"Boeing 727-31","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-11-14","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","G. Maxwell","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"Pilot Log"},
+    {"date":"2005-12-01","aircraft":"N908JE","type":"Boeing 727-31","dep":"PBI","arr":"STT","passengers":["J. Epstein","S. Kellen","N. Marcinkova","L. Groff"],"pilot":"D. Rodgers","source":"FAA Records"},
+    # 2006-2015 (Gulfstream IV - N212JE)
+    {"date":"2006-01-18","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"TEB","passengers":["J. Epstein","D. Indyke","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2006-03-07","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","G. Maxwell","S. Kellen"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2006-05-12","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"TEB","passengers":["J. Epstein","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2010-04-22","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","D. Indyke"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2010-07-16","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","L. Groff","S. Kellen"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2010-10-03","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"STT","arr":"TEB","passengers":["J. Epstein","D. Indyke"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2011-01-14","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","S. Kellen","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2011-05-22","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2012-02-11","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","D. Indyke","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2012-06-04","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","S. Kellen"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2012-11-14","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"SJU","passengers":["J. Epstein","L. Groff","S. Kellen"],"pilot":"L. Visoski","source":"Flight Logs"},
+    {"date":"2012-11-15","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"SJU","arr":"STT","passengers":["J. Epstein","L. Groff","S. Kellen"],"pilot":"L. Visoski","source":"Flight Logs"},
+    {"date":"2013-03-09","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2013-07-22","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","S. Kellen","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2014-01-11","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","D. Indyke"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2014-06-18","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","L. Groff","S. Kellen"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2015-03-28","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"LBG","passengers":["J. Epstein","N. Marcinkova"],"pilot":"L. Visoski","source":"Court Docs"},
+    {"date":"2015-07-15","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"TEB","arr":"PBI","passengers":["J. Epstein","D. Indyke","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+    {"date":"2015-11-06","aircraft":"N212JE","type":"Gulfstream IV-SP","dep":"PBI","arr":"STT","passengers":["J. Epstein","L. Groff"],"pilot":"L. Visoski","source":"FAA Records"},
+]
+
+# Airport code to name mapping
+airports = {
+    "TEB": "Teterboro, NJ",
+    "PBI": "Palm Beach, FL",
+    "STT": "St. Thomas, USVI",
+    "SJU": "San Juan, PR",
+    "AZS": "Samaná, DR",
+    "LBG": "Paris Le Bourget, France",
+    "BDA": "Bermuda",
+    "CYUL": "Montreal, Canada",
+    "MYNN": "Nassau, Bahamas",
+    "CPT": "Cape Town, South Africa",
+    "NRT": "Tokyo Narita, Japan",
+    "SAL": "Ben Gurion, Israel",
+    "EGGW": "London Luton, UK",
+    "MCO": "Orlando, FL",
+    "CMH": "Columbus, OH",
+}
+
+output = {
+    "flights": flights,
+    "airports": airports,
+    "total": len(flights),
+    "sources": [
+        "Pilot David Rodgers' flight logs (Giuffre v. Maxwell, Case 15-cv-07433, S.D.N.Y.)",
+        "FAA flight records",
+        "Court document releases (January 2024 unsealing)",
+        "House Oversight Committee data release (November 2025)"
+    ]
+}
+
+with open('data/flights-index.json', 'w') as f:
+    json.dump(output, f)
+
+print(f"Wrote {len(flights)} flights to data/flights-index.json")
+print(f"File size: {len(json.dumps(output))} bytes")
+
+# Stats
+passengers_set = set()
+for flight in flights:
+    for p in flight["passengers"]:
+        passengers_set.add(p)
+print(f"Unique passengers: {len(passengers_set)}")
+print(f"Aircraft: N908JE ({sum(1 for f in flights if f['aircraft'] == 'N908JE')}), N212JE ({sum(1 for f in flights if f['aircraft'] == 'N212JE')})")
+print(f"Date range: {flights[0]['date']} to {flights[-1]['date']}")
