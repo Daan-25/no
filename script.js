@@ -1380,18 +1380,21 @@ async function initDuckDB() {
     badge.textContent = 'Loading DuckDB...';
     try {
         const CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/dist/';
-        const mod = await import(CDN + 'duckdb-browser.mjs');
-        const bundles = await mod.getJsDelivrBundles();
-        const bundle = await mod.selectBundle(bundles);
-        const worker = await mod.createWorker(bundle.mainWorker);
-        const logger = new mod.ConsoleLogger();
-        const db = new mod.AsyncDuckDB(logger, worker);
-        await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+        const duckdb = await import(CDN + 'duckdb-browser.mjs');
+        const bundles = duckdb.getJsDelivrBundles();
+        const bundle = await duckdb.selectBundle(bundles);
 
-        // Enable httpfs for remote parquet
+        // Create worker via blob URL (required for cross-origin CDN)
+        const workerUrl = URL.createObjectURL(
+            new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })
+        );
+        const worker = new Worker(workerUrl);
+        const logger = new duckdb.ConsoleLogger();
+        const db = new duckdb.AsyncDuckDB(logger, worker);
+        await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+        URL.revokeObjectURL(workerUrl);
+
         const conn = await db.connect();
-        await conn.query("INSTALL httpfs; LOAD httpfs;");
-        await conn.query("SET enable_http_metadata_cache=true;");
 
         sqlState.db = db;
         sqlState.conn = conn;
