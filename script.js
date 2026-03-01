@@ -4717,6 +4717,131 @@ function triggerMatrixEasterEgg() {
     });
 })();
 
+// ===== UNDERCOVER MODE (Panic Button) =====
+(function initUndercoverMode() {
+    let active = false;
+    const btn = document.getElementById('undercover-btn');
+    if (!btn) return;
+
+    const FAKE_TITLE = 'Q3 Budget Review - Google Sheets';
+    const REAL_TITLE = document.title;
+    const FAKE_FAVICON = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect fill="%2334a853" width="24" height="24" rx="4"/><text x="5" y="18" font-size="16" fill="white" font-family="Arial">S</text></svg>';
+    let realFavicon = '';
+    const faviconEl = document.querySelector('link[rel="icon"]');
+
+    function generateFakeSpreadsheet() {
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const depts = ['Marketing','Engineering','Sales','HR','Operations','Finance','Legal','Support'];
+        const items = ['Software Licenses','Office Supplies','Travel','Training','Consulting','Equipment','Catering','Subscriptions'];
+
+        let rows = '';
+        for (let i = 0; i < 25; i++) {
+            const dept = depts[i % depts.length];
+            const item = items[Math.floor(Math.random() * items.length)];
+            const vals = Array.from({length: 4}, () => (Math.random() * 15000 + 500).toFixed(2));
+            const total = vals.reduce((s, v) => s + parseFloat(v), 0).toFixed(2);
+            rows += `<tr>
+                <td class="uc-cell uc-row-num">${i + 1}</td>
+                <td class="uc-cell">${dept}</td>
+                <td class="uc-cell">${item}</td>
+                ${vals.map(v => `<td class="uc-cell uc-num">$${parseFloat(v).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>`).join('')}
+                <td class="uc-cell uc-num uc-total">$${parseFloat(total).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            </tr>`;
+        }
+
+        return `
+            <div class="uc-spreadsheet">
+                <div class="uc-toolbar-top">
+                    <div class="uc-toolbar-left">
+                        <svg width="24" height="24" viewBox="0 0 24 24"><rect fill="#34a853" width="24" height="24" rx="4"/><text x="5" y="18" font-size="16" fill="white" font-family="Arial">S</text></svg>
+                        <div class="uc-file-info">
+                            <div class="uc-filename">Q3 Budget Review 2025</div>
+                            <div class="uc-menu-bar">
+                                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Data</span><span>Tools</span><span>Extensions</span><span>Help</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uc-toolbar-right-area">
+                        <button class="uc-share-btn">Share</button>
+                        <div class="uc-avatar-small">ME</div>
+                    </div>
+                </div>
+                <div class="uc-formula-bar">
+                    <span class="uc-cell-ref">B2</span>
+                    <span class="uc-fx">fx</span>
+                    <input class="uc-formula-input" value="Marketing" readonly>
+                </div>
+                <div class="uc-sheet-wrap">
+                    <table class="uc-table">
+                        <thead>
+                            <tr>
+                                <th class="uc-th uc-row-num"></th>
+                                <th class="uc-th">A<br><span class="uc-col-name">Department</span></th>
+                                <th class="uc-th">B<br><span class="uc-col-name">Category</span></th>
+                                <th class="uc-th">C<br><span class="uc-col-name">Q1</span></th>
+                                <th class="uc-th">D<br><span class="uc-col-name">Q2</span></th>
+                                <th class="uc-th">E<br><span class="uc-col-name">Q3</span></th>
+                                <th class="uc-th">F<br><span class="uc-col-name">Q4</span></th>
+                                <th class="uc-th">G<br><span class="uc-col-name">Total</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div class="uc-sheet-tabs">
+                    <div class="uc-tab active">Sheet1</div>
+                    <div class="uc-tab">Summary</div>
+                    <div class="uc-tab">Charts</div>
+                    <div class="uc-tab">+</div>
+                </div>
+                <div class="uc-exit-hint">Press <kbd>Ctrl+U</kbd> or <kbd>Esc</kbd> to exit undercover mode</div>
+            </div>
+        `;
+    }
+
+    let overlay = null;
+
+    function activateUndercover() {
+        active = true;
+        document.title = FAKE_TITLE;
+        // Swap favicon
+        if (!faviconEl) {
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.href = FAKE_FAVICON;
+            document.head.appendChild(link);
+        } else {
+            realFavicon = faviconEl.href;
+            faviconEl.href = FAKE_FAVICON;
+        }
+
+        overlay = document.createElement('div');
+        overlay.id = 'undercover-overlay';
+        overlay.className = 'undercover-overlay active';
+        overlay.innerHTML = generateFakeSpreadsheet();
+        document.body.appendChild(overlay);
+    }
+
+    function deactivateUndercover() {
+        active = false;
+        document.title = REAL_TITLE;
+        if (faviconEl) faviconEl.href = realFavicon || '';
+        if (overlay) { overlay.remove(); overlay = null; }
+    }
+
+    btn.addEventListener('click', () => active ? deactivateUndercover() : activateUndercover());
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'u' && e.ctrlKey && !e.shiftKey) {
+            e.preventDefault();
+            active ? deactivateUndercover() : activateUndercover();
+        }
+        if (e.key === 'Escape' && active) {
+            deactivateUndercover();
+        }
+    });
+})();
+
 // Start
 init().then(() => {
     // Apply route from URL hash after data is loaded
