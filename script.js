@@ -336,11 +336,13 @@ async function openEmail(emailId, docId) {
     }
 
     // Fallback: load from DuckDB (archive emails)
-    if (sqlState.conn) {
+    const conn = sqlState.conn || await ensureDuckDBConn();
+    if (conn) {
         try {
             const q = emailId.replace(/'/g, "''");
-            const result = await sqlState.conn.query(`
-                SELECT sender, subject, to_recipients, cc_recipients, sent_at,
+            // First get this email to find its doc_id and subject
+            const result = await conn.query(`
+                SELECT id, doc_id, sender, subject, to_recipients, cc_recipients, sent_at,
                        content_markdown, content_html, attachments, epstein_is_sender
                 FROM ${EMAILS_PARQUET}
                 WHERE id = '${q}'
@@ -348,23 +350,84 @@ async function openEmail(emailId, docId) {
             `);
             const rows = result.toArray();
             if (rows.length) {
-                const r = rows[0];
-                const senderName = (r.sender || 'Unknown').replace(/<[^>]+>/g, '').trim();
-                const senderEmail = ((r.sender || '').match(/<([^>]+)>/) || [])[1] || r.sender || '';
-                const date = r.sent_at ? new Date(r.sent_at) : null;
-                const fakeThread = [{
-                    from: senderName,
-                    from_email: senderEmail,
-                    to: (r.to_recipients || '').replace(/[\[\]"]/g, ''),
-                    subject: r.subject || '(no subject)',
-                    body: r.content_markdown || r.content_html || '(no content)',
-                    formatted_date: date ? date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '',
-                    formatted_time: date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
-                    avatar_color: r.epstein_is_sender ? '#c0392b' : null,
-                    attachments: Number(r.attachments) || 0,
-                    stars: 0
-                }];
+                const main = rows[0];
+                let threadRows = [main];
+
+                // Try to find related emails in the same thread via doc_id
+                if (main.doc_id) {
+                    const dq = String(main.doc_id).replace(/'/g, "''");
+                    try {
+                        const related = await conn.query(`
+                            SELECT id, sender, subject, to_recipients, cc_recipients, sent_at,
+                                   content_markdown, content_html, attachments, epstein_is_sender
+                            FROM ${EMAILS_PARQUET}
+                            WHERE doc_id = '${dq}' AND id != '${q}'
+                            ORDER BY sent_at ASC
+                            LIMIT 20
+                        `);
+                        const relatedRows = related.toArray();
+                        if (relatedRows.length > 0) {
+                            threadRows = [...relatedRows, main].sort((a, b) => {
+                                const da = a.sent_at ? new Date(a.sent_at).getTime() : 0;
+                                const db = b.sent_at ? new Date(b.sent_at).getTime() : 0;
+                                return da - db;
+                            });
+                        }
+                    } catch(e) { /* ignore, just show single email */ }
+                }
+
+                // If still single, try matching by subject (Re:/Fwd: stripped)
+                if (threadRows.length === 1 && main.subject) {
+                    const baseSubject = (main.subject || '').replace(/^(re|fw|fwd):\s*/gi, '').trim().replace(/'/g, "''");
+                    if (baseSubject.length > 5) {
+                        try {
+                            const related = await conn.query(`
+                                SELECT id, sender, subject, to_recipients, cc_recipients, sent_at,
+                                       content_markdown, content_html, attachments, epstein_is_sender
+                                FROM ${EMAILS_PARQUET}
+                                WHERE (subject ILIKE '%${baseSubject}%') AND id != '${q}'
+                                ORDER BY sent_at ASC
+                                LIMIT 10
+                            `);
+                            const relatedRows = related.toArray();
+                            if (relatedRows.length > 0) {
+                                threadRows = [...relatedRows, main].sort((a, b) => {
+                                    const da = a.sent_at ? new Date(a.sent_at).getTime() : 0;
+                                    const db = b.sent_at ? new Date(b.sent_at).getTime() : 0;
+                                    return da - db;
+                                });
+                            }
+                        } catch(e) { /* ignore */ }
+                    }
+                }
+
+                const fakeThread = threadRows.map(r => {
+                    const senderName = (r.sender || 'Unknown').replace(/<[^>]+>/g, '').trim();
+                    const senderEmail = ((r.sender || '').match(/<([^>]+)>/) || [])[1] || r.sender || '';
+                    const date = r.sent_at ? new Date(r.sent_at) : null;
+                    return {
+                        from: senderName,
+                        from_email: senderEmail,
+                        to: (r.to_recipients || '').replace(/[\[\]"]/g, ''),
+                        subject: r.subject || '(no subject)',
+                        body: r.content_markdown || r.content_html || '(no content)',
+                        formatted_date: date ? date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '',
+                        formatted_time: date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+                        avatar_color: r.epstein_is_sender ? '#c0392b' : null,
+                        attachments: Number(r.attachments) || 0,
+                        stars: 0
+                    };
+                });
                 detail.innerHTML = buildEmailDetailHTML(fakeThread);
+                detail.querySelectorAll('.tt-dot').forEach(dot => {
+                    dot.addEventListener('click', () => {
+                        const idx = parseInt(dot.dataset.idx);
+                        const msgs = detail.querySelectorAll('.email-detail-message');
+                        if (msgs[idx]) msgs[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        detail.querySelectorAll('.tt-dot').forEach(d => d.classList.remove('active'));
+                        dot.classList.add('active');
+                    });
+                });
                 return;
             }
         } catch(e) {
