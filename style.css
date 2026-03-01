@@ -3122,12 +3122,7 @@ input:focus, select:focus, textarea:focus {
     padding: 0;
 }
 .terminal-cursor {
-    display: inline-block;
-    width: 8px;
-    height: 16px;
-    background: #00ff41;
-    animation: termBlink 1s step-end infinite;
-    margin-left: -4px;
+    display: none;
 }
 @keyframes termBlink { 50% { opacity: 0; } }
 
