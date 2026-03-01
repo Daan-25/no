@@ -4061,6 +4061,489 @@ function triggerMatrixEasterEgg() {
     });
 }
 
+// ===== HACKER TERMINAL =====
+(function initTerminal() {
+    const overlay = document.getElementById('terminal-overlay');
+    const input = document.getElementById('terminal-input');
+    const output = document.getElementById('terminal-output');
+    const closeBtn = document.getElementById('terminal-close');
+    const triggerBtn = document.getElementById('terminal-trigger');
+    if (!overlay || !input || !output) return;
+
+    let cmdHistory = [];
+    let histIdx = -1;
+    let termOpen = false;
+
+    const ASCII_BANNER = `<span class="term-ascii">
+ ██╗   ██╗███╗   ██╗███████╗███████╗ █████╗ ██╗     ███████╗██████╗
+ ██║   ██║████╗  ██║██╔════╝██╔════╝██╔══██╗██║     ██╔════╝██╔══██╗
+ ██║   ██║██╔██╗ ██║███████╗█████╗  ███████║██║     █████╗  ██║  ██║
+ ██║   ██║██║╚██╗██║╚════██║██╔══╝  ██╔══██╗██║     ██╔══╝  ██║  ██║
+ ╚██████╔╝██║ ╚████║███████║███████╗██║  ██║███████╗███████╗██████╔╝
+  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝
+</span>`;
+
+    function openTerminal() {
+        termOpen = true;
+        overlay.classList.add('active');
+        setTimeout(() => input.focus(), 100);
+        if (!output.innerHTML) {
+            printLines([
+                ASCII_BANNER,
+                '<span class="term-info">  UNSEALED — Epstein Email Archive Terminal</span>',
+                '<span class="term-muted">  Secure connection established. 1.78M emails loaded.</span>',
+                '<span class="term-muted">  Type <span class="term-success">help</span> for available commands.</span>',
+                ''
+            ]);
+        }
+    }
+
+    function closeTerminal() {
+        termOpen = false;
+        overlay.classList.remove('active');
+    }
+
+    function print(html) {
+        output.innerHTML += '<div class="term-line">' + html + '</div>';
+        const body = document.getElementById('terminal-body');
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function printLines(lines) { lines.forEach(l => print(l)); }
+
+    // Command definitions
+    const commands = {
+        help: () => {
+            printLines([
+                '<span class="term-info">Available commands:</span>',
+                '',
+                '  <span class="term-success">search</span> &lt;query&gt;       Search emails (uses DuckDB if available)',
+                '  <span class="term-success">whois</span> &lt;name&gt;        Look up a person in the archive',
+                '  <span class="term-success">open</span> &lt;email_id&gt;     Open an email by ID',
+                '  <span class="term-success">flights</span> [dest]       Show flight records (optional destination filter)',
+                '  <span class="term-success">stats</span>               Show archive statistics',
+                '  <span class="term-success">top senders</span>         Top 20 email senders',
+                '  <span class="term-success">top receivers</span>       Top 20 email receivers',
+                '  <span class="term-success">recent</span>              Show 10 most recent emails',
+                '  <span class="term-success">count</span>               Total email count',
+                '  <span class="term-success">sql</span> &lt;query&gt;         Run raw SQL on the archive',
+                '  <span class="term-success">goto</span> &lt;view&gt;         Navigate to a view (inbox, photos, flights, etc.)',
+                '  <span class="term-success">contacts</span>            List known contacts',
+                '  <span class="term-success">matrix</span>              🔴 You know what this does',
+                '  <span class="term-success">clear</span>               Clear the terminal',
+                '  <span class="term-success">exit</span>                Close the terminal',
+                ''
+            ]);
+        },
+
+        clear: () => { output.innerHTML = ''; },
+        exit: () => closeTerminal(),
+
+        stats: () => {
+            const total = state.allLoaded ? state.allLoaded.length : 0;
+            const fromEp = state.allLoaded ? state.allLoaded.filter(e => e.ep).length : 0;
+            const withAtt = state.allLoaded ? state.allLoaded.filter(e => e.att > 0).length : 0;
+            const contacts = state.contacts ? state.contacts.length : 0;
+            const flights = state.flights ? state.flights.length : 0;
+            printLines([
+                '<span class="term-info">╔══════════════════════════════════════╗</span>',
+                '<span class="term-info">║       ARCHIVE STATISTICS             ║</span>',
+                '<span class="term-info">╠══════════════════════════════════════╣</span>',
+                `<span class="term-info">║</span>  Local emails:     <span class="term-accent">${total.toLocaleString().padStart(8)}</span>       <span class="term-info">║</span>`,
+                `<span class="term-info">║</span>  Full archive:     <span class="term-accent">1,780,000+</span>       <span class="term-info">║</span>`,
+                `<span class="term-info">║</span>  From Epstein:     <span class="term-accent">${fromEp.toLocaleString().padStart(8)}</span>       <span class="term-info">║</span>`,
+                `<span class="term-info">║</span>  With attachments: <span class="term-accent">${withAtt.toLocaleString().padStart(8)}</span>       <span class="term-info">║</span>`,
+                `<span class="term-info">║</span>  Known contacts:   <span class="term-accent">${contacts.toLocaleString().padStart(8)}</span>       <span class="term-info">║</span>`,
+                `<span class="term-info">║</span>  Flight records:   <span class="term-accent">${flights.toLocaleString().padStart(8)}</span>       <span class="term-info">║</span>`,
+                '<span class="term-info">╚══════════════════════════════════════╝</span>',
+                ''
+            ]);
+        },
+
+        count: async () => {
+            if (sqlState.conn) {
+                try {
+                    print('<span class="term-muted">Querying full archive...</span>');
+                    const r = await sqlState.conn.query(`SELECT COUNT(*) as c FROM ${EMAILS_PARQUET}`);
+                    const n = Number(r.toArray()[0].c);
+                    print(`<span class="term-success">Total emails in full archive: <span class="term-accent">${n.toLocaleString()}</span></span>`);
+                } catch(e) { print(`<span class="term-err">DuckDB error: ${esc(e.message)}</span>`); }
+            } else {
+                print(`<span class="term-info">Local archive: ${state.allLoaded.length.toLocaleString()} emails</span>`);
+                print('<span class="term-muted">(Connect DuckDB for full 1.78M count)</span>');
+            }
+            print('');
+        },
+
+        search: async (args) => {
+            if (!args) { print('<span class="term-warn">Usage: search &lt;query&gt;</span>'); return; }
+            print(`<span class="term-muted">Searching for "${esc(args)}"...</span>`);
+
+            // DuckDB search
+            if (sqlState.conn) {
+                try {
+                    const q = args.replace(/'/g, "''");
+                    const r = await sqlState.conn.query(`
+                        SELECT id, sender, subject, sent_at
+                        FROM ${EMAILS_PARQUET}
+                        WHERE subject ILIKE '%${q}%' OR sender ILIKE '%${q}%'
+                        LIMIT 15
+                    `);
+                    const rows = r.toArray();
+                    if (rows.length === 0) {
+                        print('<span class="term-warn">No results found.</span>');
+                    } else {
+                        print(`<span class="term-success">Found ${rows.length} results (showing max 15):</span>`);
+                        print('');
+                        rows.forEach((row, i) => {
+                            const date = row.sent_at ? new Date(row.sent_at).toLocaleDateString() : 'unknown';
+                            const sender = (row.sender || 'unknown').replace(/<[^>]+>/g, '').trim().substring(0, 30);
+                            const subj = (row.subject || '(no subject)').substring(0, 50);
+                            print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-info">${esc(date)}</span> │ <span class="term-success">${esc(sender)}</span>`);
+                            print(`      ${esc(subj)}`);
+                            print(`      <span class="term-muted">ID: ${row.id}</span>`);
+                        });
+                    }
+                } catch(e) { print(`<span class="term-err">Search error: ${esc(e.message)}</span>`); }
+            } else {
+                // Local search fallback
+                const q = args.toLowerCase();
+                const results = state.allLoaded.filter(e =>
+                    (e.s && e.s.toLowerCase().includes(q)) ||
+                    (e.f && e.f.toLowerCase().includes(q)) ||
+                    (e.sn && e.sn.toLowerCase().includes(q))
+                ).slice(0, 15);
+                if (results.length === 0) {
+                    print('<span class="term-warn">No results in local data.</span>');
+                } else {
+                    print(`<span class="term-success">Found ${results.length} results:</span>`);
+                    results.forEach((e, i) => {
+                        print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-info">${esc(e.d || '')}</span> │ <span class="term-success">${esc(e.sn || e.f || 'unknown')}</span>`);
+                        print(`      ${esc(e.s || '(no subject)')}`);
+                    });
+                }
+            }
+            print('');
+        },
+
+        whois: async (args) => {
+            if (!args) { print('<span class="term-warn">Usage: whois &lt;name&gt;</span>'); return; }
+            print(`<span class="term-muted">Looking up "${esc(args)}"...</span>`);
+
+            if (sqlState.conn) {
+                try {
+                    const q = args.replace(/'/g, "''");
+                    const r = await sqlState.conn.query(`
+                        SELECT sender, COUNT(*) as cnt
+                        FROM ${EMAILS_PARQUET}
+                        WHERE sender ILIKE '%${q}%'
+                        GROUP BY sender
+                        ORDER BY cnt DESC
+                        LIMIT 10
+                    `);
+                    const rows = r.toArray();
+                    if (rows.length) {
+                        print(`<span class="term-success">Email accounts matching "${esc(args)}":</span>`);
+                        rows.forEach(row => {
+                            print(`  <span class="term-info">${esc(row.sender)}</span> — <span class="term-accent">${Number(row.cnt).toLocaleString()}</span> emails`);
+                        });
+                    } else {
+                        print('<span class="term-warn">No matching senders found.</span>');
+                    }
+
+                    // Also check as recipient
+                    const r2 = await sqlState.conn.query(`
+                        SELECT COUNT(*) as cnt
+                        FROM ${EMAILS_PARQUET}
+                        WHERE to_recipients ILIKE '%${q}%' OR cc_recipients ILIKE '%${q}%'
+                    `);
+                    const recvCount = Number(r2.toArray()[0].cnt);
+                    if (recvCount > 0) {
+                        print(`  <span class="term-muted">Also appears as recipient in <span class="term-accent">${recvCount.toLocaleString()}</span> emails</span>`);
+                    }
+                } catch(e) { print(`<span class="term-err">Error: ${esc(e.message)}</span>`); }
+            } else {
+                // Local contacts fallback
+                const q = args.toLowerCase();
+                const matches = (state.contacts || []).filter(c =>
+                    c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q)
+                ).slice(0, 10);
+                if (matches.length) {
+                    matches.forEach(c => {
+                        print(`  <span class="term-success">${esc(c.name)}</span> <span class="term-muted">&lt;${esc(c.email)}&gt;</span> — ${c.count} emails`);
+                    });
+                } else {
+                    print('<span class="term-warn">Not found in local contacts.</span>');
+                }
+            }
+            print('');
+        },
+
+        'top senders': async () => {
+            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected. Try later.</span>'); return; }
+            print('<span class="term-muted">Querying top senders from 1.78M emails...</span>');
+            try {
+                const r = await sqlState.conn.query(`
+                    SELECT sender, COUNT(*) as cnt
+                    FROM ${EMAILS_PARQUET}
+                    GROUP BY sender ORDER BY cnt DESC LIMIT 20
+                `);
+                const rows = r.toArray();
+                print('<span class="term-info">Top 20 Email Senders:</span>');
+                print('<span class="term-info">─────────────────────────────────────────────────</span>');
+                rows.forEach((row, i) => {
+                    const name = (row.sender || 'unknown').substring(0, 40);
+                    const bar = '█'.repeat(Math.min(20, Math.ceil(Number(row.cnt) / Number(rows[0].cnt) * 20)));
+                    print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-success">${bar}</span> <span class="term-accent">${Number(row.cnt).toLocaleString().padStart(7)}</span>  ${esc(name)}`);
+                });
+            } catch(e) { print(`<span class="term-err">Error: ${esc(e.message)}</span>`); }
+            print('');
+        },
+
+        'top receivers': async () => {
+            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected. Try later.</span>'); return; }
+            print('<span class="term-muted">Querying top receivers...</span>');
+            try {
+                const r = await sqlState.conn.query(`
+                    SELECT to_recipients, COUNT(*) as cnt
+                    FROM ${EMAILS_PARQUET}
+                    WHERE to_recipients IS NOT NULL AND to_recipients != ''
+                    GROUP BY to_recipients ORDER BY cnt DESC LIMIT 20
+                `);
+                const rows = r.toArray();
+                print('<span class="term-info">Top 20 Email Receivers:</span>');
+                print('<span class="term-info">─────────────────────────────────────────────────</span>');
+                rows.forEach((row, i) => {
+                    const name = (row.to_recipients || 'unknown').replace(/[\[\]"]/g, '').substring(0, 40);
+                    const bar = '█'.repeat(Math.min(20, Math.ceil(Number(row.cnt) / Number(rows[0].cnt) * 20)));
+                    print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-success">${bar}</span> <span class="term-accent">${Number(row.cnt).toLocaleString().padStart(7)}</span>  ${esc(name)}`);
+                });
+            } catch(e) { print(`<span class="term-err">Error: ${esc(e.message)}</span>`); }
+            print('');
+        },
+
+        recent: async () => {
+            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected.</span>'); return; }
+            print('<span class="term-muted">Loading most recent emails...</span>');
+            try {
+                const r = await sqlState.conn.query(`
+                    SELECT id, sender, subject, sent_at
+                    FROM ${EMAILS_PARQUET}
+                    WHERE sent_at IS NOT NULL
+                    ORDER BY sent_at DESC LIMIT 10
+                `);
+                const rows = r.toArray();
+                print('<span class="term-info">10 Most Recent Emails:</span>');
+                print('');
+                rows.forEach((row, i) => {
+                    const date = row.sent_at ? new Date(row.sent_at).toLocaleString() : '?';
+                    const sender = (row.sender || '?').replace(/<[^>]+>/g, '').trim().substring(0, 35);
+                    print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-info">${esc(date)}</span>`);
+                    print(`      <span class="term-success">${esc(sender)}</span>: ${esc((row.subject || '').substring(0, 60))}`);
+                });
+            } catch(e) { print(`<span class="term-err">Error: ${esc(e.message)}</span>`); }
+            print('');
+        },
+
+        flights: (args) => {
+            const data = state.flights || [];
+            if (!data.length) { print('<span class="term-warn">No flight data loaded.</span>'); return; }
+            let filtered = data;
+            if (args) {
+                const q = args.toLowerCase();
+                filtered = data.filter(f =>
+                    (f.from && f.from.toLowerCase().includes(q)) ||
+                    (f.to && f.to.toLowerCase().includes(q)) ||
+                    (f.passengers && f.passengers.some(p => p.toLowerCase().includes(q)))
+                );
+            }
+            if (!filtered.length) { print('<span class="term-warn">No flights matching query.</span>'); return; }
+            print(`<span class="term-info">Flight Records (${filtered.length} total${args ? ', filtered' : ''}):</span>`);
+            print('<span class="term-info">─────────────────────────────────────────────────</span>');
+            filtered.slice(0, 20).forEach((f, i) => {
+                print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-info">${esc(f.date || '?')}</span>  <span class="term-success">${esc(f.from || '?')}</span> → <span class="term-accent">${esc(f.to || '?')}</span>`);
+                if (f.passengers && f.passengers.length) {
+                    print(`      <span class="term-muted">Passengers: ${esc(f.passengers.join(', '))}</span>`);
+                }
+            });
+            if (filtered.length > 20) print(`<span class="term-muted">  ... and ${filtered.length - 20} more</span>`);
+            print('');
+        },
+
+        open: (args) => {
+            if (!args) { print('<span class="term-warn">Usage: open &lt;email_id&gt;</span>'); return; }
+            print(`<span class="term-muted">Opening email ${esc(args)}...</span>`);
+            closeTerminal();
+            openEmail(args, args);
+        },
+
+        goto: (args) => {
+            const views = ['inbox','contacts','flights','photos','documents','timeline','network','stats','bookmarks','profiles','board','sixdegrees','sqlexplorer'];
+            if (!args || !views.includes(args.toLowerCase())) {
+                print('<span class="term-warn">Available views:</span>');
+                print('  ' + views.map(v => `<span class="term-success">${v}</span>`).join(', '));
+                return;
+            }
+            print(`<span class="term-muted">Navigating to ${args}...</span>`);
+            closeTerminal();
+            navigateTo(args.toLowerCase());
+        },
+
+        contacts: () => {
+            const data = state.contacts || [];
+            if (!data.length) { print('<span class="term-warn">No contacts loaded.</span>'); return; }
+            print(`<span class="term-info">Known Contacts (${data.length}):</span>`);
+            print('<span class="term-info">─────────────────────────────────────────────────</span>');
+            data.slice(0, 25).forEach((c, i) => {
+                print(`  <span class="term-muted">${String(i+1).padStart(2)}.</span> <span class="term-success">${esc(c.name)}</span> <span class="term-muted">&lt;${esc(c.email)}&gt;</span> — ${c.count || 0} emails`);
+            });
+            if (data.length > 25) print(`<span class="term-muted">  ... and ${data.length - 25} more</span>`);
+            print('');
+        },
+
+        sql: async (args) => {
+            if (!args) { print('<span class="term-warn">Usage: sql &lt;SELECT ...&gt;</span>'); return; }
+            if (!sqlState.conn) { print('<span class="term-err">DuckDB not connected yet. Wait for it to load.</span>'); return; }
+            print(`<span class="term-muted">Running query...</span>`);
+            try {
+                const r = await sqlState.conn.query(args);
+                const rows = r.toArray();
+                if (!rows.length) { print('<span class="term-warn">No results.</span>'); return; }
+                const cols = Object.keys(rows[0]);
+                // Table header
+                let header = cols.map(c => `<th>${esc(c)}</th>`).join('');
+                let body = rows.slice(0, 50).map(row =>
+                    '<tr>' + cols.map(c => {
+                        let v = row[c];
+                        if (v === null || v === undefined) v = 'NULL';
+                        return `<td>${esc(String(v)).substring(0, 60)}</td>`;
+                    }).join('') + '</tr>'
+                ).join('');
+                print(`<table class="term-table"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`);
+                if (rows.length > 50) print(`<span class="term-muted">(showing 50 of ${rows.length} rows)</span>`);
+            } catch(e) { print(`<span class="term-err">SQL Error: ${esc(e.message)}</span>`); }
+            print('');
+        },
+
+        matrix: () => {
+            closeTerminal();
+            if (typeof showMatrix === 'function') showMatrix();
+            else print('<span class="term-err">Matrix not available.</span>');
+        }
+    };
+
+    // Execute command
+    async function execCmd(raw) {
+        const line = raw.trim();
+        if (!line) return;
+
+        print(`<span class="term-prompt">unsealed@epstein:~$</span> <span class="term-cmd">${esc(line)}</span>`);
+        cmdHistory.unshift(line);
+        if (cmdHistory.length > 100) cmdHistory.pop();
+        histIdx = -1;
+
+        // Match multi-word commands first
+        const multiCmds = ['top senders', 'top receivers'];
+        const matchedMulti = multiCmds.find(mc => line.toLowerCase().startsWith(mc));
+        if (matchedMulti && commands[matchedMulti]) {
+            await commands[matchedMulti]();
+            return;
+        }
+
+        const parts = line.match(/^(\S+)\s*(.*)/);
+        if (!parts) return;
+        const cmd = parts[1].toLowerCase();
+        const args = parts[2] || '';
+
+        if (commands[cmd]) {
+            await commands[cmd](args);
+        } else {
+            // Easter eggs
+            const eggs = {
+                'whoami': () => print('<span class="term-info">anonymous investigator @ unsealed.archive</span>\n'),
+                'pwd': () => print('<span class="term-info">/home/unsealed/classified/epstein-archive</span>\n'),
+                'ls': () => print('<span class="term-info">emails/  photos/  documents/  flights.log  contacts.db  evidence_board/  README.md</span>\n'),
+                'cat': () => print('<span class="term-muted">🐱 meow. (Try "open &lt;id&gt;" to read emails)</span>\n'),
+                'rm': () => print('<span class="term-err">Nice try. Evidence cannot be destroyed. 🔒</span>\n'),
+                'sudo': () => {
+                    printLines([
+                        '<span class="term-err">⚠️  ACCESS DENIED</span>',
+                        '<span class="term-warn">This incident has been reported to the House Oversight Committee.</span>',
+                        '<span class="term-muted">Just kidding. But you don\'t need sudo here.</span>',
+                        ''
+                    ]);
+                },
+                'hack': () => {
+                    printLines([
+                        '<span class="term-success">INITIATING HACK SEQUENCE...</span>',
+                        '<span class="term-muted">[████████████████████████] 100%</span>',
+                        '<span class="term-err">Just kidding. The emails are already public. 📂</span>',
+                        ''
+                    ]);
+                },
+                'ping': () => print('<span class="term-success">PONG from epstein-archive.sealed.gov (0.001ms)</span>\n'),
+                'date': () => print(`<span class="term-info">${new Date().toString()}</span>\n`),
+                'hello': () => print('<span class="term-info">Hello, investigator. The truth is in the emails. 🔍</span>\n'),
+                'epstein': () => print('<span class="term-accent">Jeffrey Epstein didn\'t... well, you know the rest. 👀</span>\n'),
+                'island': () => print('<span class="term-warn">Little St. James Island, U.S. Virgin Islands. Try: flights st. james</span>\n'),
+            };
+            if (eggs[cmd]) {
+                eggs[cmd]();
+            } else {
+                print(`<span class="term-err">Command not found: ${esc(cmd)}</span>`);
+                print('<span class="term-muted">Type <span class="term-success">help</span> for available commands.</span>');
+                print('');
+            }
+        }
+    }
+
+    // Input handling
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const val = input.value;
+            input.value = '';
+            execCmd(val);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (histIdx < cmdHistory.length - 1) {
+                histIdx++;
+                input.value = cmdHistory[histIdx];
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (histIdx > 0) {
+                histIdx--;
+                input.value = cmdHistory[histIdx];
+            } else {
+                histIdx = -1;
+                input.value = '';
+            }
+        } else if (e.key === 'Escape') {
+            closeTerminal();
+        } else if (e.key === 'l' && e.ctrlKey) {
+            e.preventDefault();
+            output.innerHTML = '';
+        }
+    });
+
+    // Click on body focuses input
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeTerminal();
+        else input.focus();
+    });
+
+    closeBtn.addEventListener('click', closeTerminal);
+    if (triggerBtn) triggerBtn.addEventListener('click', openTerminal);
+
+    // Global shortcut: Ctrl+` to toggle terminal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '`' && e.ctrlKey) {
+            e.preventDefault();
+            termOpen ? closeTerminal() : openTerminal();
+        }
+    });
+})();
+
 // Start
 init().then(() => {
     // Apply route from URL hash after data is loaded
