@@ -4111,6 +4111,14 @@ function triggerMatrixEasterEgg() {
 
     function printLines(lines) { lines.forEach(l => print(l)); }
 
+    async function getConn() {
+        if (sqlState.conn) return sqlState.conn;
+        print('<span class="term-muted">Connecting to DuckDB...</span>');
+        const conn = await ensureDuckDBConn();
+        if (!conn) print('<span class="term-err">Failed to connect to DuckDB. Try again later.</span>');
+        return conn;
+    }
+
     // Command definitions
     const commands = {
         help: () => {
@@ -4161,16 +4169,16 @@ function triggerMatrixEasterEgg() {
         },
 
         count: async () => {
-            if (sqlState.conn) {
+            const conn = await getConn();
+            if (conn) {
                 try {
                     print('<span class="term-muted">Querying full archive...</span>');
-                    const r = await sqlState.conn.query(`SELECT COUNT(*) as c FROM ${EMAILS_PARQUET}`);
+                    const r = await conn.query(`SELECT COUNT(*) as c FROM ${EMAILS_PARQUET}`);
                     const n = Number(r.toArray()[0].c);
                     print(`<span class="term-success">Total emails in full archive: <span class="term-accent">${n.toLocaleString()}</span></span>`);
                 } catch(e) { print(`<span class="term-err">DuckDB error: ${esc(e.message)}</span>`); }
             } else {
                 print(`<span class="term-info">Local archive: ${state.allLoaded.length.toLocaleString()} emails</span>`);
-                print('<span class="term-muted">(Connect DuckDB for full 1.78M count)</span>');
             }
             print('');
         },
@@ -4179,11 +4187,11 @@ function triggerMatrixEasterEgg() {
             if (!args) { print('<span class="term-warn">Usage: search &lt;query&gt;</span>'); return; }
             print(`<span class="term-muted">Searching for "${esc(args)}"...</span>`);
 
-            // DuckDB search
-            if (sqlState.conn) {
+            const conn = await getConn();
+            if (conn) {
                 try {
                     const q = args.replace(/'/g, "''");
-                    const r = await sqlState.conn.query(`
+                    const r = await conn.query(`
                         SELECT id, sender, subject, sent_at
                         FROM ${EMAILS_PARQUET}
                         WHERE subject ILIKE '%${q}%' OR sender ILIKE '%${q}%'
@@ -4230,10 +4238,11 @@ function triggerMatrixEasterEgg() {
             if (!args) { print('<span class="term-warn">Usage: whois &lt;name&gt;</span>'); return; }
             print(`<span class="term-muted">Looking up "${esc(args)}"...</span>`);
 
-            if (sqlState.conn) {
+            const conn = await getConn();
+            if (conn) {
                 try {
                     const q = args.replace(/'/g, "''");
-                    const r = await sqlState.conn.query(`
+                    const r = await conn.query(`
                         SELECT sender, COUNT(*) as cnt
                         FROM ${EMAILS_PARQUET}
                         WHERE sender ILIKE '%${q}%'
@@ -4252,7 +4261,7 @@ function triggerMatrixEasterEgg() {
                     }
 
                     // Also check as recipient
-                    const r2 = await sqlState.conn.query(`
+                    const r2 = await conn.query(`
                         SELECT COUNT(*) as cnt
                         FROM ${EMAILS_PARQUET}
                         WHERE to_recipients ILIKE '%${q}%' OR cc_recipients ILIKE '%${q}%'
@@ -4280,10 +4289,11 @@ function triggerMatrixEasterEgg() {
         },
 
         'top senders': async () => {
-            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected. Try later.</span>'); return; }
+            const conn = await getConn();
+            if (!conn) return;
             print('<span class="term-muted">Querying top senders from 1.78M emails...</span>');
             try {
-                const r = await sqlState.conn.query(`
+                const r = await conn.query(`
                     SELECT sender, COUNT(*) as cnt
                     FROM ${EMAILS_PARQUET}
                     GROUP BY sender ORDER BY cnt DESC LIMIT 20
@@ -4301,10 +4311,11 @@ function triggerMatrixEasterEgg() {
         },
 
         'top receivers': async () => {
-            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected. Try later.</span>'); return; }
+            const conn = await getConn();
+            if (!conn) return;
             print('<span class="term-muted">Querying top receivers...</span>');
             try {
-                const r = await sqlState.conn.query(`
+                const r = await conn.query(`
                     SELECT to_recipients, COUNT(*) as cnt
                     FROM ${EMAILS_PARQUET}
                     WHERE to_recipients IS NOT NULL AND to_recipients != ''
@@ -4323,10 +4334,11 @@ function triggerMatrixEasterEgg() {
         },
 
         recent: async () => {
-            if (!sqlState.conn) { print('<span class="term-warn">DuckDB not connected.</span>'); return; }
+            const conn = await getConn();
+            if (!conn) return;
             print('<span class="term-muted">Loading most recent emails...</span>');
             try {
-                const r = await sqlState.conn.query(`
+                const r = await conn.query(`
                     SELECT id, sender, subject, sent_at
                     FROM ${EMAILS_PARQUET}
                     WHERE sent_at IS NOT NULL
@@ -4403,10 +4415,11 @@ function triggerMatrixEasterEgg() {
 
         sql: async (args) => {
             if (!args) { print('<span class="term-warn">Usage: sql &lt;SELECT ...&gt;</span>'); return; }
-            if (!sqlState.conn) { print('<span class="term-err">DuckDB not connected yet. Wait for it to load.</span>'); return; }
+            const conn = await getConn();
+            if (!conn) return;
             print(`<span class="term-muted">Running query...</span>`);
             try {
-                const r = await sqlState.conn.query(args);
+                const r = await conn.query(args);
                 const rows = r.toArray();
                 if (!rows.length) { print('<span class="term-warn">No results.</span>'); return; }
                 const cols = Object.keys(rows[0]);
