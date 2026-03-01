@@ -5305,7 +5305,6 @@ window.addEventListener('resize', resizeGlobe);
         wtState.active = false;
         stopPlayback();
         overlay.classList.remove('active');
-        speechSynthesis.cancel();
     }
 
     function startPlayback() {
@@ -5358,22 +5357,11 @@ window.addEventListener('resize', resizeGlobe);
                     transcript.scrollTop = transcript.scrollHeight;
                     setTimeout(typeChar, 25 + Math.random() * 25);
                 } else {
-                    // Use Web Speech API to read aloud
-                    if ('speechSynthesis' in window && wtState.playing) {
-                        const utt = new SpeechSynthesisUtterance(text);
-                        utt.rate = 1.1;
-                        utt.pitch = 0.9;
-                        utt.onend = () => {
-                            wtState.lineIdx++;
-                            updateProgress();
-                            setTimeout(playNextLine, 300);
-                        };
-                        speechSynthesis.speak(utt);
-                    } else {
-                        wtState.lineIdx++;
-                        updateProgress();
-                        setTimeout(playNextLine, 1200);
-                    }
+                    // No speech — just atmospheric typewriter with timed pause
+                    wtState.lineIdx++;
+                    updateProgress();
+                    const pause = Math.min(text.length * 30, 2000);
+                    setTimeout(playNextLine, pause);
                 }
             }
             typeChar();
@@ -5387,7 +5375,6 @@ window.addEventListener('resize', resizeGlobe);
 
     function stopPlayback() {
         wtState.playing = false;
-        speechSynthesis.cancel();
         clearInterval(wtState.vuTimer);
         clearInterval(wtState.reelTimer);
         document.querySelectorAll('.vu-bar').forEach(b => b.style.height = '4px');
@@ -5395,7 +5382,6 @@ window.addEventListener('resize', resizeGlobe);
 
     function pausePlayback() {
         wtState.playing = false;
-        speechSynthesis.cancel();
         clearInterval(wtState.vuTimer);
         clearInterval(wtState.reelTimer);
     }
