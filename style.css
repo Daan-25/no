@@ -233,7 +233,7 @@ input, select { font-family: inherit; color: var(--text-primary); }
     font-size: 18px;
 }
 
-.topbar-center { flex: 1; max-width: 720px; }
+.topbar-center { flex: 1; max-width: 720px; min-width: 0; }
 
 .search-bar {
     display: flex;
@@ -268,7 +268,7 @@ input, select { font-family: inherit; color: var(--text-primary); }
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-    justify-content: flex-end;
+    margin-left: auto;
 }
 
 .source-badge {
