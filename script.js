@@ -4198,7 +4198,7 @@ function triggerMatrixEasterEgg() {
     const messages = [
         'You found the secret...',
         'The truth is in the data.',
-        '15,120 emails. Every one tells a story.',
+        '1.78 million emails. Every one tells a story.',
         '🔓 UNSEALED 🔓',
     ];
     messages.forEach((msg, i) => {
@@ -5011,7 +5011,7 @@ window.addEventListener('resize', resizeGlobe);
 
         matrix: () => {
             closeTerminal();
-            if (typeof showMatrix === 'function') showMatrix();
+            if (typeof triggerMatrixEasterEgg === 'function') triggerMatrixEasterEgg();
             else print('<span class="term-err">Matrix not available.</span>');
         }
     };
