@@ -1323,6 +1323,215 @@ function runSixDegreesSearch(query) {
     }
 }
 
+// ===== SQL EXPLORER (DuckDB-WASM) =====
+const sqlState = { db: null, conn: null, initialized: false, loading: false };
+
+const SQL_EXAMPLES = {
+    top_senders: `SELECT sender, COUNT(*) as email_count
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+GROUP BY sender
+ORDER BY email_count DESC
+LIMIT 20;`,
+    epstein_sent: `SELECT subject, to_recipients, sent_at
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+WHERE epstein_is_sender = true
+  AND subject IS NOT NULL
+  AND subject != ''
+ORDER BY sent_at DESC
+LIMIT 50;`,
+    by_year: `SELECT EXTRACT(YEAR FROM CAST(sent_at AS TIMESTAMP)) as year,
+       COUNT(*) as emails
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+WHERE sent_at IS NOT NULL
+GROUP BY year
+ORDER BY year;`,
+    to_recipients: `SELECT to_recipients, COUNT(*) as times_received
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+WHERE epstein_is_sender = true
+GROUP BY to_recipients
+ORDER BY times_received DESC
+LIMIT 30;`,
+    subjects: `SELECT subject, sender, sent_at
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+WHERE subject ILIKE '%island%'
+   OR subject ILIKE '%flight%'
+   OR subject ILIKE '%private%'
+ORDER BY sent_at
+LIMIT 50;`,
+    accounts: `SELECT account_email, COUNT(*) as emails
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+GROUP BY account_email
+ORDER BY emails DESC;`,
+    doc_sources: `SELECT source, COUNT(*) as docs, SUM(page_count) as total_pages
+FROM read_parquet('https://data.jmail.world/v1/documents.parquet')
+GROUP BY source
+ORDER BY docs DESC;`,
+    doc_largest: `SELECT original_filename, page_count, size,
+       document_description, source
+FROM read_parquet('https://data.jmail.world/v1/documents.parquet')
+WHERE page_count IS NOT NULL
+ORDER BY page_count DESC
+LIMIT 30;`
+};
+
+async function initDuckDB() {
+    const badge = document.getElementById('sql-status-badge');
+    badge.className = 'sql-badge loading';
+    badge.textContent = 'Loading DuckDB...';
+    try {
+        const CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/dist/';
+        const mod = await import(CDN + 'duckdb-browser.mjs');
+        const bundles = await mod.getJsDelivrBundles();
+        const bundle = await mod.selectBundle(bundles);
+        const worker = await mod.createWorker(bundle.mainWorker);
+        const logger = new mod.ConsoleLogger();
+        const db = new mod.AsyncDuckDB(logger, worker);
+        await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+
+        // Enable httpfs for remote parquet
+        const conn = await db.connect();
+        await conn.query("INSTALL httpfs; LOAD httpfs;");
+        await conn.query("SET enable_http_metadata_cache=true;");
+
+        sqlState.db = db;
+        sqlState.conn = conn;
+        badge.className = 'sql-badge ready';
+        badge.textContent = 'Ready';
+        return true;
+    } catch(e) {
+        console.error('DuckDB init error:', e);
+        badge.className = 'sql-badge error';
+        badge.textContent = 'Error';
+        return false;
+    }
+}
+
+async function initSQLExplorer() {
+    if (sqlState.initialized) return;
+    sqlState.initialized = true;
+
+    const editor = document.getElementById('sql-editor');
+    const runBtn = document.getElementById('sql-run-btn');
+    const exSelect = document.getElementById('sql-examples');
+
+    // Init DuckDB
+    initDuckDB();
+
+    // Example selector
+    exSelect.addEventListener('change', () => {
+        const key = exSelect.value;
+        if (key && SQL_EXAMPLES[key]) {
+            editor.value = SQL_EXAMPLES[key];
+            exSelect.value = '';
+        }
+    });
+
+    // Run button
+    runBtn.addEventListener('click', () => runSQLQuery(editor.value));
+
+    // Ctrl+Enter to run
+    editor.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            runSQLQuery(editor.value);
+        }
+        // Tab inserts spaces
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = editor.selectionStart;
+            editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(editor.selectionEnd);
+            editor.selectionStart = editor.selectionEnd = start + 2;
+        }
+    });
+}
+
+async function runSQLQuery(sql) {
+    if (!sql.trim()) return;
+    const emptyEl = document.getElementById('sql-result-empty');
+    const loadingEl = document.getElementById('sql-loading');
+    const tableWrap = document.getElementById('sql-result-table-wrap');
+    const errorEl = document.getElementById('sql-error');
+    const loadingText = document.getElementById('sql-loading-text');
+    const runBtn = document.getElementById('sql-run-btn');
+
+    // Hide all, show loading
+    emptyEl.style.display = 'none';
+    tableWrap.style.display = 'none';
+    errorEl.style.display = 'none';
+    loadingEl.style.display = 'flex';
+    loadingText.textContent = 'Executing query...';
+    runBtn.disabled = true;
+
+    // Init DuckDB if not ready
+    if (!sqlState.conn) {
+        loadingText.textContent = 'Initializing DuckDB-WASM...';
+        const ok = await initDuckDB();
+        if (!ok) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            errorEl.textContent = 'Failed to initialize DuckDB. Try refreshing the page.';
+            runBtn.disabled = false;
+            return;
+        }
+    }
+
+    const startTime = performance.now();
+    loadingText.textContent = 'Querying data.jmail.world...';
+
+    try {
+        const result = await sqlState.conn.query(sql);
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+        const rows = result.toArray();
+        const schema = result.schema.fields;
+
+        loadingEl.style.display = 'none';
+
+        if (rows.length === 0) {
+            emptyEl.style.display = 'block';
+            emptyEl.innerHTML = `<p>Query returned 0 rows (${elapsed}s)</p>`;
+            runBtn.disabled = false;
+            return;
+        }
+
+        // Render table
+        tableWrap.style.display = 'block';
+        const metaEl = document.getElementById('sql-result-meta');
+        metaEl.innerHTML = `<span>${rows.length.toLocaleString()} rows</span><span>${elapsed}s</span>`;
+
+        const table = document.getElementById('sql-result-table');
+        const cols = schema.map(f => f.name);
+
+        let html = '<thead><tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr></thead><tbody>';
+        const maxRows = Math.min(rows.length, 500);
+        for (let i = 0; i < maxRows; i++) {
+            const row = rows[i];
+            html += '<tr>';
+            for (const col of cols) {
+                let val = row[col];
+                if (val === null || val === undefined) {
+                    html += '<td class="null">NULL</td>';
+                } else if (typeof val === 'bigint' || typeof val === 'number') {
+                    html += `<td class="num">${val.toLocaleString()}</td>`;
+                } else {
+                    const s = String(val);
+                    html += `<td title="${esc(s)}">${esc(s.length > 200 ? s.substring(0, 200) + '…' : s)}</td>`;
+                }
+            }
+            html += '</tr>';
+        }
+        if (rows.length > 500) {
+            html += `<tr><td colspan="${cols.length}" style="text-align:center;color:var(--text-secondary);font-style:italic">Showing 500 of ${rows.length.toLocaleString()} rows</td></tr>`;
+        }
+        html += '</tbody>';
+        table.innerHTML = html;
+    } catch(e) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.textContent = '❌ ' + (e.message || String(e));
+    }
+    runBtn.disabled = false;
+}
+
 function switchView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + viewId).classList.add('active');
@@ -1337,6 +1546,7 @@ function switchView(viewId) {
     if (viewId === 'profiles') renderProfiles();
     if (viewId === 'board') initBoard();
     if (viewId === 'sixdegrees') initSixDegrees();
+    if (viewId === 'sqlexplorer') initSQLExplorer();
 }
 
 // === FOLDER / FILTER / SEARCH ===

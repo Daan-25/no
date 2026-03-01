@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -128,6 +128,10 @@
                 <button class="app-btn" data-view="sixdegrees" title="Six Degrees of Epstein">
                     <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                     <span class="app-label">6 Degrees</span>
+                </button>
+                <button class="app-btn" data-view="sqlexplorer" title="SQL Explorer">
+                    <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zM6 17v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V17c0 .5-2.13 2-6 2s-6-1.5-6-2zm0-4v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V13c0 .5-2.13 2-6 2s-6-1.5-6-2z"/></svg>
+                    <span class="app-label">SQL</span>
                 </button>
             </div>
             <div class="sidebar-folders" id="sidebar-folders">
@@ -523,6 +527,95 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SQL Explorer -->
+            <div class="view" id="view-sqlexplorer">
+                <div class="sql-container">
+                    <div class="sql-header">
+                        <div class="sql-title">
+                            <span class="sql-icon">🗄️</span>
+                            <h2>SQL Explorer</h2>
+                            <span class="sql-badge" id="sql-status-badge">Loading...</span>
+                        </div>
+                        <p class="sql-subtitle">Query 1.78M emails &amp; 1.41M documents directly in your browser with DuckDB-WASM — powered by <a href="https://data.jmail.world" target="_blank">data.jmail.world</a></p>
+                    </div>
+                    <div class="sql-editor-wrap">
+                        <div class="sql-editor-toolbar">
+                            <div class="sql-tab-bar">
+                                <span class="sql-tab active">Query</span>
+                            </div>
+                            <div class="sql-toolbar-actions">
+                                <select id="sql-examples" class="sql-example-select">
+                                    <option value="">📋 Example Queries...</option>
+                                    <option value="top_senders">Top 20 Senders</option>
+                                    <option value="epstein_sent">Emails Sent by Epstein</option>
+                                    <option value="by_year">Emails by Year</option>
+                                    <option value="to_recipients">Most Frequent Recipients</option>
+                                    <option value="subjects">Interesting Subjects</option>
+                                    <option value="accounts">Email Accounts</option>
+                                    <option value="doc_sources">Document Sources</option>
+                                    <option value="doc_largest">Largest Documents</option>
+                                </select>
+                                <button class="sql-run-btn" id="sql-run-btn" title="Run Query (Ctrl+Enter)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="sql-editor" spellcheck="false" placeholder="Write SQL here... (Ctrl+Enter to run)">SELECT sender, COUNT(*) as email_count
+FROM read_parquet('https://data.jmail.world/v1/emails.parquet')
+WHERE epstein_is_sender = true
+GROUP BY sender
+ORDER BY email_count DESC
+LIMIT 20;</textarea>
+                    </div>
+                    <div class="sql-result-area" id="sql-result-area">
+                        <div class="sql-result-empty" id="sql-result-empty">
+                            <div class="sql-terminal-icon">
+                                <span>$</span><span class="sql-cursor-blink">_</span>
+                            </div>
+                            <p>Run a query to see results</p>
+                            <p class="sql-hint">Available tables: <code>read_parquet('https://data.jmail.world/v1/emails.parquet')</code>, <code>read_parquet('https://data.jmail.world/v1/documents.parquet')</code></p>
+                        </div>
+                        <div class="sql-loading" id="sql-loading" style="display:none">
+                            <div class="sql-loading-spinner"></div>
+                            <span id="sql-loading-text">Executing query...</span>
+                        </div>
+                        <div class="sql-result-table-wrap" id="sql-result-table-wrap" style="display:none">
+                            <div class="sql-result-meta" id="sql-result-meta"></div>
+                            <div class="sql-result-scroll">
+                                <table class="sql-result-table" id="sql-result-table"></table>
+                            </div>
+                        </div>
+                        <div class="sql-error" id="sql-error" style="display:none"></div>
+                    </div>
+                    <div class="sql-schema-section">
+                        <h3>📊 Available Data</h3>
+                        <div class="sql-schema-cards">
+                            <div class="sql-schema-card">
+                                <div class="sql-schema-card-header">
+                                    <span>📧</span>
+                                    <strong>emails.parquet</strong>
+                                    <span class="sql-schema-count">1.78M rows</span>
+                                </div>
+                                <div class="sql-schema-cols">
+                                    <code>id</code> <code>sender</code> <code>subject</code> <code>to_recipients</code> <code>cc_recipients</code> <code>bcc_recipients</code> <code>sent_at</code> <code>content_markdown</code> <code>content_html</code> <code>attachments</code> <code>account_email</code> <code>folder_path</code> <code>is_promotional</code> <code>epstein_is_sender</code> <code>all_participants</code>
+                                </div>
+                            </div>
+                            <div class="sql-schema-card">
+                                <div class="sql-schema-card-header">
+                                    <span>📄</span>
+                                    <strong>documents.parquet</strong>
+                                    <span class="sql-schema-count">1.41M rows</span>
+                                </div>
+                                <div class="sql-schema-cols">
+                                    <code>id</code> <code>source</code> <code>volume</code> <code>original_filename</code> <code>page_count</code> <code>size</code> <code>document_description</code> <code>source_url</code> <code>path</code> <code>has_thumbnail</code> <code>tags</code> <code>duration_seconds</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -595,6 +688,6 @@
     <!-- Sidebar mobile overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=12"></script>
 </body>
 </html>
