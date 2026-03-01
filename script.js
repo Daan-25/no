@@ -5253,6 +5253,262 @@ window.addEventListener('resize', resizeGlobe);
     });
 })();
 
+// ===== WIRETAP MODE =====
+(function initWiretap() {
+    const overlay = document.getElementById('wiretap-overlay');
+    const transcript = document.getElementById('wiretap-transcript');
+    const reelL = document.getElementById('wiretap-reel-l');
+    const reelR = document.getElementById('wiretap-reel-r');
+    const progressBar = document.getElementById('wt-progress-bar');
+    const subjectEl = document.getElementById('wiretap-subject');
+    const metaEl = document.getElementById('wiretap-meta');
+    if (!overlay) return;
+
+    let wtState = { active: false, playing: false, lines: [], lineIdx: 0, timer: null, vuTimer: null, reelAngle: 0, reelTimer: null };
+
+    function openWiretap() {
+        // Gather email content from current detail view
+        const detail = document.getElementById('email-detail');
+        if (!detail) return;
+        const msgs = detail.querySelectorAll('.email-detail-message');
+        const subject = detail.querySelector('.email-detail-subject')?.textContent || 'Unknown Subject';
+
+        const lines = [];
+        msgs.forEach(msg => {
+            const sender = msg.querySelector('.detail-sender')?.textContent?.split('<')[0]?.trim() || 'Unknown';
+            const date = msg.querySelector('.detail-date')?.textContent || '';
+            const body = msg.querySelector('.email-detail-body')?.textContent || '';
+            lines.push({ type: 'header', text: `[${date}] FROM: ${sender}` });
+            // Split body into sentences
+            const sentences = body.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+            sentences.forEach(s => lines.push({ type: 'body', text: s.trim(), sender }));
+            lines.push({ type: 'divider', text: '— END OF INTERCEPT SEGMENT —' });
+        });
+
+        if (!lines.length) { lines.push({ type: 'body', text: '(No content available for playback)', sender: 'System' }); }
+
+        wtState.lines = lines;
+        wtState.lineIdx = 0;
+        wtState.playing = false;
+        wtState.active = true;
+
+        subjectEl.textContent = subject.toUpperCase();
+        const firstDate = msgs[0]?.querySelector('.detail-date')?.textContent || 'UNKNOWN';
+        metaEl.textContent = `DATE: ${firstDate} | CASE: EPSTEIN-2025-UNSEALED`;
+        transcript.innerHTML = '<div class="wt-static-line">— PRESS PLAY TO BEGIN INTERCEPT PLAYBACK —</div>';
+        progressBar.style.width = '0%';
+
+        overlay.classList.add('active');
+    }
+
+    function closeWiretap() {
+        wtState.active = false;
+        stopPlayback();
+        overlay.classList.remove('active');
+        speechSynthesis.cancel();
+    }
+
+    function startPlayback() {
+        if (wtState.playing || wtState.lineIdx >= wtState.lines.length) return;
+        wtState.playing = true;
+        transcript.innerHTML = '';
+        playNextLine();
+        startReels();
+        startVU();
+    }
+
+    function playNextLine() {
+        if (!wtState.playing || wtState.lineIdx >= wtState.lines.length) {
+            stopPlayback();
+            const endDiv = document.createElement('div');
+            endDiv.className = 'wt-line wt-end';
+            endDiv.textContent = '— INTERCEPT COMPLETE — TAPE ENDED —';
+            transcript.appendChild(endDiv);
+            return;
+        }
+
+        const line = wtState.lines[wtState.lineIdx];
+        const div = document.createElement('div');
+
+        if (line.type === 'header') {
+            div.className = 'wt-line wt-header';
+            div.textContent = line.text;
+            transcript.appendChild(div);
+            transcript.scrollTop = transcript.scrollHeight;
+            wtState.lineIdx++;
+            setTimeout(playNextLine, 600);
+        } else if (line.type === 'divider') {
+            div.className = 'wt-line wt-divider';
+            div.textContent = line.text;
+            transcript.appendChild(div);
+            transcript.scrollTop = transcript.scrollHeight;
+            wtState.lineIdx++;
+            setTimeout(playNextLine, 800);
+        } else {
+            div.className = 'wt-line wt-body';
+            transcript.appendChild(div);
+            // Typewriter effect
+            let charIdx = 0;
+            const text = line.text;
+            function typeChar() {
+                if (!wtState.playing) return;
+                if (charIdx < text.length) {
+                    div.textContent += text[charIdx];
+                    charIdx++;
+                    transcript.scrollTop = transcript.scrollHeight;
+                    setTimeout(typeChar, 25 + Math.random() * 25);
+                } else {
+                    // Use Web Speech API to read aloud
+                    if ('speechSynthesis' in window && wtState.playing) {
+                        const utt = new SpeechSynthesisUtterance(text);
+                        utt.rate = 1.1;
+                        utt.pitch = 0.9;
+                        utt.onend = () => {
+                            wtState.lineIdx++;
+                            updateProgress();
+                            setTimeout(playNextLine, 300);
+                        };
+                        speechSynthesis.speak(utt);
+                    } else {
+                        wtState.lineIdx++;
+                        updateProgress();
+                        setTimeout(playNextLine, 1200);
+                    }
+                }
+            }
+            typeChar();
+        }
+    }
+
+    function updateProgress() {
+        const pct = (wtState.lineIdx / wtState.lines.length) * 100;
+        progressBar.style.width = pct + '%';
+    }
+
+    function stopPlayback() {
+        wtState.playing = false;
+        speechSynthesis.cancel();
+        clearInterval(wtState.vuTimer);
+        clearInterval(wtState.reelTimer);
+        document.querySelectorAll('.vu-bar').forEach(b => b.style.height = '4px');
+    }
+
+    function pausePlayback() {
+        wtState.playing = false;
+        speechSynthesis.cancel();
+        clearInterval(wtState.vuTimer);
+        clearInterval(wtState.reelTimer);
+    }
+
+    function startVU() {
+        const bars = document.querySelectorAll('.vu-bar');
+        wtState.vuTimer = setInterval(() => {
+            if (!wtState.playing) return;
+            bars.forEach(b => {
+                const h = wtState.playing ? (8 + Math.random() * 28) : 4;
+                b.style.height = h + 'px';
+            });
+        }, 80);
+    }
+
+    function startReels() {
+        wtState.reelTimer = setInterval(() => {
+            if (!wtState.playing) return;
+            wtState.reelAngle += 6;
+            if (reelL) reelL.style.transform = `rotate(${wtState.reelAngle}deg)`;
+            if (reelR) reelR.style.transform = `rotate(${-wtState.reelAngle}deg)`;
+        }, 50);
+    }
+
+    // Button bindings
+    document.getElementById('wiretap-btn')?.addEventListener('click', openWiretap);
+    document.getElementById('wiretap-close')?.addEventListener('click', closeWiretap);
+    document.getElementById('wt-play')?.addEventListener('click', startPlayback);
+    document.getElementById('wt-pause')?.addEventListener('click', pausePlayback);
+    document.getElementById('wt-stop')?.addEventListener('click', () => { stopPlayback(); transcript.innerHTML = '<div class="wt-static-line">— PLAYBACK STOPPED —</div>'; });
+
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeWiretap(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && wtState.active) closeWiretap(); });
+})();
+
+// ===== REDACTED MODE =====
+(function initRedacted() {
+    const toggle = document.getElementById('redacted-toggle');
+    if (!toggle) return;
+
+    let redacted = false;
+    const NAMES = ['Jeffrey Epstein','Epstein','Ghislaine Maxwell','Maxwell','Bill Clinton','Clinton',
+        'Prince Andrew','Andrew','Donald Trump','Trump','Bill Gates','Gates','Alan Dershowitz',
+        'Dershowitz','Les Wexner','Wexner','Jean-Luc Brunel','Brunel','Sarah Kellen','Kellen',
+        'Virginia Giuffre','Giuffre','Nadia Marcinkova','Adriana Ross','Lesley Groff'];
+    const LOCATIONS = ['Little St. James','Zorro Ranch','Palm Beach','Teterboro','9 E 71st',
+        '71st Street','Paris','Nassau','Manhattan','MCC','Metropolitan Correctional'];
+    const CODES = ['Lolita Express','N908JE','Southern Trust','MC2'];
+    const allTerms = [...NAMES, ...LOCATIONS, ...CODES].sort((a, b) => b.length - a.length);
+
+    // Build regex from terms
+    const regex = new RegExp('(' + allTerms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+
+    function activateRedacted() {
+        redacted = true;
+        document.body.classList.add('redacted-mode');
+        toggle.classList.add('active');
+        toggle.title = 'Declassify — Remove redactions';
+        redactCurrentView();
+    }
+
+    function deactivateRedacted() {
+        redacted = false;
+        document.body.classList.remove('redacted-mode');
+        toggle.classList.remove('active');
+        toggle.title = 'Redacted Mode — Classify/Declassify';
+        unredactAll();
+    }
+
+    function redactCurrentView() {
+        // Process email list items
+        document.querySelectorAll('.email-row .email-from, .email-row .email-subject, .email-row .email-preview').forEach(el => {
+            if (!el.dataset.original) el.dataset.original = el.innerHTML;
+            el.innerHTML = el.dataset.original.replace(regex, '<span class="redacted-bar" onclick="this.classList.add(\'declassified\')" title="Click to declassify">$1</span>');
+        });
+        // Process email detail
+        document.querySelectorAll('.email-detail-body, .detail-sender, .detail-recipients, .email-detail-subject').forEach(el => {
+            if (!el.dataset.original) el.dataset.original = el.innerHTML;
+            el.innerHTML = el.dataset.original.replace(regex, '<span class="redacted-bar" onclick="this.classList.add(\'declassified\')" title="Click to declassify">$1</span>');
+        });
+    }
+
+    function unredactAll() {
+        document.querySelectorAll('[data-original]').forEach(el => {
+            el.innerHTML = el.dataset.original;
+            delete el.dataset.original;
+        });
+    }
+
+    toggle.addEventListener('click', () => redacted ? deactivateRedacted() : activateRedacted());
+
+    // Re-apply redactions when emails render
+    const origRender = window.renderEmailList;
+    if (origRender) {
+        window.renderEmailList = function() {
+            origRender.apply(this, arguments);
+            if (redacted) setTimeout(redactCurrentView, 50);
+        };
+    }
+
+    // Re-apply when email detail opens
+    const observer = new MutationObserver(() => { if (redacted) setTimeout(redactCurrentView, 100); });
+    const detail = document.getElementById('email-detail');
+    if (detail) observer.observe(detail, { childList: true, subtree: true });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'r' && e.ctrlKey && e.shiftKey) {
+            e.preventDefault();
+            redacted ? deactivateRedacted() : activateRedacted();
+        }
+    });
+})();
+
 // Start
 init().then(() => {
     // Apply route from URL hash after data is loaded

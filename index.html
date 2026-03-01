@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=31">
+    <link rel="stylesheet" href="style.css?v=32">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,6 +68,9 @@
             </div>
         </div>
         <div class="topbar-right">
+            <button class="redacted-toggle" id="redacted-toggle" title="Redacted Mode — Classify/Declassify">
+                <span class="redacted-icon">█</span>
+            </button>
             <button class="undercover-btn" id="undercover-btn" title="Undercover Mode (Ctrl+U)">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             </button>
@@ -241,6 +244,10 @@
                         Back to Inbox
                     </button>
                     <div class="detail-actions">
+                        <button class="toolbar-btn wiretap-btn" id="wiretap-btn" title="Wiretap Mode — Listen to this email">
+                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                            🎙️
+                        </button>
                         <button class="toolbar-btn" id="tts-btn" title="Read aloud">
                             <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                         </button>
@@ -742,6 +749,51 @@ LIMIT 20;</textarea>
     <!-- Sidebar mobile overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+    <!-- WIRETAP PLAYER OVERLAY -->
+    <div class="wiretap-overlay" id="wiretap-overlay">
+        <div class="wiretap-player">
+            <div class="wiretap-header">
+                <div class="wiretap-stamp">🔴 CLASSIFIED INTERCEPT — FBI SURVEILLANCE</div>
+                <button class="wiretap-close" id="wiretap-close">✕</button>
+            </div>
+            <div class="wiretap-cassette">
+                <div class="wiretap-reel wiretap-reel-l" id="wiretap-reel-l">
+                    <div class="reel-hub"></div>
+                </div>
+                <div class="wiretap-tape-window">
+                    <div class="tape-label">
+                        <div class="tape-label-title" id="wiretap-subject">INTERCEPTED COMMUNICATION</div>
+                        <div class="tape-label-info" id="wiretap-meta">DATE: — | SUBJECT: —</div>
+                    </div>
+                </div>
+                <div class="wiretap-reel wiretap-reel-r" id="wiretap-reel-r">
+                    <div class="reel-hub"></div>
+                </div>
+            </div>
+            <div class="wiretap-controls">
+                <button class="wt-ctrl" id="wt-play">▶ PLAY</button>
+                <button class="wt-ctrl" id="wt-pause">⏸ PAUSE</button>
+                <button class="wt-ctrl" id="wt-stop">⏹ STOP</button>
+                <div class="wiretap-vu">
+                    <div class="vu-bar" id="vu-1"></div>
+                    <div class="vu-bar" id="vu-2"></div>
+                    <div class="vu-bar" id="vu-3"></div>
+                    <div class="vu-bar" id="vu-4"></div>
+                    <div class="vu-bar" id="vu-5"></div>
+                    <div class="vu-bar" id="vu-6"></div>
+                    <div class="vu-bar" id="vu-7"></div>
+                    <div class="vu-bar" id="vu-8"></div>
+                </div>
+                <div class="wiretap-progress">
+                    <div class="wt-progress-bar" id="wt-progress-bar"></div>
+                </div>
+            </div>
+            <div class="wiretap-transcript" id="wiretap-transcript">
+                <div class="wt-static-line">— AWAITING PLAYBACK —</div>
+            </div>
+        </div>
+    </div>
+
     <!-- HACKER TERMINAL OVERLAY -->
     <div class="terminal-overlay" id="terminal-overlay">
         <div class="terminal-window">
@@ -761,7 +813,7 @@ LIMIT 20;</textarea>
         </div>
     </div>
 
-    <script src="script.js?v=31"></script>
+    <script src="script.js?v=32"></script>
     <script type="module">
         // Pre-load DuckDB-WASM and expose globally for SQL Explorer
         import * as duckdb from 'https://esm.sh/@duckdb/duckdb-wasm@1.29.0';
