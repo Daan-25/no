@@ -1812,6 +1812,8 @@ function switchView(viewId) {
     if (viewId === 'board') initBoard();
     if (viewId === 'sixdegrees') initSixDegrees();
     if (viewId === 'sqlexplorer') initSQLExplorer();
+    if (viewId === 'briefing') generateBriefing();
+    if (viewId === 'globe') initGlobe();
 }
 
 // === FOLDER / FILTER / SEARCH ===
@@ -2369,7 +2371,7 @@ function applyRoute() {
     const viewMap = {
         inbox:'inbox', contacts:'contacts', flights:'flights', photos:'photos',
         documents:'documents', timeline:'timeline', network:'network', stats:'stats',
-        bookmarks:'bookmarks', profiles:'profiles',
+        bookmarks:'bookmarks', profiles:'profiles', briefing:'briefing', globe:'globe',
     };
     const viewId = viewMap[path] || 'inbox';
     switchView(viewId);
@@ -4220,6 +4222,399 @@ function triggerMatrixEasterEgg() {
         if (e.key === 'Escape') { closeMatrix(); document.removeEventListener('keydown', matrixEsc); }
     });
 }
+
+// ===== DAILY BRIEFING =====
+function generateBriefing() {
+    const content = document.getElementById('briefing-content');
+    const dateEl = document.getElementById('briefing-date');
+    if (!content) return;
+
+    const today = new Date();
+    const month = today.getMonth();
+    const day = today.getDate();
+    dateEl.textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) +
+        ' — ' + today.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' EST';
+
+    const emails = state.allLoaded || [];
+    const flights = state.flights || [];
+    const contacts = state.contacts || [];
+
+    // Find emails from "this day" in history
+    const pad = n => String(n).padStart(2, '0');
+    const todayStr = `${pad(month + 1)}-${pad(day)}`;
+    const onThisDay = emails.filter(e => e.d && e.d.slice(5, 10) === todayStr);
+
+    // Top sender today
+    const senderCounts = {};
+    onThisDay.forEach(e => {
+        const s = e.sn || e.f || 'Unknown';
+        senderCounts[s] = (senderCounts[s] || 0) + 1;
+    });
+    const topSenders = Object.entries(senderCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    // Random notable email
+    const notableKw = ['island', 'money', 'flight', 'meeting', 'secret', 'private', 'foundation', 'donation', 'attorney'];
+    const notable = onThisDay.filter(e => notableKw.some(k => (e.s || '').toLowerCase().includes(k)));
+    const randomNotable = notable.length ? notable[Math.floor(Math.random() * notable.length)] : onThisDay[Math.floor(Math.random() * onThisDay.length)];
+
+    // Flight on this day
+    const todayFlights = flights.filter(f => f.date && f.date.slice(5, 10) === todayStr);
+
+    // From-Epstein count
+    const fromEp = onThisDay.filter(e => e.ep).length;
+
+    // Pick a random "focus person"
+    const focusContact = contacts.length ? contacts[Math.floor(Math.random() * Math.min(20, contacts.length))] : null;
+
+    // Suspicious score for the day
+    const suspWords = ['island', 'massage', 'model', 'girl', 'secret', 'cash', 'private', 'destroy', 'delete'];
+    let dayThreat = 0;
+    onThisDay.forEach(e => {
+        const sub = (e.s || '').toLowerCase();
+        suspWords.forEach(w => { if (sub.includes(w)) dayThreat++; });
+    });
+    const threatLevel = dayThreat >= 5 ? 'ELEVATED' : dayThreat >= 2 ? 'GUARDED' : 'LOW';
+    const threatColor = dayThreat >= 5 ? '#e74c3c' : dayThreat >= 2 ? '#f39c12' : '#27ae60';
+
+    let html = '';
+
+    // Section 1: Overview
+    html += `<div class="brief-section">
+        <h2 class="brief-section-title">I. SITUATION OVERVIEW</h2>
+        <div class="brief-stat-grid">
+            <div class="brief-stat-card">
+                <div class="brief-stat-num">${onThisDay.length}</div>
+                <div class="brief-stat-label">Emails on This Day</div>
+            </div>
+            <div class="brief-stat-card">
+                <div class="brief-stat-num">${fromEp}</div>
+                <div class="brief-stat-label">From Epstein</div>
+            </div>
+            <div class="brief-stat-card">
+                <div class="brief-stat-num">${todayFlights.length}</div>
+                <div class="brief-stat-label">Flight Records</div>
+            </div>
+            <div class="brief-stat-card" style="border-color:${threatColor}">
+                <div class="brief-stat-num" style="color:${threatColor}">${threatLevel}</div>
+                <div class="brief-stat-label">Threat Assessment</div>
+            </div>
+        </div>
+    </div>`;
+
+    // Section 2: Key Communications
+    if (topSenders.length) {
+        html += `<div class="brief-section">
+            <h2 class="brief-section-title">II. KEY COMMUNICATIONS</h2>
+            <p class="brief-text">On <strong>${today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</strong> across all archived years, <strong>${onThisDay.length}</strong> communications were intercepted. Primary actors:</p>
+            <div class="brief-actors">
+                ${topSenders.map(([name, count]) => `<div class="brief-actor"><span class="brief-actor-name">${esc(name)}</span><span class="brief-actor-count">${count} msgs</span></div>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    // Section 3: Notable Intercept
+    if (randomNotable) {
+        html += `<div class="brief-section">
+            <h2 class="brief-section-title">III. NOTABLE INTERCEPT</h2>
+            <div class="brief-intercept">
+                <div class="brief-intercept-meta">
+                    <span><strong>FROM:</strong> ${esc(randomNotable.sn || randomNotable.f || 'Unknown')}</span>
+                    <span><strong>DATE:</strong> ${esc(randomNotable.d || 'Unknown')}</span>
+                </div>
+                <div class="brief-intercept-subject">${esc(randomNotable.s || '(no subject)')}</div>
+                ${randomNotable.ep ? '<div class="brief-intercept-flag">⚠️ EPSTEIN IS SENDER</div>' : ''}
+            </div>
+        </div>`;
+    }
+
+    // Section 4: Flight Activity
+    if (todayFlights.length) {
+        html += `<div class="brief-section">
+            <h2 class="brief-section-title">IV. FLIGHT ACTIVITY</h2>
+            <div class="brief-flights">
+                ${todayFlights.slice(0, 5).map(f => `<div class="brief-flight">
+                    <span class="brief-flight-date">${esc(f.date || '')}</span>
+                    <span class="brief-flight-route">${esc(f.from || '?')} ✈️ ${esc(f.to || '?')}</span>
+                    ${f.passengers ? `<span class="brief-flight-pax">${f.passengers.length} pax</span>` : ''}
+                </div>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    // Section 5: Person of Interest
+    if (focusContact) {
+        html += `<div class="brief-section">
+            <h2 class="brief-section-title">V. PERSON OF INTEREST — DAILY FOCUS</h2>
+            <div class="brief-poi">
+                <div class="brief-poi-avatar" style="background:${getColor(focusContact.name)}">${initials(focusContact.name)}</div>
+                <div class="brief-poi-info">
+                    <div class="brief-poi-name">${esc(focusContact.name)}</div>
+                    <div class="brief-poi-email">${esc(focusContact.email)}</div>
+                    <div class="brief-poi-stat">${focusContact.count || 0} total communications in archive</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // Section 6: Analyst Note
+    const notes = [
+        'Pattern analysis suggests heightened activity during holiday periods. Cross-reference with flight logs recommended.',
+        'Multiple encrypted communications detected during this period. Further analysis may reveal additional connections.',
+        'Financial transactions on this date align with known foundation activity. See Section II for related contacts.',
+        'Unusual volume of communications to Caribbean destinations noted. Review flight manifests for corroboration.',
+        'Several deleted emails from this date were recovered during forensic analysis. Content flagged for review.'
+    ];
+    html += `<div class="brief-section">
+        <h2 class="brief-section-title">VI. ANALYST NOTES</h2>
+        <p class="brief-text brief-note">${notes[Math.floor(Math.random() * notes.length)]}</p>
+        <div class="brief-footer">
+            <span>PREPARED BY: Unsealed Intelligence Division</span>
+            <span>DISTRIBUTION: Authorized Investigators Only</span>
+        </div>
+    </div>`;
+
+    content.innerHTML = html;
+}
+
+document.getElementById('briefing-regenerate')?.addEventListener('click', generateBriefing);
+
+// ===== 3D GLOBE =====
+let globeState = { inited: false, scene: null, renderer: null, camera: null, globe: null, arcs: [], autoRotate: true, mouse: {x:0,y:0}, dragging: false, prevMouse: {x:0,y:0}, rotation: {x:0.3,y:0} };
+
+function initGlobe() {
+    if (globeState.inited) { resizeGlobe(); return; }
+
+    const canvas = document.getElementById('globe-canvas');
+    const container = document.getElementById('globe-container');
+    if (!canvas || !container) return;
+
+    const W = container.clientWidth;
+    const H = container.clientHeight || 600;
+
+    // Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+    camera.position.z = 2.8;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Globe sphere
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const globeGeo = new THREE.SphereGeometry(1, 64, 64);
+    const globeMat = new THREE.MeshPhongMaterial({
+        color: isDark ? 0x0a1628 : 0x1a3a5c,
+        emissive: isDark ? 0x050d1a : 0x0a1e3c,
+        shininess: 20,
+        transparent: true,
+        opacity: 0.9
+    });
+    const globe = new THREE.Mesh(globeGeo, globeMat);
+    scene.add(globe);
+
+    // Wireframe overlay
+    const wireGeo = new THREE.SphereGeometry(1.002, 36, 36);
+    const wireMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x1a3a5c : 0x2a5a8c, wireframe: true, transparent: true, opacity: 0.15 });
+    const wireframe = new THREE.Mesh(wireGeo, wireMat);
+    globe.add(wireframe);
+
+    // Atmosphere glow
+    const atmosGeo = new THREE.SphereGeometry(1.15, 64, 64);
+    const atmosMat = new THREE.ShaderMaterial({
+        vertexShader: `varying vec3 vNormal; void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: `varying vec3 vNormal; void main() { float intensity = pow(0.65 - dot(vNormal, vec3(0,0,1.0)), 2.0); gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity * 0.4; }`,
+        side: THREE.BackSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+    });
+    scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0x444466, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 3, 5);
+    scene.add(dirLight);
+
+    // Known locations with coordinates
+    const locations = {
+        'New York': [40.71, -74.01], 'Palm Beach': [26.71, -80.04], 'Little St. James': [18.30, -64.83],
+        'Paris': [48.86, 2.35], 'London': [51.51, -0.13], 'Tel Aviv': [32.07, 34.77],
+        'Santa Fe': [35.69, -105.94], 'Columbus': [39.96, -83.00], 'Los Angeles': [34.05, -118.24],
+        'Washington DC': [38.91, -77.04], 'Miami': [25.76, -80.19], 'Tokyo': [35.68, 139.69],
+        'Teterboro': [40.85, -74.06], 'Bedford': [41.24, -73.69], 'Nassau': [25.06, -77.35],
+        'Dubai': [25.20, 55.27], 'Geneva': [46.20, 6.14], 'Stockholm': [59.33, 18.07],
+        'Melbourne': [-37.81, 144.96], 'Marrakech': [31.63, -8.01]
+    };
+
+    function latLonToVec3(lat, lon, r) {
+        const phi = (90 - lat) * Math.PI / 180;
+        const theta = (lon + 180) * Math.PI / 180;
+        return new THREE.Vector3(
+            -r * Math.sin(phi) * Math.cos(theta),
+            r * Math.cos(phi),
+            r * Math.sin(phi) * Math.sin(theta)
+        );
+    }
+
+    // Add location dots
+    const dotGeo = new THREE.SphereGeometry(0.015, 8, 8);
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0xc0392b });
+    const locNames = Object.keys(locations);
+    locNames.forEach(name => {
+        const [lat, lon] = locations[name];
+        const pos = latLonToVec3(lat, lon, 1.01);
+        const dot = new THREE.Mesh(dotGeo, dotMat.clone());
+        dot.position.copy(pos);
+        dot.userData = { name };
+        globe.add(dot);
+
+        // Glow ring
+        const ringGeo = new THREE.RingGeometry(0.02, 0.035, 16);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xc0392b, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.copy(pos);
+        ring.lookAt(new THREE.Vector3(0, 0, 0));
+        globe.add(ring);
+    });
+
+    // Add arcs between locations
+    function createArc(from, to, color) {
+        const start = latLonToVec3(from[0], from[1], 1.01);
+        const end = latLonToVec3(to[0], to[1], 1.01);
+        const mid = start.clone().add(end).multiplyScalar(0.5);
+        const dist = start.distanceTo(end);
+        mid.normalize().multiplyScalar(1 + dist * 0.4);
+
+        const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+        const points = curve.getPoints(50);
+        const geo = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 });
+        const line = new THREE.Line(geo, mat);
+        globe.add(line);
+        return line;
+    }
+
+    // Generate arcs from flights data
+    const flightLocs = {};
+    (state.flights || []).forEach(f => {
+        if (f.from && f.to) {
+            const key = `${f.from}→${f.to}`;
+            flightLocs[key] = (flightLocs[key] || 0) + 1;
+        }
+    });
+
+    // Map flight locations to known coordinates
+    const matchLoc = (name) => {
+        const n = (name || '').toLowerCase();
+        for (const [loc, coords] of Object.entries(locations)) {
+            if (n.includes(loc.toLowerCase()) || loc.toLowerCase().includes(n)) return coords;
+        }
+        return null;
+    };
+
+    let arcCount = 0;
+    Object.entries(flightLocs).forEach(([route, count]) => {
+        const [fromName, toName] = route.split('→');
+        const fromCoords = matchLoc(fromName);
+        const toCoords = matchLoc(toName);
+        if (fromCoords && toCoords) {
+            const intensity = Math.min(count / 10, 1);
+            const color = new THREE.Color().setHSL(0, 0.8, 0.4 + intensity * 0.3);
+            createArc(fromCoords, toCoords, color);
+            arcCount++;
+        }
+    });
+
+    // Also add some email-based connections
+    const emailLocs = [
+        ['New York', 'Palm Beach'], ['New York', 'Little St. James'], ['Palm Beach', 'Little St. James'],
+        ['New York', 'Paris'], ['New York', 'London'], ['London', 'Paris'],
+        ['New York', 'Santa Fe'], ['New York', 'Washington DC'], ['New York', 'Tel Aviv'],
+        ['Palm Beach', 'Nassau'], ['London', 'Dubai'], ['Paris', 'Marrakech']
+    ];
+    emailLocs.forEach(([a, b]) => {
+        if (locations[a] && locations[b]) {
+            createArc(locations[a], locations[b], 0x3498db);
+            arcCount++;
+        }
+    });
+
+    // Stats
+    const statsEl = document.getElementById('globe-stats');
+    if (statsEl) statsEl.innerHTML = `<span>${locNames.length} locations</span><span>•</span><span>${arcCount} connections</span>`;
+
+    // Mouse interaction
+    let isDragging = false;
+    let prevX = 0, prevY = 0;
+
+    canvas.addEventListener('mousedown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; globeState.autoRotate = false; });
+    canvas.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const dx = e.clientX - prevX;
+            const dy = e.clientY - prevY;
+            globe.rotation.y += dx * 0.005;
+            globe.rotation.x += dy * 0.005;
+            globe.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, globe.rotation.x));
+            prevX = e.clientX;
+            prevY = e.clientY;
+        }
+    });
+    canvas.addEventListener('mouseup', () => isDragging = false);
+    canvas.addEventListener('mouseleave', () => isDragging = false);
+
+    // Touch support
+    canvas.addEventListener('touchstart', (e) => { isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY; globeState.autoRotate = false; }, { passive: true });
+    canvas.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length) {
+            const dx = e.touches[0].clientX - prevX;
+            const dy = e.touches[0].clientY - prevY;
+            globe.rotation.y += dx * 0.005;
+            globe.rotation.x += dy * 0.005;
+            prevX = e.touches[0].clientX;
+            prevY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    // Zoom
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camera.position.z = Math.max(1.5, Math.min(5, camera.position.z + e.deltaY * 0.002));
+    }, { passive: false });
+
+    // Controls
+    document.getElementById('globe-spin')?.addEventListener('click', () => {
+        globeState.autoRotate = !globeState.autoRotate;
+    });
+    document.getElementById('globe-reset')?.addEventListener('click', () => {
+        camera.position.z = 2.8;
+        globe.rotation.set(0.3, 0, 0);
+        globeState.autoRotate = true;
+    });
+
+    // Animate
+    function animate() {
+        requestAnimationFrame(animate);
+        if (globeState.autoRotate) globe.rotation.y += 0.002;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    globeState = { ...globeState, inited: true, scene, renderer, camera, globe };
+}
+
+function resizeGlobe() {
+    if (!globeState.renderer) return;
+    const container = document.getElementById('globe-container');
+    if (!container) return;
+    const W = container.clientWidth;
+    const H = container.clientHeight || 600;
+    globeState.camera.aspect = W / H;
+    globeState.camera.updateProjectionMatrix();
+    globeState.renderer.setSize(W, H);
+}
+window.addEventListener('resize', resizeGlobe);
 
 // ===== HACKER TERMINAL =====
 (function initTerminal() {

@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=25">
+    <link rel="stylesheet" href="style.css?v=26">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&family=Special+Elite&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <!-- CINEMATIC INTRO -->
@@ -139,6 +140,14 @@
                 <button class="app-btn terminal-trigger" id="terminal-trigger" title="Hacker Terminal (Ctrl+`)">
                     <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M20 19.59V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/></svg>
                     <span class="app-label">Terminal</span>
+                </button>
+                <button class="app-btn" data-view="briefing" title="Daily Briefing">
+                    <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM6 20V4h5v7h7v9H6zm2-6h8v2H8v-2zm0-3h8v2H8v-2z"/></svg>
+                    <span class="app-label">Briefing</span>
+                </button>
+                <button class="app-btn" data-view="globe" title="3D Globe">
+                    <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M17.9 17.39c-.26-.8-1.01-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39zM11 19.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+                    <span class="app-label">Globe</span>
                 </button>
             </div>
             <div class="sidebar-folders" id="sidebar-folders">
@@ -627,6 +636,39 @@ LIMIT 20;</textarea>
                     </div>
                 </div>
             </div>
+
+            <!-- DAILY BRIEFING VIEW -->
+            <div class="view" id="view-briefing">
+                <div class="briefing-container">
+                    <div class="briefing-header">
+                        <div class="briefing-stamp">TOP SECRET // NOFORN</div>
+                        <h1 class="briefing-title">DAILY INTELLIGENCE BRIEFING</h1>
+                        <div class="briefing-subtitle" id="briefing-date"></div>
+                        <div class="briefing-classification">CLASSIFICATION: UNSEALED — FOR PUBLIC REVIEW</div>
+                    </div>
+                    <div class="briefing-content" id="briefing-content">
+                        <div class="loading-indicator"><div class="spinner"></div> Generating briefing...</div>
+                    </div>
+                    <button class="briefing-regenerate" id="briefing-regenerate">🔄 Generate New Briefing</button>
+                </div>
+            </div>
+
+            <!-- 3D GLOBE VIEW -->
+            <div class="view" id="view-globe">
+                <div class="globe-container" id="globe-container">
+                    <div class="globe-overlay-info">
+                        <h2 class="globe-title">🌍 Epstein Network Globe</h2>
+                        <p class="globe-subtitle">Email & flight connections across the world</p>
+                        <div class="globe-stats" id="globe-stats"></div>
+                    </div>
+                    <canvas id="globe-canvas"></canvas>
+                    <div class="globe-controls">
+                        <button class="globe-ctrl-btn" id="globe-spin" title="Toggle auto-rotate">🔄 Spin</button>
+                        <button class="globe-ctrl-btn" id="globe-reset" title="Reset view">🏠 Reset</button>
+                    </div>
+                    <div class="globe-tooltip" id="globe-tooltip"></div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -718,7 +760,7 @@ LIMIT 20;</textarea>
         </div>
     </div>
 
-    <script src="script.js?v=25"></script>
+    <script src="script.js?v=26"></script>
     <script type="module">
         // Pre-load DuckDB-WASM and expose globally for SQL Explorer
         import * as duckdb from 'https://esm.sh/@duckdb/duckdb-wasm@1.29.0';
