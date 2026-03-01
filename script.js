@@ -312,7 +312,6 @@ function showLoading(on) {
 // === EMAIL DETAIL ===
 async function openEmail(emailId, docId) {
     if (readingPaneActive) {
-        // In reading pane mode, load in side pane instead
         openInReadingPane(emailId, docId);
         return;
     }
@@ -320,24 +319,60 @@ async function openEmail(emailId, docId) {
     detail.innerHTML = '<div class="loading-indicator"><div class="spinner"></div> Loading thread...</div>';
     switchView('email-detail');
 
+    // Try local thread first
     const thread = await loadThread(docId);
-    if (!thread) {
-        detail.innerHTML = '<div class="empty-state">Failed to load email</div>';
+    if (thread) {
+        detail.innerHTML = buildEmailDetailHTML(thread);
+        detail.querySelectorAll('.tt-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.dataset.idx);
+                const msgs = detail.querySelectorAll('.email-detail-message');
+                if (msgs[idx]) msgs[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                detail.querySelectorAll('.tt-dot').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+            });
+        });
         return;
     }
 
-    detail.innerHTML = buildEmailDetailHTML(thread);
+    // Fallback: load from DuckDB (archive emails)
+    if (sqlState.conn) {
+        try {
+            const q = emailId.replace(/'/g, "''");
+            const result = await sqlState.conn.query(`
+                SELECT sender, subject, to_recipients, cc_recipients, sent_at,
+                       content_markdown, content_html, attachments, epstein_is_sender
+                FROM ${EMAILS_PARQUET}
+                WHERE id = '${q}'
+                LIMIT 1
+            `);
+            const rows = result.toArray();
+            if (rows.length) {
+                const r = rows[0];
+                const senderName = (r.sender || 'Unknown').replace(/<[^>]+>/g, '').trim();
+                const senderEmail = ((r.sender || '').match(/<([^>]+)>/) || [])[1] || r.sender || '';
+                const date = r.sent_at ? new Date(r.sent_at) : null;
+                const fakeThread = [{
+                    from: senderName,
+                    from_email: senderEmail,
+                    to: (r.to_recipients || '').replace(/[\[\]"]/g, ''),
+                    subject: r.subject || '(no subject)',
+                    body: r.content_markdown || r.content_html || '(no content)',
+                    formatted_date: date ? date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '',
+                    formatted_time: date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+                    avatar_color: r.epstein_is_sender ? '#c0392b' : null,
+                    attachments: Number(r.attachments) || 0,
+                    stars: 0
+                }];
+                detail.innerHTML = buildEmailDetailHTML(fakeThread);
+                return;
+            }
+        } catch(e) {
+            console.error('DuckDB email load error:', e);
+        }
+    }
 
-    // Thread timeline dot click -> scroll to message
-    detail.querySelectorAll('.tt-dot').forEach(dot => {
-        dot.addEventListener('click', () => {
-            const idx = parseInt(dot.dataset.idx);
-            const msgs = detail.querySelectorAll('.email-detail-message');
-            if (msgs[idx]) msgs[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
-            detail.querySelectorAll('.tt-dot').forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-        });
-    });
+    detail.innerHTML = '<div class="empty-state">Failed to load email</div>';
 }
 
 // === CONTACTS ===
