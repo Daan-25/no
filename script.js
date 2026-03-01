@@ -4400,15 +4400,28 @@ function initGlobe() {
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Globe sphere
+    // Globe sphere with earth texture
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const globeGeo = new THREE.SphereGeometry(1, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
     const globeMat = new THREE.MeshPhongMaterial({
-        color: isDark ? 0x0a1628 : 0x1a3a5c,
+        color: 0x4488cc,
         emissive: isDark ? 0x050d1a : 0x0a1e3c,
         shininess: 20,
         transparent: true,
-        opacity: 0.9
+        opacity: 0.95
+    });
+    // Load earth night texture (city lights on dark landmass)
+    textureLoader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg', tex => {
+        globeMat.map = tex;
+        globeMat.color.set(0xffffff);
+        globeMat.needsUpdate = true;
+    });
+    // Load bump map for terrain relief
+    textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png', tex => {
+        globeMat.bumpMap = tex;
+        globeMat.bumpScale = 0.03;
+        globeMat.needsUpdate = true;
     });
     const globe = new THREE.Mesh(globeGeo, globeMat);
     scene.add(globe);
@@ -4430,11 +4443,14 @@ function initGlobe() {
     });
     scene.add(new THREE.Mesh(atmosGeo, atmosMat));
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0x444466, 0.6));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    // Lights - brighter to show earth texture
+    scene.add(new THREE.AmbientLight(0x888899, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
     dirLight.position.set(5, 3, 5);
     scene.add(dirLight);
+    const fillLight = new THREE.DirectionalLight(0x4466aa, 0.3);
+    fillLight.position.set(-5, -2, -3);
+    scene.add(fillLight);
 
     // Known locations with coordinates
     const locations = {
