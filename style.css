@@ -2908,3 +2908,73 @@ input:focus, select:focus, textarea:focus {
     .sql-editor-toolbar { flex-direction: column; }
     .sql-schema-cards { flex-direction: column; }
 }
+
+/* ===== FULL ARCHIVE MODE ===== */
+.archive-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.archive-toggle .archive-label { font-size: 11px; white-space: nowrap; }
+.archive-toggle.active {
+    background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+    color: #fff !important;
+    border-color: #27ae60 !important;
+    box-shadow: 0 0 12px rgba(39, 174, 96, 0.3);
+}
+.archive-toggle:not(.active):hover { border-color: #27ae60; color: #27ae60; }
+.archive-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+}
+.archive-pager button {
+    padding: 6px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--glass);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.archive-pager button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.archive-pager button:disabled { opacity: 0.3; cursor: not-allowed; }
+.archive-pager .page-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.archive-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: #27ae6022;
+    color: #27ae60;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 6px;
+    animation: archivePulse 2s ease-in-out infinite;
+}
+@keyframes archivePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+.duckdb-search-hint {
+    text-align: center;
+    padding: 8px;
+    font-size: 11px;
+    color: #27ae60;
+    background: #27ae6010;
+    border-radius: 8px;
+    margin: 8px 12px 0;
+}

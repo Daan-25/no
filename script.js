@@ -1418,6 +1418,161 @@ async function initDuckDB() {
     }
 }
 
+// ===== FULL ARCHIVE MODE (DuckDB-powered inbox) =====
+const archiveState = { active: false, page: 0, pageSize: 100, total: 0, query: '' };
+const EMAILS_PARQUET = "read_parquet('https://data.jmail.world/v1/emails.parquet')";
+
+function initArchiveToggle() {
+    const btn = document.getElementById('archive-toggle');
+    if (!btn) return;
+
+    // Show button once DuckDB is ready or starts loading
+    const checkReady = () => {
+        if (window._duckdb) { btn.style.display = ''; return; }
+        window.addEventListener('duckdb-ready', () => { btn.style.display = ''; }, { once: true });
+    };
+    checkReady();
+
+    btn.addEventListener('click', async () => {
+        archiveState.active = !archiveState.active;
+        btn.classList.toggle('active');
+
+        if (archiveState.active) {
+            btn.querySelector('.archive-label').textContent = 'Local Data';
+            archiveState.page = 0;
+            archiveState.query = '';
+            await loadArchivePage();
+        } else {
+            btn.querySelector('.archive-label').textContent = 'Full Archive';
+            // Restore local data
+            const filtered = applyFilters(state.allLoaded);
+            renderEmailList(filtered);
+            updateEmailCount(filtered.length, state.meta ? state.meta.totalEmails : state.allLoaded.length);
+            // Remove pager
+            const pager = document.querySelector('.archive-pager');
+            if (pager) pager.remove();
+        }
+    });
+}
+
+async function ensureDuckDBConn() {
+    if (sqlState.conn) return sqlState.conn;
+    const ok = await initDuckDB();
+    return ok ? sqlState.conn : null;
+}
+
+async function loadArchivePage() {
+    const list = document.getElementById('email-list');
+    list.innerHTML = '<div class="loading-indicator"><div class="spinner"></div> Querying 1.78M emails...</div>';
+
+    const conn = await ensureDuckDBConn();
+    if (!conn) {
+        list.innerHTML = '<div class="empty-state">DuckDB is still loading. Try again in a moment.</div>';
+        return;
+    }
+
+    const offset = archiveState.page * archiveState.pageSize;
+    let where = 'WHERE subject IS NOT NULL';
+    const folder = state.folder;
+    if (folder === 'sent') where += ' AND epstein_is_sender = true';
+
+    // Search filter
+    if (archiveState.query) {
+        const q = archiveState.query.replace(/'/g, "''");
+        where += ` AND (subject ILIKE '%${q}%' OR sender ILIKE '%${q}%' OR to_recipients ILIKE '%${q}%')`;
+    }
+
+    // Folder filter from filter-select
+    const f = state.filter;
+    if (f === 'from-epstein') where += ' AND epstein_is_sender = true';
+    else if (f === 'to-epstein') where += ' AND epstein_is_sender IS NOT true';
+    else if (f === 'attachments') where += ' AND attachments > 0';
+
+    try {
+        // Get count
+        if (archiveState.total === 0 || archiveState.page === 0) {
+            const countResult = await conn.query(`SELECT COUNT(*) as c FROM ${EMAILS_PARQUET} ${where}`);
+            const countRows = countResult.toArray();
+            archiveState.total = Number(countRows[0].c);
+        }
+
+        // Get page
+        const result = await conn.query(`
+            SELECT id, sender, subject, to_recipients, sent_at, 
+                   SUBSTRING(content_markdown, 1, 120) as preview,
+                   epstein_is_sender, attachments, account_email
+            FROM ${EMAILS_PARQUET}
+            ${where}
+            ORDER BY sent_at DESC NULLS LAST
+            LIMIT ${archiveState.pageSize}
+            OFFSET ${offset}
+        `);
+
+        const rows = result.toArray();
+
+        // Map to email format
+        const emails = rows.map(r => ({
+            id: r.id || '',
+            did: r.id || '',
+            f: (r.sender || 'Unknown').replace(/<[^>]+>/g, '').trim(),
+            fe: ((r.sender || '').match(/<([^>]+)>/) || [])[1] || r.sender || '',
+            s: r.subject || '(no subject)',
+            sn: r.preview || '',
+            t: (r.to_recipients || '').replace(/[\[\]"]/g, '').substring(0, 60),
+            d: r.sent_at || '',
+            fd: r.sent_at ? new Date(r.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            sent: r.epstein_is_sender || false,
+            ep: r.epstein_is_sender || false,
+            att: Number(r.attachments) || 0,
+            ac: r.epstein_is_sender ? '#c0392b' : null,
+            _archive: true
+        }));
+
+        renderEmailList(emails);
+
+        // Update count
+        const countEl = document.querySelector('.email-count');
+        if (countEl) {
+            countEl.innerHTML = `Full Archive: ${archiveState.total.toLocaleString()} emails <span class="archive-badge">DuckDB</span>`;
+        }
+
+        // Add pager
+        renderArchivePager();
+
+    } catch(e) {
+        console.error('Archive query error:', e);
+        list.innerHTML = `<div class="empty-state">Query error: ${esc(e.message)}</div>`;
+    }
+}
+
+function renderArchivePager() {
+    let pager = document.querySelector('.archive-pager');
+    if (!pager) {
+        pager = document.createElement('div');
+        pager.className = 'archive-pager';
+        const list = document.getElementById('email-list');
+        list.parentNode.insertBefore(pager, list.nextSibling);
+    }
+
+    const totalPages = Math.ceil(archiveState.total / archiveState.pageSize);
+    const current = archiveState.page + 1;
+    const from = archiveState.page * archiveState.pageSize + 1;
+    const to = Math.min(from + archiveState.pageSize - 1, archiveState.total);
+
+    pager.innerHTML = `
+        <button id="arch-prev" ${archiveState.page === 0 ? 'disabled' : ''}>← Previous</button>
+        <span class="page-info">${from.toLocaleString()}–${to.toLocaleString()} of ${archiveState.total.toLocaleString()}</span>
+        <button id="arch-next" ${current >= totalPages ? 'disabled' : ''}>Next →</button>
+    `;
+
+    document.getElementById('arch-prev').onclick = () => {
+        if (archiveState.page > 0) { archiveState.page--; loadArchivePage(); }
+    };
+    document.getElementById('arch-next').onclick = () => {
+        if (current < totalPages) { archiveState.page++; loadArchivePage(); }
+    };
+}
+
 async function initSQLExplorer() {
     if (sqlState.initialized) return;
     sqlState.initialized = true;
@@ -1608,6 +1763,9 @@ async function init() {
         // Show initial photos (load-on-view)
         showMorePhotos();
 
+        // Init archive toggle (shows button when DuckDB ready)
+        initArchiveToggle();
+
         // Update contacts count
         const contactsP = document.querySelector('#view-contacts .contacts-header p');
         if (contactsP) contactsP.textContent = `${state.contacts.length.toLocaleString()} entities extracted from email correspondence`;
@@ -1634,7 +1792,13 @@ document.querySelectorAll('.folder').forEach(f => {
 
 document.getElementById('filter-select').addEventListener('change', (e) => {
     state.filter = e.target.value;
-    refreshInbox();
+    if (archiveState.active) {
+        archiveState.page = 0;
+        archiveState.total = 0;
+        loadArchivePage();
+    } else {
+        refreshInbox();
+    }
 });
 
 let searchTimeout;
@@ -1659,7 +1823,14 @@ document.getElementById('search-input').addEventListener('keydown', (e) => {
         state.searchQuery = e.target.value.trim();
         addSearchHistory(state.searchQuery);
         switchView('inbox');
-        refreshInbox();
+        if (archiveState.active) {
+            archiveState.query = state.searchQuery;
+            archiveState.page = 0;
+            archiveState.total = 0;
+            loadArchivePage();
+        } else {
+            refreshInbox();
+        }
     }
     if (e.key === 'Escape') {
         document.getElementById('global-search-results').classList.remove('active');
@@ -1707,6 +1878,12 @@ function showGlobalSearchResults(query) {
             </div>`;
         }
         html += `</div>`;
+    }
+
+    // DuckDB full-archive search (async, appended when ready)
+    if (sqlState.conn) {
+        html += `<div class="gsr-section" id="gsr-duckdb"><div class="gsr-title">🗄️ Full Archive (1.78M emails)</div><div class="gsr-item" style="opacity:0.5"><span class="gsr-item-text">Searching...</span></div></div>`;
+        duckdbSearchForGlobal(query);
     }
 
     // Photo results (top 5)
@@ -1819,6 +1996,68 @@ function showGlobalSearchResults(query) {
             }
         });
     });
+}
+
+async function duckdbSearchForGlobal(query) {
+    const section = document.getElementById('gsr-duckdb');
+    if (!section || !sqlState.conn) return;
+    try {
+        const q = query.replace(/'/g, "''");
+        const result = await sqlState.conn.query(`
+            SELECT id, sender, subject, sent_at
+            FROM ${EMAILS_PARQUET}
+            WHERE subject ILIKE '%${q}%' OR sender ILIKE '%${q}%' OR to_recipients ILIKE '%${q}%'
+            LIMIT 8
+        `);
+        const rows = result.toArray();
+
+        // Get count
+        const countResult = await sqlState.conn.query(`
+            SELECT COUNT(*) as c FROM ${EMAILS_PARQUET}
+            WHERE subject ILIKE '%${q}%' OR sender ILIKE '%${q}%' OR to_recipients ILIKE '%${q}%'
+        `);
+        const total = Number(countResult.toArray()[0].c);
+
+        if (!rows.length) {
+            section.innerHTML = `<div class="gsr-title">🗄️ Full Archive</div><div class="gsr-item" style="opacity:0.5"><span class="gsr-item-text">No results in 1.78M emails</span></div>`;
+            return;
+        }
+
+        let html = `<div class="gsr-title">🗄️ Full Archive <span style="opacity:0.5;font-size:11px">${total.toLocaleString()} results</span></div>`;
+        for (const r of rows) {
+            const sender = (r.sender || 'Unknown').replace(/<[^>]+>/g, '').trim();
+            html += `<div class="gsr-item" data-type="archive-search" style="cursor:pointer">
+                <svg class="gsr-item-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4z"/></svg>
+                <span class="gsr-item-text">${esc(r.subject || '(no subject)')}</span>
+                <span class="gsr-item-sub">${esc(sender)}</span>
+            </div>`;
+        }
+        if (total > 8) {
+            html += `<div class="gsr-item" data-type="archive-all" data-query="${esc(query)}" style="color:#27ae60;cursor:pointer">
+                <span class="gsr-item-text">🔍 Browse all ${total.toLocaleString()} results in Full Archive →</span>
+            </div>`;
+        }
+        section.innerHTML = html;
+
+        // Bind archive-all click
+        section.querySelectorAll('[data-type="archive-all"]').forEach(el => {
+            el.addEventListener('click', () => {
+                document.getElementById('global-search-results').classList.remove('active');
+                // Enable archive mode and search
+                if (!archiveState.active) {
+                    document.getElementById('archive-toggle').click();
+                }
+                archiveState.query = query;
+                archiveState.page = 0;
+                archiveState.total = 0;
+                switchView('inbox');
+                loadArchivePage();
+            });
+        });
+    } catch(e) {
+        console.error('DuckDB search error:', e);
+        if (section) section.innerHTML = `<div class="gsr-title">🗄️ Full Archive</div><div class="gsr-item" style="opacity:0.5"><span class="gsr-item-text">Search error</span></div>`;
+    }
 }
 
 document.getElementById('contacts-search').addEventListener('input', (e) => {
