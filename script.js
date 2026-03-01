@@ -1379,12 +1379,21 @@ async function initDuckDB() {
     badge.className = 'sql-badge loading';
     badge.textContent = 'Loading DuckDB...';
     try {
-        const CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/dist/';
-        const duckdb = await import(CDN + 'duckdb-browser.mjs');
+        // Wait for DuckDB module loaded via <script type="module"> in HTML
+        let duckdb = window._duckdb;
+        if (!duckdb) {
+            await new Promise((resolve, reject) => {
+                window.addEventListener('duckdb-ready', resolve, { once: true });
+                setTimeout(() => reject(new Error('DuckDB module load timeout')), 30000);
+            });
+            duckdb = window._duckdb;
+        }
+        if (!duckdb) throw new Error('DuckDB module not available');
+
+        badge.textContent = 'Initializing...';
         const bundles = duckdb.getJsDelivrBundles();
         const bundle = await duckdb.selectBundle(bundles);
 
-        // Create worker via blob URL (required for cross-origin CDN)
         const workerUrl = URL.createObjectURL(
             new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })
         );

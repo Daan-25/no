@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -688,6 +688,12 @@ LIMIT 20;</textarea>
     <!-- Sidebar mobile overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="script.js?v=13"></script>
+    <script src="script.js?v=14"></script>
+    <script type="module">
+        // Pre-load DuckDB-WASM and expose globally for SQL Explorer
+        import * as duckdb from 'https://esm.sh/@duckdb/duckdb-wasm@1.29.0';
+        window._duckdb = duckdb;
+        window.dispatchEvent(new Event('duckdb-ready'));
+    </script>
 </body>
 </html>
