@@ -2317,7 +2317,11 @@ function applyRoute() {
         const folder = params.get('folder');
         if (q) { document.getElementById('search-input').value = q; state.searchQuery = q; }
         if (folder) setFolder(folder);
-        refreshInbox();
+        if (archiveState.active) {
+            loadArchivePage();
+        } else {
+            refreshInbox();
+        }
     }
     if (path === 'photos' && params.get('q')) {
         document.getElementById('photos-search').value = params.get('q');
