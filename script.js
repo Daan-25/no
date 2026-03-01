@@ -1814,6 +1814,7 @@ function switchView(viewId) {
     if (viewId === 'sqlexplorer') initSQLExplorer();
     if (viewId === 'briefing') generateBriefing();
     if (viewId === 'globe') initGlobe();
+    if (viewId === 'conspiracy') initConspiracyBoard();
 }
 
 // === FOLDER / FILTER / SEARCH ===
@@ -2372,6 +2373,7 @@ function applyRoute() {
         inbox:'inbox', contacts:'contacts', flights:'flights', photos:'photos',
         documents:'documents', timeline:'timeline', network:'network', stats:'stats',
         bookmarks:'bookmarks', profiles:'profiles', briefing:'briefing', globe:'globe',
+        conspiracy:'conspiracy',
     };
     const viewId = viewMap[path] || 'inbox';
     switchView(viewId);
@@ -4631,6 +4633,290 @@ function resizeGlobe() {
     globeState.renderer.setSize(W, H);
 }
 window.addEventListener('resize', resizeGlobe);
+
+// ===== CONSPIRACY BOARD (Red String) =====
+const cbState = { inited: false, cards: [], strings: [], zoom: 1, connecting: false, connectFrom: null };
+
+function initConspiracyBoard() {
+    if (cbState.inited) return;
+    cbState.inited = true;
+
+    const board = document.getElementById('conspiracy-board');
+    const cardsEl = document.getElementById('conspiracy-cards');
+    const svgEl = document.getElementById('conspiracy-strings');
+    if (!board || !cardsEl || !svgEl) return;
+
+    // Build card data from contacts, locations, key persons
+    const keyPersons = [
+        { type: 'person', name: 'Jeffrey Epstein', role: 'Principal Subject', color: '#c0392b', img: '👤' },
+        { type: 'person', name: 'Ghislaine Maxwell', role: 'Associate / Recruiter', color: '#8e44ad', img: '👤' },
+        { type: 'person', name: 'Bill Clinton', role: '26 flight logs', color: '#2c3e50', img: '🏛️' },
+        { type: 'person', name: 'Prince Andrew', role: 'Duke of York', color: '#2980b9', img: '👑' },
+        { type: 'person', name: 'Donald Trump', role: 'Social circle pre-2004', color: '#d35400', img: '🏛️' },
+        { type: 'person', name: 'Bill Gates', role: 'Multiple meetings', color: '#27ae60', img: '💻' },
+        { type: 'person', name: 'Alan Dershowitz', role: 'Legal defense', color: '#7f8c8d', img: '⚖️' },
+        { type: 'person', name: 'Les Wexner', role: 'Financial backer', color: '#f39c12', img: '💰' },
+        { type: 'person', name: 'Jean-Luc Brunel', role: 'Model scout', color: '#e74c3c', img: '👤' },
+        { type: 'person', name: 'Sarah Kellen', role: 'Personal assistant', color: '#9b59b6', img: '👤' },
+    ];
+
+    const keyLocations = [
+        { type: 'location', name: 'Little St. James', detail: 'Private island, USVI', color: '#1abc9c', img: '🏝️' },
+        { type: 'location', name: '9 E 71st Street', detail: 'NYC Mansion', color: '#3498db', img: '🏠' },
+        { type: 'location', name: 'Zorro Ranch', detail: 'Stanley, New Mexico', color: '#e67e22', img: '🏜️' },
+        { type: 'location', name: 'Palm Beach Estate', detail: 'El Brillo Way, FL', color: '#2ecc71', img: '🌴' },
+        { type: 'location', name: 'Paris Apartment', detail: 'Avenue Foch, France', color: '#e74c3c', img: '🗼' },
+    ];
+
+    const keyEntities = [
+        { type: 'entity', name: 'Lolita Express', detail: 'Boeing 727-31, N908JE', color: '#f1c40f', img: '✈️' },
+        { type: 'entity', name: 'J. Epstein VI Foundation', detail: 'Financial vehicle', color: '#1abc9c', img: '🏦' },
+        { type: 'entity', name: 'Southern Trust Co.', detail: 'Financial entity', color: '#95a5a6', img: '📋' },
+        { type: 'entity', name: 'MC2 Model Mgmt', detail: 'Brunel/Epstein venture', color: '#e91e63', img: '📸' },
+    ];
+
+    const keyEvents = [
+        { type: 'event', name: 'First Arrest (2006)', detail: 'Palm Beach PD investigation', color: '#e74c3c', img: '🚔' },
+        { type: 'event', name: 'Plea Deal (2008)', detail: 'Controversial NPA by Acosta', color: '#f39c12', img: '⚖️' },
+        { type: 'event', name: 'Second Arrest (2019)', detail: 'SDNY, sex trafficking', color: '#c0392b', img: '🚨' },
+        { type: 'event', name: 'Death (Aug 2019)', detail: 'MCC Manhattan', color: '#2c3e50', img: '💀' },
+        { type: 'event', name: 'Maxwell Trial (2021)', detail: 'Convicted on 5 counts', color: '#8e44ad', img: '🔨' },
+    ];
+
+    const allItems = [...keyPersons, ...keyLocations, ...keyEntities, ...keyEvents];
+
+    // Add contacts from data
+    const topContacts = (state.contacts || [])
+        .filter(c => c.count > 5)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8)
+        .filter(c => !keyPersons.some(p => c.name.includes(p.name.split(' ').pop())));
+
+    topContacts.forEach(c => {
+        allItems.push({ type: 'person', name: c.name, role: `${c.count} emails`, color: '#7f8c8d', img: '📧' });
+    });
+
+    // Default connections (red strings)
+    const defaultStrings = [
+        ['Jeffrey Epstein', 'Ghislaine Maxwell'],
+        ['Jeffrey Epstein', 'Little St. James'],
+        ['Jeffrey Epstein', '9 E 71st Street'],
+        ['Jeffrey Epstein', 'Lolita Express'],
+        ['Jeffrey Epstein', 'Palm Beach Estate'],
+        ['Jeffrey Epstein', 'Les Wexner'],
+        ['Jeffrey Epstein', 'J. Epstein VI Foundation'],
+        ['Ghislaine Maxwell', 'Jean-Luc Brunel'],
+        ['Ghislaine Maxwell', 'Sarah Kellen'],
+        ['Ghislaine Maxwell', 'MC2 Model Mgmt'],
+        ['Ghislaine Maxwell', 'Paris Apartment'],
+        ['Bill Clinton', 'Lolita Express'],
+        ['Prince Andrew', 'Ghislaine Maxwell'],
+        ['Prince Andrew', 'Little St. James'],
+        ['Bill Gates', 'Jeffrey Epstein'],
+        ['Alan Dershowitz', 'Jeffrey Epstein'],
+        ['Jean-Luc Brunel', 'MC2 Model Mgmt'],
+        ['Les Wexner', '9 E 71st Street'],
+        ['Lolita Express', 'Little St. James'],
+        ['Lolita Express', 'Zorro Ranch'],
+        ['Jeffrey Epstein', 'First Arrest (2006)'],
+        ['Jeffrey Epstein', 'Plea Deal (2008)'],
+        ['Jeffrey Epstein', 'Second Arrest (2019)'],
+        ['Jeffrey Epstein', 'Death (Aug 2019)'],
+        ['Ghislaine Maxwell', 'Maxwell Trial (2021)'],
+        ['Donald Trump', 'Palm Beach Estate'],
+        ['Jeffrey Epstein', 'Zorro Ranch'],
+        ['Southern Trust Co.', 'J. Epstein VI Foundation'],
+    ];
+
+    // Layout cards in clusters
+    const bw = board.clientWidth || 1200;
+    const bh = board.clientHeight || 800;
+    const cx = bw / 2, cy = bh / 2;
+
+    function layoutCards() {
+        const groups = { person: [], location: [], entity: [], event: [] };
+        allItems.forEach(item => groups[item.type].push(item));
+
+        const positions = [];
+        // Persons in a ring around center
+        groups.person.forEach((item, i) => {
+            const angle = (i / groups.person.length) * Math.PI * 2 - Math.PI / 2;
+            const r = i === 0 ? 0 : (i < 3 ? 180 : 320);
+            positions.push({ ...item, x: cx + Math.cos(angle) * r - 70, y: cy + Math.sin(angle) * r - 45 });
+        });
+        // Locations top-right
+        groups.location.forEach((item, i) => {
+            positions.push({ ...item, x: bw - 250 - (i % 2) * 200, y: 40 + Math.floor(i / 2) * 120 });
+        });
+        // Entities bottom-left
+        groups.entity.forEach((item, i) => {
+            positions.push({ ...item, x: 40 + (i % 2) * 200, y: bh - 200 + Math.floor(i / 2) * 120 });
+        });
+        // Events bottom-right timeline
+        groups.event.forEach((item, i) => {
+            positions.push({ ...item, x: bw - 250 - (i % 3) * 180, y: bh - 200 + Math.floor(i / 3) * 120 });
+        });
+        return positions;
+    }
+
+    const cardPositions = layoutCards();
+    cbState.cards = cardPositions;
+
+    // Render cards
+    cardsEl.innerHTML = '';
+    cardPositions.forEach((card, idx) => {
+        const el = document.createElement('div');
+        el.className = `cb-card cb-type-${card.type}`;
+        el.style.left = card.x + 'px';
+        el.style.top = card.y + 'px';
+        el.dataset.idx = idx;
+        el.dataset.name = card.name;
+
+        const typeLabel = { person: 'PERSON OF INTEREST', location: 'LOCATION', entity: 'ENTITY', event: 'KEY EVENT' }[card.type];
+
+        el.innerHTML = `
+            <div class="cb-card-pin" style="background:${card.color}"></div>
+            <div class="cb-card-type">${typeLabel}</div>
+            <div class="cb-card-icon">${card.img}</div>
+            <div class="cb-card-name">${card.name}</div>
+            <div class="cb-card-detail">${card.role || card.detail || ''}</div>
+        `;
+
+        // Drag functionality
+        let dragging = false, startX, startY, origX, origY;
+        el.addEventListener('mousedown', (e) => {
+            if (cbState.connecting) return;
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            origX = parseFloat(el.style.left); origY = parseFloat(el.style.top);
+            el.style.zIndex = 100;
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            const dx = (e.clientX - startX) / cbState.zoom;
+            const dy = (e.clientY - startY) / cbState.zoom;
+            const nx = origX + dx, ny = origY + dy;
+            el.style.left = nx + 'px';
+            el.style.top = ny + 'px';
+            cbState.cards[idx].x = nx;
+            cbState.cards[idx].y = ny;
+            drawStrings();
+        });
+        document.addEventListener('mouseup', () => { if (dragging) { dragging = false; el.style.zIndex = ''; } });
+
+        // Touch drag
+        el.addEventListener('touchstart', (e) => {
+            if (cbState.connecting) return;
+            dragging = true;
+            startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+            origX = parseFloat(el.style.left); origY = parseFloat(el.style.top);
+            el.style.zIndex = 100;
+        }, { passive: true });
+        document.addEventListener('touchmove', (e) => {
+            if (!dragging) return;
+            const dx = (e.touches[0].clientX - startX) / cbState.zoom;
+            const dy = (e.touches[0].clientY - startY) / cbState.zoom;
+            el.style.left = (origX + dx) + 'px';
+            el.style.top = (origY + dy) + 'px';
+            cbState.cards[idx].x = origX + dx;
+            cbState.cards[idx].y = origY + dy;
+            drawStrings();
+        }, { passive: true });
+        document.addEventListener('touchend', () => { if (dragging) { dragging = false; el.style.zIndex = ''; } });
+
+        // Connect mode click
+        el.addEventListener('click', () => {
+            if (!cbState.connecting) return;
+            if (!cbState.connectFrom) {
+                cbState.connectFrom = card.name;
+                el.classList.add('cb-selected');
+                document.getElementById('cb-hint').textContent = `Select second card to connect to "${card.name}"...`;
+            } else if (cbState.connectFrom !== card.name) {
+                const exists = cbState.strings.some(s =>
+                    (s[0] === cbState.connectFrom && s[1] === card.name) ||
+                    (s[1] === cbState.connectFrom && s[0] === card.name));
+                if (!exists) {
+                    cbState.strings.push([cbState.connectFrom, card.name]);
+                    drawStrings();
+                }
+                document.querySelectorAll('.cb-selected').forEach(c => c.classList.remove('cb-selected'));
+                cbState.connecting = false;
+                cbState.connectFrom = null;
+                document.getElementById('cb-hint').textContent = 'Connection added! Drag cards to rearrange • Click "Connect" then two cards';
+                document.getElementById('cb-add-string').classList.remove('active');
+            }
+        });
+
+        cardsEl.appendChild(el);
+    });
+
+    // Draw red strings (SVG lines)
+    cbState.strings = [...defaultStrings];
+
+    function drawStrings() {
+        svgEl.innerHTML = '';
+        const cardW = 140, cardH = 90;
+        cbState.strings.forEach(([fromName, toName]) => {
+            const from = cbState.cards.find(c => c.name === fromName);
+            const to = cbState.cards.find(c => c.name === toName);
+            if (!from || !to) return;
+
+            const x1 = from.x + cardW / 2, y1 = from.y + cardH / 2;
+            const x2 = to.x + cardW / 2, y2 = to.y + cardH / 2;
+
+            // Slightly curved line for realism
+            const mx = (x1 + x2) / 2 + (Math.random() - 0.5) * 20;
+            const my = (y1 + y2) / 2 + (Math.random() - 0.5) * 20 - 15;
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M${x1},${y1} Q${mx},${my} ${x2},${y2}`);
+            path.setAttribute('class', 'cb-string');
+            svgEl.appendChild(path);
+
+            // Pin dots at endpoints
+            [{ cx: x1, cy: y1 }, { cx: x2, cy: y2 }].forEach(({ cx: px, cy: py }) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', px);
+                circle.setAttribute('cy', py);
+                circle.setAttribute('r', '3');
+                circle.setAttribute('fill', '#c0392b');
+                svgEl.appendChild(circle);
+            });
+        });
+    }
+
+    drawStrings();
+
+    // Controls
+    document.getElementById('cb-add-string')?.addEventListener('click', () => {
+        cbState.connecting = !cbState.connecting;
+        cbState.connectFrom = null;
+        document.querySelectorAll('.cb-selected').forEach(c => c.classList.remove('cb-selected'));
+        document.getElementById('cb-add-string').classList.toggle('active', cbState.connecting);
+        document.getElementById('cb-hint').textContent = cbState.connecting
+            ? 'Click two cards to connect them with a red string...'
+            : 'Drag cards to rearrange • Click "Connect" then two cards to draw a red string';
+    });
+
+    document.getElementById('cb-reset')?.addEventListener('click', () => {
+        cbState.inited = false;
+        cbState.strings = [];
+        initConspiracyBoard();
+    });
+
+    document.getElementById('cb-zoom-in')?.addEventListener('click', () => {
+        cbState.zoom = Math.min(2, cbState.zoom + 0.15);
+        cardsEl.style.transform = `scale(${cbState.zoom})`;
+        svgEl.style.transform = `scale(${cbState.zoom})`;
+    });
+
+    document.getElementById('cb-zoom-out')?.addEventListener('click', () => {
+        cbState.zoom = Math.max(0.4, cbState.zoom - 0.15);
+        cardsEl.style.transform = `scale(${cbState.zoom})`;
+        svgEl.style.transform = `scale(${cbState.zoom})`;
+    });
+}
 
 // ===== HACKER TERMINAL =====
 (function initTerminal() {

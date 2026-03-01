@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=27">
+    <link rel="stylesheet" href="style.css?v=28">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -148,6 +148,10 @@
                 <button class="app-btn" data-view="globe" title="3D Globe">
                     <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M17.9 17.39c-.26-.8-1.01-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39zM11 19.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
                     <span class="app-label">Globe</span>
+                </button>
+                <button class="app-btn" data-view="conspiracy" title="Conspiracy Board">
+                    <svg class="app-icon" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7V5h10v14zM8 7h3v2H8V7zm5 0h3v2h-3V7zm-5 4h3v2H8v-2zm5 0h3v2h-3v-2zm-5 4h3v2H8v-2zm5 0h3v2h-3v-2z"/></svg>
+                    <span class="app-label">Board</span>
                 </button>
             </div>
             <div class="sidebar-folders" id="sidebar-folders">
@@ -669,6 +673,21 @@ LIMIT 20;</textarea>
                     <div class="globe-tooltip" id="globe-tooltip"></div>
                 </div>
             </div>
+            <!-- CONSPIRACY BOARD VIEW -->
+            <div class="view" id="view-conspiracy">
+                <div class="conspiracy-board" id="conspiracy-board">
+                    <svg class="conspiracy-strings" id="conspiracy-strings"></svg>
+                    <div class="conspiracy-cards" id="conspiracy-cards"></div>
+                    <div class="conspiracy-toolbar">
+                        <button class="cb-btn" id="cb-add-string" title="Draw Connection">🧵 Connect</button>
+                        <button class="cb-btn" id="cb-reset" title="Reset Layout">🔄 Reset</button>
+                        <button class="cb-btn" id="cb-zoom-in" title="Zoom In">➕</button>
+                        <button class="cb-btn" id="cb-zoom-out" title="Zoom Out">➖</button>
+                        <span class="cb-hint" id="cb-hint">Drag cards to rearrange • Click "Connect" then two cards to draw a red string</span>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -760,7 +779,7 @@ LIMIT 20;</textarea>
         </div>
     </div>
 
-    <script src="script.js?v=27"></script>
+    <script src="script.js?v=28"></script>
     <script type="module">
         // Pre-load DuckDB-WASM and expose globally for SQL Explorer
         import * as duckdb from 'https://esm.sh/@duckdb/duckdb-wasm@1.29.0';
