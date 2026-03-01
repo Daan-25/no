@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsealed — The Epstein Email Archive</title>
-    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="stylesheet" href="style.css?v=18">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a73e8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -186,16 +186,16 @@
                         <button class="toolbar-btn" id="export-csv-btn" title="Export as CSV">
                             <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                         </button>
-                        <button class="toolbar-btn archive-toggle" id="archive-toggle" title="Switch to Full Archive (1.78M emails via DuckDB)" style="display:none">
-                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zM6 17v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V17c0 .5-2.13 2-6 2s-6-1.5-6-2zm0-4v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V13c0 .5-2.13 2-6 2s-6-1.5-6-2z"/></svg>
-                            <span class="archive-label">Full Archive</span>
-                        </button>
                         <select id="filter-select">
                             <option value="all">All Mail</option>
                             <option value="from-epstein">From Epstein</option>
                             <option value="to-epstein">To Epstein</option>
                             <option value="attachments">Has Attachments</option>
                         </select>
+                        <button class="toolbar-btn archive-toggle" id="archive-toggle" title="Switch to Full Archive (1.78M emails via DuckDB)" style="display:none">
+                            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zM6 17v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V17c0 .5-2.13 2-6 2s-6-1.5-6-2zm0-4v-1.42c1.23.85 3.47 1.42 6 1.42s4.77-.57 6-1.42V13c0 .5-2.13 2-6 2s-6-1.5-6-2z"/></svg>
+                            <span class="archive-label">Full Archive</span>
+                        </button>
                     </div>
                 </div>
                 <div class="advanced-filters" id="advanced-filters" style="display:none">
@@ -692,7 +692,7 @@ LIMIT 20;</textarea>
     <!-- Sidebar mobile overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="script.js?v=17"></script>
+    <script src="script.js?v=18"></script>
     <script type="module">
         // Pre-load DuckDB-WASM and expose globally for SQL Explorer
         import * as duckdb from 'https://esm.sh/@duckdb/duckdb-wasm@1.29.0';
