@@ -2618,14 +2618,111 @@ function buildThreadTimeline(messages) {
 }
 
 // Shared email detail renderer (used by both detail view and reading pane)
+function analyzeEmail(thread) {
+    const allText = thread.map(m => `${m.from || ''} ${m.to || ''} ${m.subject || ''} ${m.body || ''}`).join(' ').toLowerCase();
+    const allParticipants = thread.flatMap(m => [m.from || '', m.to || '', m.from_email || '']);
+
+    // Key locations
+    const locations = [];
+    const locationKw = {
+        'little st. james': '🏝️', 'virgin islands': '🏝️', 'new york': '🏙️', 'manhattan': '🏙️',
+        'palm beach': '🌴', 'paris': '🇫🇷', 'london': '🇬🇧', 'new mexico': '🏜️', 'zorro ranch': '🏜️',
+        'ohio': '📍', 'washington': '🏛️', 'florida': '🌴', 'caribbean': '🏝️', 'israel': '🇮🇱',
+        'bahamas': '🏝️', 'tokyo': '🇯🇵', 'africa': '🌍', 'harvard': '🎓', 'mit': '🎓',
+        'white house': '🏛️', 'buckingham': '👑', 'clinton': '🏛️'
+    };
+    for (const [loc, emoji] of Object.entries(locationKw)) {
+        if (allText.includes(loc)) locations.push(emoji + ' ' + loc.replace(/\b\w/g, c => c.toUpperCase()));
+    }
+
+    // Key topics
+    const topics = [];
+    const topicKw = {
+        'money': '💰 Financial', 'wire': '💰 Wire Transfer', 'transfer': '💰 Transfer', 'payment': '💰 Payment',
+        'donation': '💰 Donation', 'fund': '💰 Funding', 'invest': '📈 Investment',
+        'flight': '✈️ Travel', 'plane': '✈️ Aviation', 'jet': '✈️ Private Jet', 'travel': '✈️ Travel',
+        'meeting': '🤝 Meeting', 'dinner': '🍽️ Dinner', 'party': '🎉 Party', 'event': '📅 Event',
+        'lawyer': '⚖️ Legal', 'attorney': '⚖️ Legal', 'court': '⚖️ Court', 'legal': '⚖️ Legal',
+        'foundation': '🏛️ Foundation', 'charity': '🎗️ Charity', 'school': '🎓 Education',
+        'girl': '⚠️ Persons', 'massage': '⚠️ Services', 'model': '⚠️ Modeling',
+        'photograph': '📸 Photography', 'island': '🏝️ Island', 'property': '🏠 Property',
+        'secret': '🔒 Classified', 'private': '🔒 Private', 'confidential': '🔒 Confidential',
+        'press': '📰 Media', 'reporter': '📰 Media', 'journalist': '📰 Media', 'article': '📰 Media'
+    };
+    const seenTopics = new Set();
+    for (const [kw, topic] of Object.entries(topicKw)) {
+        if (allText.includes(kw) && !seenTopics.has(topic)) {
+            seenTopics.add(topic);
+            topics.push(topic);
+        }
+    }
+
+    // Suspicion score (0-100)
+    let score = 10; // baseline
+    const highRiskKw = ['island', 'massage', 'girl', 'model', 'secret', 'destroy', 'delete', 'shred', 'cover', 'deny'];
+    const medRiskKw = ['private', 'confidential', 'cash', 'wire', 'off the record', 'between us', 'no one', 'quiet'];
+    const lowRiskKw = ['meeting', 'dinner', 'flight', 'travel', 'foundation', 'donation'];
+    for (const kw of highRiskKw) { if (allText.includes(kw)) score += 15; }
+    for (const kw of medRiskKw) { if (allText.includes(kw)) score += 8; }
+    for (const kw of lowRiskKw) { if (allText.includes(kw)) score += 3; }
+    if (thread.some(m => m.avatar_color === '#c0392b')) score += 10; // from Epstein
+    score = Math.min(100, score);
+
+    const scoreColor = score >= 70 ? '#e74c3c' : score >= 40 ? '#f39c12' : '#27ae60';
+    const scoreLabel = score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW';
+
+    // Notable names detection
+    const notableNames = [
+        'ghislaine', 'maxwell', 'prince andrew', 'alan dershowitz', 'bill clinton',
+        'donald trump', 'bill gates', 'les wexner', 'jean-luc brunel', 'brunel',
+        'victoria secret', 'harvard', 'acosta', 'steve bannon', 'ehud barak',
+        'leon black', 'woody allen', 'kevin spacey', 'naomi campbell'
+    ];
+    const foundNames = notableNames.filter(n => allText.includes(n))
+        .map(n => n.replace(/\b\w/g, c => c.toUpperCase()));
+
+    if (!topics.length && !locations.length && !foundNames.length && score <= 15) return '';
+
+    let html = '<div class="intel-panel">';
+    html += '<div class="intel-header"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg> INTEL ANALYSIS</div>';
+    html += '<div class="intel-body">';
+
+    // Score meter
+    html += `<div class="intel-score">
+        <div class="intel-score-label">Suspicion Level: <strong style="color:${scoreColor}">${scoreLabel}</strong></div>
+        <div class="intel-meter"><div class="intel-meter-fill" style="width:${score}%;background:${scoreColor}"></div></div>
+        <div class="intel-score-num" style="color:${scoreColor}">${score}/100</div>
+    </div>`;
+
+    // Notable names
+    if (foundNames.length) {
+        html += `<div class="intel-section"><span class="intel-tag-label">👤 Notable Names:</span> ${foundNames.map(n => `<span class="intel-tag name">${esc(n)}</span>`).join(' ')}</div>`;
+    }
+
+    // Topics
+    if (topics.length) {
+        html += `<div class="intel-section"><span class="intel-tag-label">📋 Topics:</span> ${topics.slice(0, 8).map(t => `<span class="intel-tag topic">${t}</span>`).join(' ')}</div>`;
+    }
+
+    // Locations
+    if (locations.length) {
+        html += `<div class="intel-section"><span class="intel-tag-label">📍 Locations:</span> ${locations.slice(0, 6).map(l => `<span class="intel-tag location">${esc(l)}</span>`).join(' ')}</div>`;
+    }
+
+    html += '</div></div>';
+    return html;
+}
+
 function buildEmailDetailHTML(thread) {
     const firstBody = thread[0]?.body || '';
     const summary = generateSummary(firstBody);
     const summaryHTML = summary ? `<div class="email-summary"><strong>Summary:</strong> ${esc(summary)}</div>` : '';
     const timeline = buildThreadTimeline(thread);
 
+    const intelHTML = analyzeEmail(thread);
+
     return (thread[0] ? `<h1 class="email-detail-subject">${esc(thread[0].subject)}</h1>` : '') +
-        summaryHTML + timeline +
+        intelHTML + summaryHTML + timeline +
         thread.map((msg, i) => {
             const color = msg.avatar_color || getColor(msg.from);
             const body = msg.body || '(no content)';

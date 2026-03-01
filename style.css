@@ -2980,6 +2980,110 @@ input:focus, select:focus, textarea:focus {
     margin: 8px 12px 0;
 }
 
+/* ===== INTEL ANALYSIS PANEL ===== */
+.intel-panel {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    margin: 12px 0 16px;
+    overflow: hidden;
+    animation: intelSlide 0.4s ease;
+}
+@keyframes intelSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.intel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--bg-hover);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-family: 'Special Elite', monospace;
+    border-bottom: 1px solid var(--border);
+}
+.intel-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.intel-score {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.intel-score-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.intel-meter {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 200px;
+}
+.intel-meter-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 8px currentColor;
+}
+.intel-score-num {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    min-width: 50px;
+}
+.intel-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+.intel-tag-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.intel-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid;
+}
+.intel-tag.name {
+    background: rgba(192, 57, 43, 0.1);
+    color: #e74c3c;
+    border-color: rgba(192, 57, 43, 0.3);
+}
+.intel-tag.topic {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    border-color: rgba(52, 152, 219, 0.3);
+}
+.intel-tag.location {
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+    border-color: rgba(39, 174, 96, 0.3);
+}
+
+@media (max-width: 768px) {
+    .intel-score { flex-wrap: wrap; }
+    .intel-meter { max-width: 100%; }
+}
+
 /* ===== HACKER TERMINAL ===== */
 .terminal-overlay {
     display: none;
