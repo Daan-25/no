@@ -1,4 +1,4 @@
-const CACHE_NAME = 'unsealed-v34';
+const CACHE_NAME = 'unsealed-v35';
 const PRECACHE = ['/', '/index.html', '/style.css', '/script.js'];
 
 self.addEventListener('install', e => {
