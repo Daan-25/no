@@ -413,7 +413,7 @@ async function openEmail(emailId, docId) {
                         body: r.content_markdown || r.content_html || '(no content)',
                         formatted_date: date ? date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '',
                         formatted_time: date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
-                        avatar_color: r.epstein_is_sender ? '#d4a017' : null,
+                        avatar_color: r.epstein_is_sender ? '#c0392b' : null,
                         attachments: Number(r.attachments) || 0,
                         stars: 0
                     };
@@ -1357,7 +1357,7 @@ function runSixDegreesSearch(query) {
     // Build chain
     const chainEl = document.getElementById('sixdeg-chain');
     chainEl.innerHTML = '';
-    const colors = ['#2980b9', '#8e44ad', '#27ae60', '#e67e22', '#d4a017', '#16a085', '#d35400'];
+    const colors = ['#2980b9', '#8e44ad', '#27ae60', '#e67e22', '#c0392b', '#16a085', '#d35400'];
 
     for (let i = 0; i < path.length; i++) {
         const node = path[i];
@@ -1622,7 +1622,7 @@ async function loadArchivePage() {
             sent: r.epstein_is_sender || false,
             ep: r.epstein_is_sender || false,
             att: Number(r.attachments) || 0,
-            ac: r.epstein_is_sender ? '#d4a017' : null,
+            ac: r.epstein_is_sender ? '#c0392b' : null,
             _archive: true
         }));
 
@@ -2667,10 +2667,10 @@ function analyzeEmail(thread) {
     for (const kw of highRiskKw) { if (allText.includes(kw)) score += 15; }
     for (const kw of medRiskKw) { if (allText.includes(kw)) score += 8; }
     for (const kw of lowRiskKw) { if (allText.includes(kw)) score += 3; }
-    if (thread.some(m => m.avatar_color === '#d4a017')) score += 10; // from Epstein
+    if (thread.some(m => m.avatar_color === '#c0392b')) score += 10; // from Epstein
     score = Math.min(100, score);
 
-    const scoreColor = score >= 70 ? '#d4a017' : score >= 40 ? '#f39c12' : '#27ae60';
+    const scoreColor = score >= 70 ? '#e74c3c' : score >= 40 ? '#f39c12' : '#27ae60';
     const scoreLabel = score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW';
 
     // Notable names detection
@@ -2920,12 +2920,12 @@ function renderFlightMap() {
 
             // Glow layer (wider, transparent)
             L.polyline(arc, {
-                color: selectedPassenger ? '#d4a017' : '#3498db',
+                color: selectedPassenger ? '#e74c3c' : '#3498db',
                 weight: weight + 4, opacity: opacity * 0.3, className: 'flight-arc'
             }).addTo(routeLayer);
             // Main arc
             const line = L.polyline(arc, {
-                color: selectedPassenger ? '#d4a017' : '#3498db',
+                color: selectedPassenger ? '#e74c3c' : '#3498db',
                 weight: weight, opacity: opacity, dashArray: data.count > 3 ? null : '8 4',
                 className: 'flight-arc'
             }).addTo(routeLayer);
@@ -4274,7 +4274,7 @@ function generateBriefing() {
         suspWords.forEach(w => { if (sub.includes(w)) dayThreat++; });
     });
     const threatLevel = dayThreat >= 5 ? 'ELEVATED' : dayThreat >= 2 ? 'GUARDED' : 'LOW';
-    const threatColor = dayThreat >= 5 ? '#d4a017' : dayThreat >= 2 ? '#f39c12' : '#27ae60';
+    const threatColor = dayThreat >= 5 ? '#e74c3c' : dayThreat >= 2 ? '#f39c12' : '#27ae60';
 
     let html = '';
 
@@ -4475,7 +4475,7 @@ function initGlobe() {
 
     // Add location dots
     const dotGeo = new THREE.SphereGeometry(0.015, 8, 8);
-    const dotMat = new THREE.MeshBasicMaterial({ color: 0xd4a017 });
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0xc0392b });
     const locNames = Object.keys(locations);
     locNames.forEach(name => {
         const [lat, lon] = locations[name];
@@ -4487,7 +4487,7 @@ function initGlobe() {
 
         // Glow ring
         const ringGeo = new THREE.RingGeometry(0.02, 0.035, 16);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4a017, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xc0392b, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.position.copy(pos);
         ring.lookAt(new THREE.Vector3(0, 0, 0));
